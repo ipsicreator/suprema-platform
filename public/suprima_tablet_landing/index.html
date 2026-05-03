@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>수프리마 AI 솔루션 플랫폼</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #020b18;
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      color: #fff;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: auto;
+    }
+    .tablet-frame {
+      width: 1366px;
+      height: 1024px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 70% 32%, rgba(18, 68, 102, 0.24), transparent 28%),
+        radial-gradient(circle at 18% 42%, rgba(21, 78, 142, 0.20), transparent 34%),
+        linear-gradient(180deg, #06152a 0%, #020a15 55%, #071426 100%);
+      border: 1px solid rgba(216, 167, 94, 0.28);
+      border-radius: 14px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+    }
+    .tablet-frame::before,
+    .tablet-frame::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      opacity: .42;
+    }
+    .tablet-frame::before {
+      width: 720px;
+      height: 250px;
+      left: -120px;
+      top: 38px;
+      background: repeating-radial-gradient(ellipse at center, rgba(90,150,220,.16) 0 1px, transparent 2px 9px);
+      transform: rotate(-8deg);
+      filter: blur(.2px);
+    }
+    .tablet-frame::after {
+      width: 560px;
+      height: 420px;
+      right: -130px;
+      top: 92px;
+      border-radius: 50%;
+      border: 1px solid rgba(120, 160, 220, .16);
+      box-shadow: inset 0 0 0 30px rgba(120, 160, 220, .02), inset 0 0 0 70px rgba(120, 160, 220, .025), inset 0 0 0 120px rgba(120, 160, 220, .02);
+      transform: rotate(-16deg);
+    }
+    .top-btn {
+      position: absolute;
+      top: 36px;
+      right: 58px;
+      padding: 11px 25px;
+      border-radius: 8px;
+      border: 1px solid rgba(218, 173, 110, .55);
+      background: rgba(7,18,35,.56);
+      color: #f3eadf;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .hero {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding-top: 84px;
+      text-align: center;
+    }
+    .brand-panel {
+      width: 650px;
+      height: 155px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #d9d4cd 0%, #cbc5bd 100%);
+      border: 2px solid #e4bd82;
+      border-radius: 18px;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.24) inset, 0 14px 32px rgba(0,0,0,.34), 0 0 20px rgba(214,164,91,.26);
+    }
+    .brand-panel h1 {
+      margin: 0;
+      color: #050a11;
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: -0.075em;
+      line-height: 1.1;
+      text-shadow: 0 1px 0 rgba(255,255,255,.60);
+    }
+    .brand-panel p {
+      margin: 13px 0 0;
+      color: #111;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.055em;
+    }
+    .tagline {
+      margin: 30px auto 22px;
+      color: #e9edf5;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      text-shadow: 0 2px 8px rgba(0,0,0,.45);
+    }
+    .tagline span { color: #d9a85f; padding: 0 16px; }
+    .login-row {
+      width: 965px;
+      margin: 0 auto 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .login-btn {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      border: 1px solid rgba(211, 150, 83, .45);
+      border-radius: 10px;
+      background: rgba(9, 22, 43, .82);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .icon { font-size: 30px; font-weight: 900; line-height: 1; }
+    .google { color: #4285f4; }
+    .naver { color: #03c75a; }
+    .kakao { color: #ffd43b; }
+    .services {
+      width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .service-card {
+      position: relative;
+      height: 310px;
+      padding: 48px 42px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(62,135,255,.55);
+      background: linear-gradient(135deg, rgba(7, 25, 57, .98), rgba(4, 12, 28, .96));
+      box-shadow: inset 0 0 35px rgba(30,90,180,.18), 0 20px 40px rgba(0,0,0,.28);
+      text-align: left;
+    }
+    .service-card.green {
+      border-color: rgba(24, 178, 125, .55);
+      background: linear-gradient(135deg, rgba(4, 48, 43, .98), rgba(2, 27, 27, .96));
+      box-shadow: inset 0 0 35px rgba(22,185,136,.16), 0 20px 40px rgba(0,0,0,.28);
+    }
+    .service-no { color: #2e93ff; font-size: 16px; font-weight: 900; letter-spacing: .02em; }
+    .green .service-no { color: #20e0a6; }
+    .service-card h2 {
+      margin: 12px 0 12px;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      line-height: 1.15;
+    }
+    .bar { width: 34px; height: 2px; background: #2e93ff; margin: 0 0 24px; }
+    .green .bar { background: #20e0a6; }
+    .service-card p {
+      width: 55%;
+      margin: 0 0 28px;
+      color: #d7dfed;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.8;
+      letter-spacing: -0.035em;
+    }
+    .cta {
+      width: 185px;
+      height: 48px;
+      border-radius: 9px;
+      border: 1px solid #2e93ff;
+      background: rgba(11,38,76,.58);
+      color: #3ba2ff;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+    .green .cta { border-color: #13b985; color: #20e0a6; background: rgba(9,64,52,.42); }
+    .visual {
+      position: absolute;
+      right: 35px;
+      bottom: 32px;
+      width: 260px;
+      height: 210px;
+      opacity: .95;
+    }
+    .ai-visual::before {
+      content: "AI";
+      position: absolute;
+      right: 78px;
+      top: 68px;
+      width: 70px;
+      height: 70px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      border: 2px solid #4fb4ff;
+      color: #bce7ff;
+      font-size: 30px;
+      font-weight: 900;
+      background: rgba(16,88,178,.55);
+      box-shadow: 0 0 28px #1f8cff;
+    }
+    .ai-visual::after {
+      content: "";
+      position: absolute;
+      right: 55px;
+      top: 20px;
+      width: 180px;
+      height: 115px;
+      border: 1px solid rgba(64,158,255,.65);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(42,119,222,.20), rgba(16,43,91,.18));
+      box-shadow: 0 0 28px rgba(50,138,255,.28);
+    }
+    .target-visual::before {
+      content: "";
+      position: absolute;
+      right: 30px;
+      top: 22px;
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4f7f7 0 11%, #265a5c 12% 24%, #f0f5f4 25% 39%, #265a5c 40% 54%, #eff5f4 55% 68%, #1d5758 69% 100%);
+      box-shadow: 0 0 35px rgba(45,230,191,.30);
+    }
+    .target-visual::after {
+      content: "➜";
+      position: absolute;
+      right: 30px;
+      top: 3px;
+      color: #d8a446;
+      font-size: 90px;
+      transform: rotate(-38deg);
+      text-shadow: 0 2px 5px rgba(0,0,0,.5);
+    }
+    .bars {
+      position: absolute;
+      right: 16px;
+      bottom: 15px;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .bars i { display: block; width: 22px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #28dcae, #126f66); box-shadow: 0 0 12px rgba(32,224,166,.35); }
+    .bars i:nth-child(1){height:52px}.bars i:nth-child(2){height:72px}.bars i:nth-child(3){height:46px}.bars i:nth-child(4){height:38px}.bars i:nth-child(5){height:62px}.bars i:nth-child(6){height:92px}
+    footer {
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 248px;
+      border-top: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(4,13,28,.72), rgba(4,12,24,.96));
+      padding: 34px 72px 24px;
+    }
+    .footer-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      align-items: center;
+    }
+    .footer-col {
+      height: 145px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 38px;
+      border-right: 1px solid rgba(255,255,255,.20);
+    }
+    .footer-col:first-child { padding-left: 0; align-items: center; }
+    .footer-col:last-child { border-right: 0; padding-right: 0; }
+    .footer-logo {
+      width: 250px;
+      max-height: 96px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.45));
+    }
+    .info-title {
+      margin-bottom: 14px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.055em;
+    }
+    .info-line, .social-line {
+      margin: 7px 0;
+      color: #ecf0f7;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 1.35;
+    }
+    .info-label { color: #d8a85f; margin-right: 8px; }
+    .social-line { display: flex; align-items: center; gap: 13px; }
+    .social-icon {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      flex: 0 0 34px;
+      box-shadow: 0 5px 14px rgba(0,0,0,.32);
+    }
+    .band { background: #28c268; }
+    .blog { background: #51cb4c; }
+    .insta { background: linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7); }
+    .copy {
+      margin-top: 18px;
+      text-align: center;
+      color: rgba(230,234,242,.72);
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+    @media (max-width: 1365px) {
+      body { justify-content: flex-start; }
+      .tablet-frame { flex: 0 0 1366px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="tablet-frame">
+    <button class="top-btn">센터 소개</button>
+
+    <section class="hero">
+      <div class="brand-panel">
+        <h1>수프리마 AI 솔루션 플랫폼</h1>
+        <p>Su·Prima 입시&amp;코칭센터</p>
+      </div>
+
+      <div class="tagline"><span>❮</span>입시의 본질을 분석하고, 최적의 전략으로 합격을 설계합니다.<span>❯</span></div>
+
+      <div class="login-row">
+        <div class="login-btn"><span class="icon google">G</span>구글로 시작하기</div>
+        <div class="login-btn"><span class="icon naver">N</span>네이버로 시작하기</div>
+        <div class="login-btn"><span class="icon kakao">●</span>카카오로 시작하기</div>
+      </div>
+
+      <div class="services">
+        <article class="service-card">
+          <div class="service-no">SERVICE 01</div>
+          <h2>AI 탐구 세특 솔루션</h2>
+          <div class="bar"></div>
+          <p>학생의 관심사와 진로에 맞춘 심화 탐구 주제를 추천하고, 전문가 수준의 세특 문장을 자동으로 생성합니다.</p>
+          <button class="cta">솔루션 시작하기 →</button>
+          <div class="visual ai-visual"></div>
+        </article>
+
+        <article class="service-card green">
+          <div class="service-no">SERVICE 02</div>
+          <h2>나의 입시 위치 진단</h2>
+          <div class="bar"></div>
+          <p>학생부 분석을 통해 종합 등급을 산출하고, 대학별 합격 컷과 비교하여 최적의 지원 전략을 제시합니다.</p>
+          <button class="cta">진단 시작하기 →</button>
+          <div class="visual target-visual"><div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img class="footer-logo" src="assets/logo.png" alt="대치 수프리마 Su·Prima 입시&코칭 센터 로고" />
+        </div>
+
+        <div class="footer-col">
+          <div class="info-title">대치수프리마 입시&amp;코칭센터</div>
+          <div class="info-line"><span class="info-label">대표 :</span>이기욱 대표컨설턴트</div>
+          <div class="info-line"><span class="info-label">연락처 :</span>010-2370-1077(문자전송)</div>
+          <div class="info-line"><span class="info-label">소재지 :</span>서울시 강남구 테헤란로 326 B1F</div>
+        </div>
+
+        <div class="footer-col">
+          <div class="social-line"><span class="social-icon band">b</span>네이버 밴드 : band.us/@suprima</div>
+          <div class="social-line"><span class="social-icon blog">blog</span>블로그 : https://blog.naver.com/gouniv_hifive</div>
+          <div class="social-line"><span class="social-icon insta">◎</span>인스타그램 : suprima_ipsicreator</div>
+        </div>
+      </div>
+      <div class="copy">© 2025 Su·Prima 입시&amp;코칭 센터. All rights reserved.</div>
+    </footer>
+  </main>
+</body>
+</html>
