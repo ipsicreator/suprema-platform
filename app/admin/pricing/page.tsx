@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import RequireAuth from "../../components/auth/RequireAuth";
+import AdminOnly from "../../components/auth/AdminOnly";
 
 interface Plan {
   planId: string;
@@ -58,6 +59,7 @@ export default function AdminPricingPage() {
   return (
     <main className="container" style={{ paddingTop: "3rem", paddingBottom: "3rem" }}>
       <RequireAuth>
+        <AdminOnly>
         <h1 className="page-title" style={{ fontSize: "2rem", marginBottom: "1rem" }}>관리자 - 가격 설정</h1>
         <p className="page-subtitle">월 가격, 1회 가격, 허용 개월(1/3/6)을 수정할 수 있습니다.</p>
         <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1rem" }}>
@@ -187,6 +189,7 @@ export default function AdminPricingPage() {
         )}
 
         {message && <p style={{ marginTop: "1rem", color: "var(--text-secondary)" }}>{message}</p>}
+        </AdminOnly>
       </RequireAuth>
     </main>
   );
