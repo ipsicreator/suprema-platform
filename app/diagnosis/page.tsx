@@ -1,8 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import UserInfoForm, { UserInfo } from "../components/UserInfoForm";
+import RequireAuth from "../components/auth/RequireAuth";
+
+interface HolisticResult {
+  summary?: string;
+  detail?: Record<string, number>;
+  ai_comment?: string;
+  level?: number;
+}
+
+interface ChoiceItem {
+  university: string;
+  department: string;
+  admission_type: string;
+  track_name: string;
+}
+
+interface EvaluatedChoice extends ChoiceItem {
+  diag_level: string;
+  diag_reason: string;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  error?: string;
+  result?: T;
+  universities?: string[];
+  evaluated?: EvaluatedChoice[];
+}
 
 export default function DiagnosisPage() {
   const [step, setStep] = useState(1);
@@ -11,13 +39,13 @@ export default function DiagnosisPage() {
   // Step 2
   const [pdfBase64, setPdfBase64] = useState("");
   const [aiEnabled, setAiEnabled] = useState(false);
-  const [holisticResult, setHolisticResult] = useState<any>(null);
+  const [holisticResult, setHolisticResult] = useState<HolisticResult | null>(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
 
   // Step 3
   const [universities, setUniversities] = useState<string[]>([]);
-  const [choices, setChoices] = useState<any[]>(Array(6).fill({ university: "", department: "", admission_type: "", track_name: "" }));
-  const [evaluated, setEvaluated] = useState<any[]>([]);
+  const [choices, setChoices] = useState<ChoiceItem[]>(Array.from({ length: 6 }, () => ({ university: "", department: "", admission_type: "", track_name: "" })));
+  const [evaluated, setEvaluated] = useState<EvaluatedChoice[]>([]);
   const [loadingEval, setLoadingEval] = useState(false);
 
   const handleNextInfo = (info: UserInfo) => {
@@ -51,13 +79,13 @@ export default function DiagnosisPage() {
           ai_enabled: aiEnabled
         })
       });
-      const data = await res.json();
+      const data = (await res.json()) as ApiResponse<HolisticResult>;
       if (data.success) {
-        setHolisticResult(data.result);
+        setHolisticResult(data.result ?? null);
       } else {
         alert("분석 오류: " + data.error);
       }
-    } catch (e) {
+    } catch {
       alert("분석 요청 중 오류가 발생했습니다.");
     } finally {
       setLoadingAnalysis(false);
@@ -71,18 +99,12 @@ export default function DiagnosisPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "get_susi_options" })
       });
-      const data = await res.json();
+      const data = (await res.json()) as ApiResponse<never>;
       if (data.success) {
-        setUniversities(data.universities);
+        setUniversities(data.universities ?? []);
       }
-    } catch (e) {}
+    } catch {}
   };
-
-  useEffect(() => {
-    if (step === 3 && universities.length === 0) {
-      fetchUniversities();
-    }
-  }, [step, universities]);
 
   const updateChoice = (index: number, field: string, value: string) => {
     const newChoices = [...choices];
@@ -127,7 +149,7 @@ export default function DiagnosisPage() {
       } else {
         alert("오류: " + data.error);
       }
-    } catch (e) {
+    } catch {
       alert("평가 요청 중 오류가 발생했습니다.");
     } finally {
       setLoadingEval(false);
@@ -145,6 +167,7 @@ export default function DiagnosisPage() {
         <p className="page-subtitle">학생부 분석 및 대학별 컷 비교를 통한 맞춤형 지원 전략 수립</p>
       </div>
 
+      <RequireAuth>
       <div className="stepper">
         <div className={`step-item ${step >= 1 ? "active" : ""}`}>1. 개인정보</div>
         <div className={`step-item ${step >= 2 ? "active" : ""}`}>2. 학생부 분석</div>
@@ -203,7 +226,16 @@ export default function DiagnosisPage() {
             <button className="btn-primary" style={{ background: "rgba(255,255,255,0.1)", color: "white" }} onClick={() => setStep(1)}>
               &larr; 이전
             </button>
-            <button className="btn-primary" onClick={() => setStep(3)} disabled={!holisticResult}>
+            <button
+              className="btn-primary"
+              onClick={async () => {
+                if (universities.length === 0) {
+                  await fetchUniversities();
+                }
+                setStep(3);
+              }}
+              disabled={!holisticResult}
+            >
               다음 단계 &rarr;
             </button>
           </div>
@@ -321,6 +353,7 @@ export default function DiagnosisPage() {
           </div>
         </div>
       )}
+      </RequireAuth>
     </main>
   );
 }

@@ -1,26 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import AuthButtons from "./components/auth/AuthButtons";
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <main className="container" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+        <p style={{ color: "var(--accent)", marginBottom: "0.75rem", fontWeight: 700 }}>SUPREMA INTEGRATION PORTAL</p>
         <h1 className="page-title" style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>
           대치 수프리마 AI 솔루션 플랫폼
         </h1>
         <p className="page-subtitle" style={{ fontSize: "1.2rem", maxWidth: "600px", margin: "0 auto" }}>
-          학생의 잠재력을 최대한 끌어올리는 인공지능 기반 프리미엄 입시 컨설팅 솔루션입니다.
+          한 번의 사용자 정보 입력으로 2개 서비스를 연동하고, 통합 운영 및 결제까지 확장하는 입시 플랫폼입니다.
         </p>
+        <div style={{ marginTop: "1.5rem" }}>
+          <AuthButtons />
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "2rem", maxWidth: "1000px", margin: "0 auto" }}>
@@ -71,6 +67,20 @@ export default function Home() {
           </div>
         </Link>
 
+      </div>
+
+      <div className="glass-card" style={{ marginTop: "2rem", maxWidth: "1000px", width: "100%", marginInline: "auto" }}>
+        <h3 style={{ marginBottom: "1rem" }}>통합 운영 로드맵</h3>
+        <ul style={{ margin: 0, paddingLeft: "1.1rem", color: "var(--text-secondary)", lineHeight: 1.8 }}>
+          <li>사용자 정보 1회 입력 후 세특/입시진단 공통 사용</li>
+          <li>서비스별 결과를 한 계정에서 조회하는 통합 대시보드</li>
+          <li>결제/구독(패키지형) 연계를 위한 결제 모듈 확장</li>
+        </ul>
+      </div>
+
+      <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", marginTop: "1rem", flexWrap: "wrap" }}>
+        <Link href="/billing" className="btn-primary">결제/구독 관리</Link>
+        <Link href="/admin/pricing" className="btn-primary">관리자 가격설정</Link>
       </div>
     </main>
   );

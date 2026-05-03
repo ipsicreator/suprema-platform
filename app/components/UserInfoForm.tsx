@@ -20,6 +20,7 @@ interface Props {
 }
 
 export default function UserInfoForm({ onNext, serviceType }: Props) {
+  const [hasSavedInfo, setHasSavedInfo] = useState(false);
   const [info, setInfo] = useState<UserInfo>({
     consultantName: "",
     studentName: "",
@@ -35,14 +36,30 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Load from session storage
-    const saved = sessionStorage.getItem("suprema_user_info");
-    if (saved) {
+    const bootstrap = async () => {
+      const saved = sessionStorage.getItem("suprema_user_info");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as UserInfo;
+          setInfo(prev => ({ ...prev, ...parsed }));
+          setHasSavedInfo(Boolean(parsed.studentName && parsed.schoolName));
+        } catch {}
+      }
+
       try {
-        setInfo(prev => ({ ...prev, ...JSON.parse(saved) }));
-      } catch (e) {}
-    }
-    setMounted(true);
+        const res = await fetch("/api/platform/profile", { method: "GET" });
+        const data = await res.json();
+        if (data?.success && data?.profile) {
+          setInfo((prev) => ({ ...prev, ...data.profile }));
+          setHasSavedInfo(Boolean(data.profile.studentName && data.profile.schoolName));
+          sessionStorage.setItem("suprema_user_info", JSON.stringify(data.profile));
+        }
+      } catch {}
+
+      setMounted(true);
+    };
+
+    bootstrap();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -60,6 +77,11 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
     
     // Save to session storage
     sessionStorage.setItem("suprema_user_info", JSON.stringify(info));
+    fetch("/api/platform/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(info),
+    }).catch(() => {});
     onNext(info);
   };
 
@@ -70,6 +92,19 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
       <h2 style={{ marginBottom: "1.5rem", borderBottom: "1px solid var(--card-border)", paddingBottom: "1rem" }}>
         개인정보 입력
       </h2>
+      {hasSavedInfo && (
+        <div className="alert alert-success" style={{ marginBottom: "1.25rem" }}>
+          이전에 입력한 공통 사용자 정보가 있습니다.
+          <button
+            type="button"
+            className="btn-primary"
+            style={{ marginLeft: "0.75rem", padding: "8px 14px", fontSize: "0.9rem" }}
+            onClick={() => onNext(info)}
+          >
+            이 정보로 바로 시작
+          </button>
+        </div>
+      )}
       
       <div className="form-grid">
         <div className="form-group">

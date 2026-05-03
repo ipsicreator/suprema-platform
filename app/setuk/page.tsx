@@ -3,6 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import UserInfoForm, { UserInfo } from "../components/UserInfoForm";
+import RequireAuth from "../components/auth/RequireAuth";
+
+interface SetukResult {
+  topic_title: string;
+  topic_direction: string;
+  expected_conclusion: string;
+  setuk_sentence: string;
+}
+
+interface SetukResponse {
+  success: boolean;
+  error?: string;
+  results?: SetukResult[];
+}
 
 export default function SetukPage() {
   const [step, setStep] = useState(1);
@@ -12,7 +26,7 @@ export default function SetukPage() {
   const [interestsRaw, setInterestsRaw] = useState("");
   const [useOpenAI, setUseOpenAI] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SetukResult[]>([]);
 
   const handleNext = (info: UserInfo) => {
     setUserInfo(info);
@@ -46,14 +60,14 @@ export default function SetukPage() {
         body: JSON.stringify(payload)
       });
       
-      const data = await res.json();
+      const data = (await res.json()) as SetukResponse;
       if (data.success) {
-        setResults(data.results);
+        setResults(data.results ?? []);
         setStep(3);
       } else {
         alert("오류 발생: " + data.error);
       }
-    } catch (e) {
+    } catch {
       alert("요청 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -71,6 +85,7 @@ export default function SetukPage() {
         <p className="page-subtitle">학생 맞춤형 심화 탐구 주제 추천 및 세특 문장 자동 생성</p>
       </div>
 
+      <RequireAuth>
       <div className="stepper">
         <div className={`step-item ${step >= 1 ? "active" : ""}`}>1. 학생 정보</div>
         <div className={`step-item ${step >= 2 ? "active" : ""}`}>2. 탐구 흐름 설정</div>
@@ -157,6 +172,7 @@ export default function SetukPage() {
           </div>
         </div>
       )}
+      </RequireAuth>
     </main>
   );
 }

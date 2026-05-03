@@ -1,5 +1,93 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## SNS Login Setup (Google / Naver / Kakao)
+
+1. Install dependencies
+```bash
+npm install
+```
+
+2. Create env file
+```bash
+cp .env.example .env.local
+```
+
+3. Fill OAuth credentials in `.env.local`
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`
+- `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET`
+- `AUTH_SECRET` (required)
+
+4. Add callback URL in each provider console
+- local: `http://localhost:3000/api/auth/callback/{provider}`
+- production: `https://<your-domain>/api/auth/callback/{provider}`
+
+5. Run
+```bash
+npm run dev
+```
+
+## Billing API (monthly / 3 months / 6 months / one-time)
+
+- `GET /api/platform/billing`
+  - 플랜, 내 구독, 주문 조회
+
+- `POST /api/platform/billing`
+  - 결제 요청 생성
+  - body example (정기 3개월):
+```json
+{
+  "planId": "plan_starter",
+  "billingType": "subscription",
+  "termMonths": 3,
+  "provider": "toss"
+}
+```
+  - body example (1회 결제, 별도 금액):
+```json
+{
+  "planId": "plan_pro",
+  "billingType": "one_time",
+  "overrideAmountKrw": 250000,
+  "provider": "manual"
+}
+```
+
+- `PATCH /api/platform/billing`
+  - 상품 가격/기간 설정 변경
+```json
+{
+  "planId": "plan_starter",
+  "monthlyPriceKrw": 59000,
+  "oneTimePriceKrw": 149000,
+  "availableTermsMonths": [1, 3, 6]
+}
+```
+
+## Execution Order (1 -> 2 -> 3)
+
+1. Payment flow
+- Open `/billing`
+- Choose plan / monthly(1,3,6) or one-time
+- Click payment button to create order and open Toss payment window
+- After redirect to `/billing/success`, platform calls confirm API automatically
+
+2. Webhook flow
+- Set Toss webhook to `POST /api/webhooks/toss`
+- On payment event, order/subscription status updates automatically
+
+3. Admin pricing
+- Open `/admin/pricing`
+- Update monthly/one-time price and allowed month terms
+- Save per plan
+
+## Required Env for production
+
+- `NEXT_PUBLIC_TOSS_CLIENT_KEY`: Toss client key (frontend checkout)
+- `TOSS_SECRET_KEY`: Toss secret key (server confirm API)
+- `TOSS_WEBHOOK_SECRET`: Toss webhook verification secret
+- `ADMIN_EMAILS`: comma-separated admin account emails for `/api/platform/billing` PATCH
+
 ## Getting Started
 
 First, run the development server:
