@@ -40,19 +40,6 @@ export default function Home() {
         >
           대치 수프리마 AI 솔루션 플랫폼
         </h1>
-        <p
-          style={{
-            color: "var(--text-secondary)",
-            fontSize: "clamp(1rem, 2.2vw, 1.2rem)",
-            margin: 0,
-          }}
-        >
-          입시의 본질을 분석하고, 최적의 전략으로 합격을 설계합니다.
-        </p>
-      </section>
-
-      <section style={{ textAlign: "center", marginBottom: "0.5rem" }}>
-        <AuthButtons />
       </section>
 
       <section
@@ -176,6 +163,10 @@ export default function Home() {
         </Link>
       </section>
 
+      <section style={{ textAlign: "center", marginBottom: "0.5rem" }}>
+        <AuthButtons />
+      </section>
+
       <footer
         className="glass-card"
         style={{ marginTop: "0.5rem", maxWidth: "1100px", width: "100%", marginInline: "auto" }}
@@ -209,14 +200,17 @@ export default function Home() {
           </div>
           <div style={{ textAlign: "left" }}>
             <h3 style={{ marginBottom: "0.75rem" }}>대치수프리마 입시&코칭센터</h3>
-            <p style={{ color: "var(--text-secondary)", margin: 0 }}>대표: 명기 진로진학연구소</p>
-            <p style={{ color: "var(--text-secondary)", margin: 0 }}>연락처: 02-555-1234</p>
-            <p style={{ color: "var(--text-secondary)", margin: 0 }}>소재지: 서울 강남구 삼성로 212 3층</p>
+            <p style={{ color: "var(--text-secondary)", margin: 0 }}>대표 : 이기욱 대표컨설턴트</p>
+            <p style={{ color: "var(--text-secondary)", margin: 0 }}>연락처 : 010-2370-1077(문자전송)</p>
+            <p style={{ color: "var(--text-secondary)", margin: 0 }}>소재지 : 서울시 강남구 테헤란로 326 B1F</p>
             <p style={{ color: "var(--text-secondary)", margin: 0 }}>
-              네이버 밴드: <a href="https://band.us/@suprima" target="_blank" rel="noreferrer">band.us/@suprima</a>
+              네이버 밴드 : <a href="https://band.us/@suprima" target="_blank" rel="noreferrer">band.us/@suprima</a>
             </p>
             <p style={{ color: "var(--text-secondary)", margin: 0 }}>
-              인스타그램: <a href="https://www.instagram.com/suprima_education" target="_blank" rel="noreferrer">@suprima_education</a>
+              블로그 : <a href="https://blog.naver.com/gouniv_hifive" target="_blank" rel="noreferrer">blog.naver.com/gouniv_hifive</a>
+            </p>
+            <p style={{ color: "var(--text-secondary)", margin: 0 }}>
+              인스타그램 : <a href="https://www.instagram.com/suprima_ipsicreator" target="_blank" rel="noreferrer">suprima_ipsicreator</a>
             </p>
           </div>
         </div>
@@ -244,3 +238,6 @@ export default function Home() {
     </main>
   );
 }
+
+
+
