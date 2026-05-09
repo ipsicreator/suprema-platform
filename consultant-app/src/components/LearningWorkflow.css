@@ -1,0 +1,117 @@
+﻿.workflow-wrap {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.workflow-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.workflow-header p {
+  margin: 8px 0 0;
+  opacity: 0.86;
+}
+
+.workflow-stage-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.workflow-stage-nav button {
+  border: 1px solid #2f3b57;
+  background: #111827;
+  color: #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.workflow-stage-nav button.active {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 1px #60a5fa inset;
+}
+
+.workflow-stage-card,
+.result-card {
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  background: #0b1220;
+  padding: 16px;
+}
+
+.workflow-stage-card h2 {
+  margin: 0 0 8px;
+}
+
+.workflow-stage-card p {
+  margin: 0 0 12px;
+}
+
+.checklist {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.mini-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.run-btn {
+  margin-top: 8px;
+  width: fit-content;
+  border: 1px solid #2563eb;
+  background: #1d4ed8;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+th,
+td {
+  border-bottom: 1px solid #1f2937;
+  text-align: left;
+  padding: 8px;
+  font-size: 14px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: #0f172a;
+}
+
+@media (max-width: 1024px) {
+  .workflow-wrap {
+    padding: 16px;
+  }
+
+  .workflow-header h1 {
+    font-size: 22px;
+  }
+}
