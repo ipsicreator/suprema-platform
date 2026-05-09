@@ -19,7 +19,7 @@ function App() {
   const [selectedStudent, setSelectedStudent] = useState<{id: string, name: string} | null>(null);
 
   useEffect(() => {
-    return pb.authStore.onChange((_token, model) => {
+    return pb.authStore.onChange((_token: string, model: unknown) => {
       setIsAuthenticated(demoBypassAuth || !!model);
     });
   }, [demoBypassAuth]);
