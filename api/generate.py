@@ -7,7 +7,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from ai_setuk_generator import local_generate, UserProfile, load_topic_bank
-from utils.supabase_client import save_setuk_history
+from utils.pocketbase_client import save_setuk_history
 from datetime import datetime
 
 class handler(BaseHTTPRequestHandler):
@@ -53,8 +53,7 @@ class handler(BaseHTTPRequestHandler):
                     "setuk_sentence": r.setuk_sentence
                 })
             
-            # Create packet for history (DB/Supabase)
-            # We'll adapt save_submission and save_history_event for Supabase later
+            # Create packet for history (PocketBase)
             packet = {
                 "created_at": datetime.now().isoformat(timespec="seconds"),
                 "brand": payload.get("brand", "수프리마 AI 탐구 세특 솔루션"),
@@ -70,7 +69,7 @@ class handler(BaseHTTPRequestHandler):
                 "profile": profile_data
             }
             
-            # Save to Supabase
+            # Save to PocketBase
             save_setuk_history(packet)
             
             self.send_response(200)

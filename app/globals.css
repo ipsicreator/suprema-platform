@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
 :root {
   --bg-color: #030712;
@@ -24,10 +24,24 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
-  background-image: 
+  background-image:
     radial-gradient(circle at 15% 50%, rgba(29, 78, 216, 0.15), transparent 25%),
     radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.1), transparent 25%);
   background-attachment: fixed;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+}
+
+*::selection {
+  background-color: rgba(59, 130, 246, 0.4) !important;
+  color: white !important;
+}
+
+iframe {
+  user-select: auto !important;
+  pointer-events: auto !important;
 }
 
 a {
@@ -42,7 +56,9 @@ button {
   outline: none;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
   background: rgba(15, 23, 42, 0.8);
   border: 1px solid var(--card-border);
@@ -54,13 +70,14 @@ input, select, textarea {
   width: 100%;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   outline: none;
 }
 
-/* Common Layout */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -81,9 +98,10 @@ input:focus, select:focus, textarea:focus {
   color: var(--text-secondary);
   font-size: 1.1rem;
   margin-bottom: 2rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
-/* Glass Card */
 .glass-card {
   background: var(--card-bg);
   backdrop-filter: blur(12px);
@@ -93,6 +111,7 @@ input:focus, select:focus, textarea:focus {
   padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-width: 0;
 }
 
 .glass-card:hover {
@@ -101,7 +120,6 @@ input:focus, select:focus, textarea:focus {
   border-color: rgba(59, 130, 246, 0.4);
 }
 
-/* Primary Button */
 .btn-primary {
   background: var(--gradient-1);
   color: white;
@@ -126,7 +144,6 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(0);
 }
 
-/* Step Indicator */
 .stepper {
   display: flex;
   gap: 1rem;
@@ -146,6 +163,8 @@ input:focus, select:focus, textarea:focus {
   text-align: center;
   font-weight: 600;
   transition: all 0.3s ease;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .step-item.active {
@@ -155,7 +174,6 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-/* Loading Spinner */
 .spinner {
   width: 24px;
   height: 24px;
@@ -166,10 +184,11 @@ input:focus, select:focus, textarea:focus {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Form Grid */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -181,15 +200,17 @@ input:focus, select:focus, textarea:focus {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .form-label {
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-secondary);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
-/* Error/Success Messages */
 .alert {
   padding: 1rem;
   border-radius: 8px;
@@ -207,4 +228,9 @@ input:focus, select:focus, textarea:focus {
   background: rgba(22, 163, 74, 0.1);
   border: 1px solid rgba(22, 163, 74, 0.3);
   color: #4ade80;
+}
+
+.break-safe {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }

@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { PDFDocument } from "pdf-lib";
 
 // 환경변수에서 키 가져오기
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
@@ -215,4 +216,125 @@ export async function extractCaseFromPDF(file: File) {
     console.error('PDF extraction error:', error);
     throw error;
   }
+}
+
+const MAX_INLINE_FILE_BYTES = 18 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
+async function compressImageToLimit(file: File, limitBytes = MAX_IMAGE_BYTES): Promise<File> {
+  if (file.size <= limitBytes) return file;
+
+  const dataUrl = await new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(file);
+  });
+
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("이미지 로드 실패"));
+    image.src = dataUrl;
+  });
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("이미지 압축 컨텍스트를 만들 수 없습니다.");
+
+  let scale = 1;
+  let quality = 0.9;
+  let output = file;
+
+  for (let i = 0; i < 8; i++) {
+    canvas.width = Math.max(200, Math.floor(img.width * scale));
+    canvas.height = Math.max(200, Math.floor(img.height * scale));
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", quality)
+    );
+    if (!blob) throw new Error("이미지 압축 실패");
+
+    output = new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
+    if (output.size <= limitBytes) return output;
+
+    scale *= 0.85;
+    quality = Math.max(0.45, quality - 0.08);
+  }
+
+  return output;
+}
+
+async function splitPdfBySize(file: File, limitBytes = MAX_INLINE_FILE_BYTES): Promise<File[]> {
+  if (file.size <= limitBytes) return [file];
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const source = await PDFDocument.load(bytes);
+  const totalPages = source.getPageCount();
+  const chunks: File[] = [];
+  let start = 0;
+
+  while (start < totalPages) {
+    let pagesInChunk = Math.min(8, totalPages - start);
+    let built: File | null = null;
+
+    while (pagesInChunk >= 1) {
+      const doc = await PDFDocument.create();
+      const pageIndexes = Array.from({ length: pagesInChunk }, (_, i) => start + i);
+      const copied = await doc.copyPages(source, pageIndexes);
+      copied.forEach((p) => doc.addPage(p));
+      const chunkBytes = await doc.save();
+      const normalizedBytes = Uint8Array.from(chunkBytes);
+      const next = new File(
+        [normalizedBytes],
+        `${file.name.replace(/\.pdf$/i, "")}_part_${start + 1}-${start + pagesInChunk}.pdf`,
+        { type: "application/pdf" }
+      );
+      if (next.size <= limitBytes || pagesInChunk === 1) {
+        built = next;
+        break;
+      }
+      pagesInChunk -= 1;
+    }
+
+    if (!built) throw new Error("PDF 분할 중 오류가 발생했습니다.");
+    chunks.push(built);
+    start += pagesInChunk;
+  }
+
+  return chunks;
+}
+
+function mergeAnalysisResults(results: any[]) {
+  const summaries = results
+    .map((r, i) => (r?.analysisSummary ? `[파트 ${i + 1}] ${r.analysisSummary}` : ""))
+    .filter(Boolean);
+  const grades = results.flatMap((r) => (Array.isArray(r?.grades) ? r.grades : []));
+  const activities = results.flatMap((r) => (Array.isArray(r?.activities) ? r.activities : []));
+
+  return {
+    analysisSummary: summaries.join("\n\n"),
+    grades,
+    activities,
+  };
+}
+
+export async function analyzeStudentReportSmart(file: File) {
+  if (file.type.startsWith("image/")) {
+    const optimized = await compressImageToLimit(file);
+    return analyzeStudentReportPDF(optimized);
+  }
+
+  if (file.type === "application/pdf") {
+    const parts = await splitPdfBySize(file);
+    if (parts.length === 1) return analyzeStudentReportPDF(parts[0]);
+    const partialResults: any[] = [];
+    for (const part of parts) {
+      partialResults.push(await analyzeStudentReportPDF(part));
+    }
+    return mergeAnalysisResults(partialResults);
+  }
+
+  return analyzeStudentReportPDF(file);
 }

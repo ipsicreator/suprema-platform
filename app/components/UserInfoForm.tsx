@@ -10,8 +10,9 @@ export interface UserInfo {
   studentPhone: string;
   parentPhone: string;
   email: string;
-  studentIndex?: number; // Only used by diagnosis
-  careerHint?: string; // Only used by setuk
+  studentIndex?: number; // Internal grade (1.0 - 9.0)
+  gradingSystem?: "9-level" | "5-level";
+  careerHint?: string;
 }
 
 interface Props {
@@ -29,7 +30,8 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
     studentPhone: "",
     parentPhone: "",
     email: "",
-    studentIndex: 82.0,
+    studentIndex: 2.5,
+    gradingSystem: "9-level",
     careerHint: ""
   });
 
@@ -45,7 +47,6 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
           setHasSavedInfo(Boolean(parsed.studentName && parsed.schoolName));
         } catch {}
       }
-
       try {
         const res = await fetch("/api/platform/profile", { method: "GET" });
         const data = await res.json();
@@ -55,12 +56,19 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
           sessionStorage.setItem("suprema_user_info", JSON.stringify(data.profile));
         }
       } catch {}
-
       setMounted(true);
     };
-
     bootstrap();
   }, []);
+
+  useEffect(() => {
+    const isNewSystem = info.grade === "고1" || info.grade === "고2";
+    if (isNewSystem && info.gradingSystem !== "5-level") {
+      setInfo(prev => ({ ...prev, gradingSystem: "5-level" }));
+    } else if (!isNewSystem && info.gradingSystem === "5-level") {
+      setInfo(prev => ({ ...prev, gradingSystem: "9-level" }));
+    }
+  }, [info.grade]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -69,13 +77,11 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Basic validation
     if (!info.studentName || !info.schoolName) {
       alert("학생 이름과 학교명은 필수입니다.");
       return;
     }
     
-    // Save to session storage
     sessionStorage.setItem("suprema_user_info", JSON.stringify(info));
     fetch("/api/platform/profile", {
       method: "POST",
@@ -131,6 +137,17 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
             <option value="N수이상">N수 이상</option>
           </select>
         </div>
+        
+        {serviceType === "diagnosis" && (
+          <div className="form-group">
+            <label className="form-label">등급 체계</label>
+            <select name="gradingSystem" value={info.gradingSystem} onChange={handleChange}>
+              <option value="9-level">기존 9등급제</option>
+              <option value="5-level">신설 5등급제 (고1,2)</option>
+            </select>
+          </div>
+        )}
+
         <div className="form-group">
           <label className="form-label">학생 연락처</label>
           <input type="text" name="studentPhone" value={info.studentPhone} onChange={handleChange} placeholder="010-0000-0000" />
@@ -146,13 +163,17 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
 
         {serviceType === "diagnosis" && (
           <div className="form-group">
-            <label className="form-label">학생 지표 (50~100)</label>
+            <label className="form-label">
+              내신 등급 ({info.gradingSystem === "5-level" ? "1~5" : "1~9"}) *
+            </label>
             <input 
               type="number" 
               name="studentIndex" 
               value={info.studentIndex} 
               onChange={handleChange} 
-              min="50" max="100" step="0.5" 
+              min="1" max={info.gradingSystem === "5-level" ? "5" : "9"} step="0.01" 
+              placeholder="예: 1.25"
+              required
             />
           </div>
         )}

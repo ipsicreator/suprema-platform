@@ -14,7 +14,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
+      <body style={{ userSelect: 'auto', WebkitUserSelect: 'auto' } as any}>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+          (function() {
+            var style = document.createElement('style');
+            style.innerHTML = '* { user-select: auto !important; -webkit-user-select: auto !important; }';
+            document.head.appendChild(style);
+            
+            var handler = function(e) { e.stopPropagation(); };
+            document.addEventListener('copy', handler, true);
+            document.addEventListener('paste', handler, true);
+            document.addEventListener('contextmenu', handler, true);
+            document.addEventListener('selectstart', handler, true);
+          })();
+        ` }} />
         <SessionProviders>{children}</SessionProviders>
       </body>
     </html>

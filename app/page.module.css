@@ -1,0 +1,353 @@
+﻿.page {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 84px 20px 64px;
+  display: grid;
+  gap: 22px;
+}
+
+.hero {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid rgba(120, 198, 255, 0.24);
+  background:
+    linear-gradient(130deg, rgba(4, 10, 30, 0.95) 10%, rgba(8, 26, 58, 0.92) 70%),
+    radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.25), transparent 40%);
+  padding: 34px 30px 28px;
+  overflow: hidden;
+  box-shadow: 0 22px 55px rgba(2, 12, 32, 0.45);
+}
+
+.orbA,
+.orbB {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
+.orbA {
+  width: 210px;
+  height: 210px;
+  right: -30px;
+  top: -38px;
+  background: radial-gradient(circle, rgba(125, 211, 252, 0.35), rgba(56, 189, 248, 0.04));
+}
+
+.orbB {
+  width: 180px;
+  height: 180px;
+  left: -45px;
+  bottom: -55px;
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.22), rgba(14, 165, 233, 0.03));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(186, 230, 253, 0.35);
+  color: #dff4ff;
+  background: rgba(14, 116, 144, 0.22);
+  padding: 7px 13px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.hero h1 {
+  margin-top: 16px;
+  margin-bottom: 0;
+  font-size: clamp(34px, 6vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #f8fbff;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, #7dd3fc 0%, #5eead4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroDescription {
+  margin-top: 14px;
+  max-width: 780px;
+  font-size: clamp(15px, 2.2vw, 19px);
+  line-height: 1.62;
+  color: #c4d7ea;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.heroActions {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.primaryButton,
+.secondaryButton,
+.featureLink,
+.callButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.22s ease;
+  font-weight: 700;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #7dd3fc, #5eead4);
+  color: #05213b;
+  padding: 12px 18px;
+  box-shadow: 0 10px 26px rgba(56, 189, 248, 0.3);
+}
+
+.secondaryButton {
+  color: #d7e8f8;
+  padding: 12px 18px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(9, 18, 34, 0.6);
+}
+
+.statRow {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statRow article {
+  border: 1px solid rgba(100, 172, 255, 0.22);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(5, 22, 45, 0.55);
+  min-width: 0;
+}
+
+.statRow strong {
+  display: inline-block;
+  color: #99f6e4;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.statRow p {
+  margin: 0;
+  font-size: 13px;
+  color: #c8deef;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.featureCard {
+  background: rgba(9, 18, 34, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.featureCard h2 {
+  margin: 0;
+  font-size: 21px;
+  color: #f1f7ff;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.featureCard p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.58;
+  color: #b7c9da;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.featureLink {
+  justify-self: start;
+  padding: 9px 14px;
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  color: #dff4ff;
+}
+
+.dualSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.infoCard {
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(7, 15, 30, 0.84);
+  padding: 18px;
+  min-width: 0;
+}
+
+.infoCard h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #f2f8ff;
+}
+
+.infoCard ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.infoCard li {
+  color: #c1d2e3;
+  font-size: 14px;
+  line-height: 1.52;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.flowSection {
+  border-radius: 20px;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  background: linear-gradient(140deg, rgba(8, 22, 40, 0.88), rgba(4, 15, 34, 0.92));
+  padding: 20px;
+}
+
+.flowSection header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #f0f9ff;
+}
+
+.flowSection header p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #95b0c8;
+}
+
+.flowRow {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flowItem {
+  padding: 12px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(103, 232, 249, 0.22);
+  background: rgba(6, 35, 61, 0.45);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.flowItem span {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #99f6e4;
+  color: #083344;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flowItem p {
+  margin: 0;
+  color: #d8ebfa;
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.ctaSection {
+  border-radius: 20px;
+  border: 1px solid rgba(147, 197, 253, 0.26);
+  background: rgba(7, 16, 33, 0.9);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+}
+
+.ctaSection h3 {
+  margin: 0;
+  color: #f2f8ff;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+}
+
+.ctaSection p {
+  margin: 8px 0 0;
+  color: #abc2d8;
+  font-size: 14px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.callButton {
+  padding: 12px 16px;
+  color: #d6fff7;
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: rgba(20, 184, 166, 0.16);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.featureLink:hover,
+.callButton:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 980px) {
+  .page {
+    padding-top: 70px;
+    gap: 16px;
+  }
+
+  .featureGrid,
+  .dualSection,
+  .statRow,
+  .flowRow {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaSection {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
