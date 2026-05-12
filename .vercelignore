@@ -1,0 +1,11 @@
+# Exclude non-Next subprojects and local artifacts
+consultant-app/
+.npm-cache/
+output_assets/
+
+# Exclude legacy Python API/runtime from this Next.js deployment
+api/*.py
+utils/*.py
+lib/engines/*.py
+ai_setuk_generator.py
+requirements.txt
