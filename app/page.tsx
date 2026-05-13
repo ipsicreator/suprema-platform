@@ -1,5 +1,4 @@
-﻿import Image from "next/image";
-import Link from "next/link";
+﻿import Link from "next/link";
 import styles from "./page.module.css";
 
 const advantages = [
@@ -8,75 +7,61 @@ const advantages = [
   "상담 결과를 종합 리포트로 즉시 정리",
 ];
 
-const supplies = ["학생부", "지원대학", "지원학과", "탐구주제 등"];
+const supplies = ["학생부", "지원 대학", "지원 학과", "탐구주제(초안 가능)"];
+const centerInfo = [
+  "대표: 이기욱 대표컨설턴트",
+  "연락처: 010-2370-1077 (문자전송)",
+  "소재지: 서울시 강남구 테헤란로 326 B1F",
+];
+
+const channels = [
+  { label: "네이버 밴드", value: "band.us/@suprima", href: "https://band.us/@suprima" },
+  { label: "블로그", value: "blog.naver.com/gouniv_hifive", href: "https://blog.naver.com/gouniv_hifive" },
+  { label: "인스타그램", value: "suprima_ipsicreator", href: "https://www.instagram.com/suprima_ipsicreator" },
+];
 
 export default function Home() {
   return (
     <main className={styles.page}>
-      <section className={styles.heroWrap}>
-        <div className={styles.topRow}>
-          <a href="/FINAL_1_8_PAGES.zip" className={styles.centerLink} target="_blank" rel="noreferrer">
-            센터 소개
-          </a>
-        </div>
+      <div className={styles.topMenu}>
+        <a href="/FINAL_1_8_PAGES.zip" className={styles.menuLink} target="_blank" rel="noreferrer">
+          센터소개
+        </a>
+      </div>
 
-        <div className={styles.logoPanel}>
-          <h1>
-            <span>대치</span> 수프리마
-          </h1>
-          <p>Su·Prima 입시&코칭 센터</p>
-        </div>
+      <section className={styles.hero}>
+        <p className={styles.brand}>수프리마 AI 입시 플랫폼</p>
+        <p className={styles.lead}>내 생기부, 이대로 괜찮을까?</p>
+        <h1>
+          <span>생기부 분석</span>으로 고민 해결!
+        </h1>
 
-        <p className={styles.tagline}>입시의 본질을 분석하고, 최적의 전략으로 합격을 설계합니다.</p>
-
-        <div className={styles.ctaRow}>
-          <Link href="/diagnosis" className={styles.ctaPrimary}>
+        <div className={styles.actions}>
+          <Link href="/diagnosis" className={styles.primary}>
             진단 시작
           </Link>
-          <Link href="/intro" className={styles.ctaGhost}>
+          <Link href="/intro" className={styles.secondary}>
             진단서비스 소개
           </Link>
         </div>
-
-        <div className={styles.heroImageBox}>
-          <Image
-            src="/suprema-hero-style.png"
-            alt="수프리마 히어로 스타일 레퍼런스"
-            width={1600}
-            height={900}
-            className={styles.heroImage}
-            priority
-          />
-        </div>
       </section>
 
-      <section className={styles.serviceGrid}>
-        <article className={`${styles.serviceCard} ${styles.cardBlue}`}>
-          <p className={styles.serviceIndex}>SERVICE 01</p>
-          <h2>AI 탐구 세특 솔루션</h2>
-          <p className={styles.serviceBody}>
-            학생의 관심사와 진로를 기반으로 탐구주제, 독서, 세특 보완 방향을 연결 추천합니다.
-          </p>
-          <Link href="/exploration" className={styles.serviceButton}>
-            솔루션 시작하기
-          </Link>
-        </article>
-
-        <article className={`${styles.serviceCard} ${styles.cardGreen}`}>
-          <p className={styles.serviceIndex}>SERVICE 02</p>
-          <h2>나의 입시 위치 진단</h2>
-          <p className={styles.serviceBody}>
-            학생부 분석으로 현재 경쟁력을 진단하고, 지원 대학 기준으로 실행 가능한 전략을 제안합니다.
-          </p>
-          <Link href="/diagnosis" className={styles.serviceButtonAlt}>
-            진단 시작하기
-          </Link>
-        </article>
+      <section className={styles.visualBand}>
+        <article className={styles.featureCardStrong}>희망 대학·전형·모집단위 합격 가능성 예측</article>
+        <article className={styles.featureCardSoft}>영역별 생기부 보완 방법 안내</article>
       </section>
 
-      <section className={styles.infoGrid}>
-        <article className={styles.infoCard}>
-          <h3>AI 입시플랫폼 장점</h3>
+      <section className={styles.grid}>
+        <article className={styles.card}>
+          <h2>진단소개</h2>
+          <p>
+            학생부 데이터 기반으로 현재 위치를 점검하고, 탐구·지원 전략과 종합 리포트까지
+            한 흐름으로 연결하는 유료형 컨설팅 진단 서비스입니다.
+          </p>
+        </article>
+
+        <article className={styles.card}>
+          <h2>AI 입시플랫폼 장점</h2>
           <ul>
             {advantages.map((item) => (
               <li key={item}>{item}</li>
@@ -84,8 +69,8 @@ export default function Home() {
           </ul>
         </article>
 
-        <article className={styles.infoCard}>
-          <h3>준비물</h3>
+        <article className={styles.card}>
+          <h2>준비물</h2>
           <ul>
             {supplies.map((item) => (
               <li key={item}>{item}</li>
@@ -94,22 +79,23 @@ export default function Home() {
         </article>
       </section>
 
-      <footer className={styles.footer}>
-        <p className={styles.footerBrand}>대치 수프리마 Su·Prima 입시&코칭 센터</p>
-        <p className={styles.footerLine}>대표: 이기욱 대표컨설턴트 · 연락처: 010-2370-1077 (문자전송)</p>
-        <p className={styles.footerLine}>소재지: 서울시 강남구 테헤란로 326 B1F</p>
-        <div className={styles.footerChannels}>
-          <a href="https://band.us/@suprima" target="_blank" rel="noreferrer">
-            네이버 밴드: band.us/@suprima
-          </a>
-          <a href="https://blog.naver.com/gouniv_hifive" target="_blank" rel="noreferrer">
-            블로그: blog.naver.com/gouniv_hifive
-          </a>
-          <a href="https://www.instagram.com/suprima_ipsicreator" target="_blank" rel="noreferrer">
-            인스타그램: suprima_ipsicreator
-          </a>
+      <section className={styles.centerCard}>
+        <h2>센터 소개</h2>
+        <p className={styles.centerTitle}>대치수프리마 입시&코칭센터</p>
+        <ul className={styles.centerList}>
+          {centerInfo.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <div className={styles.channelRow}>
+          {channels.map((channel) => (
+            <a key={channel.label} href={channel.href} target="_blank" rel="noreferrer" className={styles.channelLink}>
+              <strong>{channel.label}</strong>
+              <span>{channel.value}</span>
+            </a>
+          ))}
         </div>
-      </footer>
+      </section>
     </main>
   );
 }
