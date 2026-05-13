@@ -1,92 +1,101 @@
 ﻿import Link from "next/link";
 import styles from "./page.module.css";
 
-const prepItems = ["학생부", "지원대학", "지원학과", "탐구주제(초안 가능)"];
-const flow = [
-  "사용자 정보 입력",
-  "학생부 분석",
-  "탐구주제·독서·세특 추천",
-  "대학 모의지원",
-  "종합 리포트 생성",
+const advantages = [
+  "희망 대학·전형·모집단위 기준의 합격 가능성 예측",
+  "영역별 생기부 보완 방향 자동 제안",
+  "상담 결과를 종합 리포트로 즉시 정리",
 ];
 
-const benefits = [
-  "상담 시작 전, 학생의 강점·약점을 빠르게 구조화합니다.",
-  "지원 대학/학과별 실행 전략을 근거 기반으로 제시합니다.",
-  "탐구주제와 세특 보완 포인트를 즉시 제안합니다.",
-  "최종 종합 리포트로 상담 품질을 표준화합니다.",
+const supplies = ["학생부", "지원 대학", "지원 학과", "탐구주제(초안 가능)"];
+const centerInfo = [
+  "대표: 이기욱 대표컨설턴트",
+  "연락처: 010-2370-1077 (문자전송)",
+  "소재지: 서울시 강남구 테헤란로 326 B1F",
+];
+
+const channels = [
+  { label: "네이버 밴드", value: "band.us/@suprima", href: "https://band.us/@suprima" },
+  { label: "블로그", value: "blog.naver.com/gouniv_hifive", href: "https://blog.naver.com/gouniv_hifive" },
+  { label: "인스타그램", value: "suprima_ipsicreator", href: "https://www.instagram.com/suprima_ipsicreator" },
 ];
 
 export default function Home() {
   return (
     <main className={styles.page}>
+      <div className={styles.topMenu}>
+        <a href="/FINAL_1_8_PAGES.zip" className={styles.menuLink} target="_blank" rel="noreferrer">
+          센터소개
+        </a>
+      </div>
+
       <section className={styles.hero}>
-        <div className={styles.glowA} aria-hidden="true" />
-        <div className={styles.glowB} aria-hidden="true" />
-
-        <p className={styles.badge}>SUPREMA PLATFORM · ADMISSION INTELLIGENCE</p>
+        <p className={styles.brand}>수프리마 AI 입시 플랫폼</p>
+        <p className={styles.lead}>내 생기부, 이대로 괜찮을까?</p>
         <h1>
-          내 학생부 경쟁력은
-          <br />
-          <span>어디까지 갈 수 있을까?</span>
+          <span>생기부 분석</span>으로 고민 해결!
         </h1>
-        <p className={styles.subtitle}>
-          학생부 분석부터 탐구 설계, 대학 모의지원, 종합 리포트까지.
-          수프리마 플랫폼은 입시 컨설팅의 핵심 흐름을 하나로 연결합니다.
-        </p>
 
         <div className={styles.actions}>
-          <Link href="/diagnosis" className={styles.primary}>진단 시작</Link>
-          <Link href="/intro" className={styles.secondary}>진단서비스 소개</Link>
-        </div>
-
-        <div className={styles.kpis}>
-          <article><strong>STEP 01</strong><p>학생부 중심 진단</p></article>
-          <article><strong>STEP 02</strong><p>지원 대학/학과 전략</p></article>
-          <article><strong>STEP 03</strong><p>상담 종합 리포트</p></article>
+          <Link href="/diagnosis" className={styles.primary}>
+            진단 시작
+          </Link>
+          <Link href="/intro" className={styles.secondary}>
+            진단서비스 소개
+          </Link>
         </div>
       </section>
 
-      <section className={styles.sectionGrid}>
-        <article className={styles.panel}>
-          <h2>이 플랫폼을 활용하면 좋은 점</h2>
+      <section className={styles.visualBand}>
+        <article className={styles.featureCardStrong}>희망 대학·전형·모집단위 합격 가능성 예측</article>
+        <article className={styles.featureCardSoft}>영역별 생기부 보완 방법 안내</article>
+      </section>
+
+      <section className={styles.grid}>
+        <article className={styles.card}>
+          <h2>진단소개</h2>
+          <p>
+            학생부 데이터 기반으로 현재 위치를 점검하고, 탐구·지원 전략과 종합 리포트까지
+            한 흐름으로 연결하는 유료형 컨설팅 진단 서비스입니다.
+          </p>
+        </article>
+
+        <article className={styles.card}>
+          <h2>AI 입시플랫폼 장점</h2>
           <ul>
-            {benefits.map((item) => <li key={item}>{item}</li>)}
+            {advantages.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </article>
-        <article className={styles.panel}>
-          <h2>진단 시작 전 준비물</h2>
+
+        <article className={styles.card}>
+          <h2>준비물</h2>
           <ul>
-            {prepItems.map((item) => <li key={item}>{item}</li>)}
+            {supplies.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </article>
       </section>
 
-      <section className={styles.flowWrap}>
-        <header>
-          <h3>진단 시작 후 진행 흐름</h3>
-          <p>상담 흐름을 자동 연결해 누락 없는 컨설팅을 지원합니다.</p>
-        </header>
-        <div className={styles.flowRow}>
-          {flow.map((item, idx) => (
-            <article key={item} className={styles.flowCard}>
-              <span>{idx + 1}</span>
-              <p>{item}</p>
-            </article>
+      <section className={styles.centerCard}>
+        <h2>센터 소개</h2>
+        <p className={styles.centerTitle}>대치수프리마 입시&코칭센터</p>
+        <ul className={styles.centerList}>
+          {centerInfo.map((item) => (
+            <li key={item}>{item}</li>
           ))}
-        </div>
-      </section>
-
-      <section className={styles.finalCta}>
-        <div>
-          <h3>랜딩부터 종합 리포트까지, 한 번에 운영하세요.</h3>
-          <p>화면별 텍스트 밀림 없이 데스크톱/모바일 모두 안정적으로 구성했습니다.</p>
-        </div>
-        <div className={styles.actions}>
-          <Link href="/diagnosis" className={styles.primary}>바로 시작</Link>
+        </ul>
+        <div className={styles.channelRow}>
+          {channels.map((channel) => (
+            <a key={channel.label} href={channel.href} target="_blank" rel="noreferrer" className={styles.channelLink}>
+              <strong>{channel.label}</strong>
+              <span>{channel.value}</span>
+            </a>
+          ))}
         </div>
       </section>
     </main>
   );
 }
-
