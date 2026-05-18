@@ -14,6 +14,7 @@ export interface UserInfo {
   studentIndex?: number;
   gradingSystem?: "9-level" | "5-level";
   careerHint?: string;
+  hopeDepartment?: string;
 }
 
 interface Props {

@@ -10,9 +10,10 @@ interface ReportProps {
   };
   results: any[];
   onBack?: () => void;
+  onReset?: () => void;
 }
 
-export default function ReportComponent({ studentInfo, results, onBack }: ReportProps) {
+export default function ReportComponent({ studentInfo, results, onBack, onReset }: ReportProps) {
   const handlePrint = () => {
     window.print();
   };

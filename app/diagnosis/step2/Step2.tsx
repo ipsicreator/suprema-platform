@@ -13,7 +13,7 @@ interface Step2Props {
   choices: ChoiceItem[];
   userInfo: {
     studentName: string;
-    studentIndex: number;
+    studentIndex?: number;
     grade: string;
   } | null;
   uniData: Array<{ name: string; departments: string[] }>;
