@@ -16,13 +16,15 @@ export default function RequireAuth({ children }: Props) {
 
   if (!session?.user) {
     return (
-      <div className="glass-card" style={{ maxWidth: "720px", margin: "0 auto", textAlign: "center" }}>
-        <h2 style={{ marginBottom: "0.75rem" }}>로그인이 필요합니다</h2>
-        <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>
-          2개 서비스를 연동 사용하려면 먼저 SNS 로그인을 진행해주세요.
+      <div className="v-card" style={{ maxWidth: "540px", margin: "40px auto", textAlign: "center", padding: "60px" }}>
+        <div className="v-badge">ACCESS RESTRICTED</div>
+        <h2 style={{ fontSize: "28px", fontWeight: "800", marginBottom: "16px" }}>로그인이 필요합니다</h2>
+        <p style={{ color: "var(--text-muted)", marginBottom: "32px", fontSize: "15px" }}>
+          AI 탐구 브레인 서비스를 이용하시려면<br />
+          먼저 소셜 로그인을 통해 본인 인증을 진행해 주세요.
         </p>
-        <button className="btn-primary" type="button" onClick={() => signIn()}>
-          로그인하러 가기
+        <button className="v-btn-primary" style={{ padding: "14px 40px", fontSize: "16px" }} onClick={() => signIn()}>
+          로그인 페이지로 이동
         </button>
       </div>
     );

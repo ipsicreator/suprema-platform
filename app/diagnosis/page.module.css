@@ -1,0 +1,203 @@
+.dashboardPage {
+  display: flex;
+  min-height: 100vh;
+  background: var(--suprima-cream);
+}
+
+.sidebar {
+  width: 320px;
+  background: white;
+  border-right: 1px solid var(--border-light);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sideLogo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--suprima-burgundy);
+  margin-bottom: 80px;
+  letter-spacing: 0.1em;
+}
+
+.sideMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.menuBtn {
+  padding: 16px 24px;
+  border-radius: 16px;
+  text-align: left;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--text-dim);
+  background: transparent;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.menuBtn:hover {
+  background: var(--suprima-cream);
+  color: var(--suprima-burgundy);
+}
+
+.menuActive {
+  background: var(--suprima-burgundy);
+  color: white !important;
+  box-shadow: 0 10px 20px rgba(139, 26, 26, 0.15);
+}
+
+.userMini {
+  padding-top: 40px;
+  border-top: 1px solid var(--border-light);
+}
+
+.userMini span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-light);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.userMini strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.dashboardMain {
+  flex: 1;
+  padding: 60px 80px;
+  overflow-y: auto;
+}
+
+.mainHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 60px;
+}
+
+.homeLink {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--suprima-burgundy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 32px;
+}
+
+/* History Section */
+.historyList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.historyItem {
+  background: white;
+  padding: 32px;
+  border-radius: 24px;
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+}
+
+.historyItem:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  border-color: var(--suprima-burgundy);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.historyDate {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-light);
+}
+
+.historyBadge {
+  background: var(--suprima-cream-dark);
+  color: var(--suprima-burgundy);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.viewBtn {
+  margin-top: 24px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--suprima-cream-dark);
+  color: var(--suprima-burgundy);
+  font-weight: 800;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.viewBtn:hover {
+  background: var(--suprima-burgundy);
+  color: white;
+}
+
+/* Upload Box */
+.uploadBox {
+  transition: all 0.3s ease;
+}
+
+.uploadBox:hover {
+  border-color: var(--suprima-burgundy) !important;
+  background: white !important;
+}
+
+/* Choice Grid */
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.choiceCard {
+  padding: 32px;
+  border-radius: 20px;
+}
+
+.choiceCard input, 
+.choiceCard select {
+  height: 50px;
+  padding: 0 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  font-weight: 600;
+}
+
+.secondaryBtn {
+  padding: 18px 40px;
+  border-radius: 16px;
+  font-weight: 800;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-dim);
+  transition: all 0.3s ease;
+}
+
+.secondaryBtn:hover {
+  background: var(--suprima-cream-dark);
+}

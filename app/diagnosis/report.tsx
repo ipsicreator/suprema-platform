@@ -1,122 +1,221 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, AlertTriangle, TrendingUp, TrendingDown, Minus, Download, ArrowRight } from "lucide-react";
+import { CheckCircle2, AlertTriangle, TrendingUp, TrendingDown, Minus, Download, ArrowRight, Printer } from "lucide-react";
 
-export default function ReportPage() {
-  // Mock data for 3-year history (2023, 2024, 2025)
-  const reportData = {
-    student: {
-      name: "홍길동",
-      grade: "고3 (9등급제)",
-      score: "1.95",
-      type: "인문계열",
-    },
-    analysis: [
-      {
-        university: "성균관대학교",
-        major: "사회과학계열",
-        method: "학교장추천 (교과)",
-        history: {
-          y2023: "1.82",
-          y2024: "1.88",
-          y2025: "1.92",
-        },
-        status: "적정",
-        trend: "up", // up, down, steady
-        remark: "3개년 입결이 완만하게 상승 중이나, 2025 컷 대비 학생 점수가 경쟁력 있음.",
-      },
-      {
-        university: "중앙대학교",
-        major: "심리학과",
-        method: "지역균형 (교과)",
-        history: {
-          y2023: "2.10",
-          y2024: "1.95",
-          y2025: "1.85",
-        },
-        status: "도전",
-        trend: "up",
-        remark: "합격선이 급격히 상승 중인 학과임. 2025 컷 대비 다소 부족하므로 서류 보완 필수.",
-      },
-      {
-        university: "경희대학교",
-        major: "정치외교학과",
-        method: "네오르네상스 (종합)",
-        history: {
-          y2023: "2.25",
-          y2024: "2.15",
-          y2025: "2.20",
-        },
-        status: "안정",
-        trend: "steady",
-        remark: "최근 3개년 박스권 입결 유지. 현재 점수로 안정적인 합격권 판단.",
-      }
-    ]
+interface ReportProps {
+  studentInfo: {
+    name: string;
+    grade: string;
+    score: string;
+  };
+  results: any[];
+  onBack?: () => void;
+}
+
+export default function ReportComponent({ studentInfo, results, onBack }: ReportProps) {
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-50 pt-24 px-6 pb-20">
-      <div className="max-w-6xl mx-auto min-w-0">
-        {/* Header */}
-        <div className="flex justify-between items-end mb-10">
+    <div style={{ color: "#111827", padding: "0" }} className="print-p-0">
+      
+      {/* Centered Fixed Width Container */}
+      <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
+        
+        {/* Header Row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px" }} className="print-mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">3개년 입결 추이 분석 리포트</h1>
-            <p className="text-slate-400 text-sm">실제 입학 결과(2023-2025)를 바탕으로 분석한 정밀 리포트입니다.</p>
+            <div style={{
+              display: "inline-block",
+              padding: "6px 14px",
+              backgroundColor: "rgba(139, 26, 26, 0.05)",
+              color: "var(--suprima-burgundy)",
+              borderRadius: "9999px",
+              fontSize: "10px",
+              fontWeight: 800,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              marginBottom: "12px"
+            }} className="print-hidden">
+              Analysis Report
+            </div>
+            <h1 className="heading-premium" style={{ fontSize: "2.25rem", fontWeight: 950, letterSpacing: "-0.05em", marginBottom: "8px", color: "#1a0f08" }}>
+              3개년 입결 추이 분석 리포트
+            </h1>
+            <p style={{ color: "#6B7280", fontSize: "13px", fontWeight: 600, margin: 0 }}>
+              실제 입학 결과(2023-2025)를 바탕으로 분석한 대치 수프리마 정밀 진단 리포트입니다.
+            </p>
           </div>
-          <button className="btn-primary text-sm flex items-center gap-2">
-            <Download className="w-4 h-4" /> 리포트 저장
-          </button>
+          
+          <div style={{ display: "flex", gap: "12px" }} className="print-hidden">
+            {onBack && (
+              <button 
+                onClick={onBack}
+                style={{
+                  padding: "12px 24px",
+                  backgroundColor: "white",
+                  border: "1px solid #D1D5DB",
+                  color: "#4B5563",
+                  borderRadius: "14px",
+                  fontWeight: 800,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#F9FAFB")}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "white")}
+              >
+                다시 진단하기
+              </button>
+            )}
+            <button 
+              onClick={handlePrint}
+              className="btn-premium"
+              style={{ padding: "12px 24px", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
+            >
+              <Printer className="w-4 h-4" /> PDF 리포트 저장
+            </button>
+          </div>
         </div>
 
         {/* Student Info Bar */}
-        <div className="glass p-6 rounded-2xl border border-white/5 mb-8 flex flex-wrap gap-8 items-center">
-          <div><span className="text-slate-500 text-xs block mb-1">학생명</span><span className="font-bold">{reportData.student.name}</span></div>
-          <div className="w-px h-8 bg-white/10" />
-          <div><span className="text-slate-500 text-xs block mb-1">내신 지표</span><span className="font-bold text-sky-400">{reportData.student.score}</span></div>
-          <div className="w-px h-8 bg-white/10" />
-          <div><span className="text-slate-500 text-xs block mb-1">대상 학년</span><span className="font-bold">{reportData.student.grade}</span></div>
+        <div style={{
+          backgroundColor: "white",
+          padding: "32px 40px",
+          borderRadius: "28px",
+          border: "1px solid #ECE0D1",
+          boxShadow: "0 10px 30px rgba(44, 26, 10, 0.03)",
+          marginBottom: "40px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "48px",
+          alignItems: "center"
+        }}>
+          <div>
+            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "6px" }}>대상 학생</span>
+            <span style={{ fontSize: "1.6rem", fontWeight: 950, color: "#111827" }}>{studentInfo.name}</span>
+          </div>
+          <div style={{ width: "1px", height: "40px", backgroundColor: "#ECE0D1" }} className="print-hidden" />
+          <div>
+            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "6px" }}>내신 평균 지표</span>
+            <span style={{ fontSize: "1.6rem", fontWeight: 950, color: "var(--suprima-burgundy)" }}>
+              {studentInfo.score} <small style={{ fontSize: "12px", color: "#9CA3AF", fontWeight: "bold", marginLeft: "4px" }}>등급</small>
+            </span>
+          </div>
+          <div style={{ width: "1px", height: "40px", backgroundColor: "#ECE0D1" }} className="print-hidden" />
+          <div>
+            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "6px" }}>분석 기준 학년</span>
+            <span style={{ fontSize: "1.6rem", fontWeight: 950, color: "#111827" }}>{studentInfo.grade}</span>
+          </div>
         </div>
 
         {/* 3-Year Comparison Table */}
-        <div className="glass rounded-3xl border border-white/5 overflow-hidden">
-          <table className="w-full text-left border-collapse table-fixed">
+        <div style={{
+          backgroundColor: "white",
+          borderRadius: "28px",
+          border: "1px solid #ECE0D1",
+          boxShadow: "0 10px 30px rgba(44, 26, 10, 0.03)",
+          overflow: "hidden",
+          marginBottom: "32px"
+        }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
             <thead>
-              <tr className="bg-white/[0.02] text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-white/5">
-                <th className="px-6 py-5">대학 / 전형</th>
-                <th className="px-4 py-5 text-center">2023 실결</th>
-                <th className="px-4 py-5 text-center">2024 실결</th>
-                <th className="px-4 py-5 text-center bg-sky-500/5 text-sky-400">2025 실결</th>
-                <th className="px-4 py-5 text-center">추이</th>
-                <th className="px-6 py-5">판정 및 소견</th>
+              <tr style={{ backgroundColor: "#F9FAFB", borderBottom: "1px solid #ECE0D1" }}>
+                <th style={{ padding: "20px 24px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "left", width: "35%" }}>
+                  대학 / 전형 / 학과
+                </th>
+                <th style={{ padding: "20px 12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "12%" }}>
+                  2023 실결
+                </th>
+                <th style={{ padding: "20px 12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "12%" }}>
+                  2024 실결
+                </th>
+                <th style={{
+                  padding: "20px 12px",
+                  fontSize: "10px",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  backgroundColor: "rgba(139, 26, 26, 0.03)",
+                  color: "var(--suprima-burgundy)",
+                  textAlign: "center",
+                  width: "14%"
+                }}>
+                  2025 실결
+                </th>
+                <th style={{ padding: "20px 12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "10%" }}>
+                  추이
+                </th>
+                <th style={{ padding: "20px 24px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "left", width: "27%" }}>
+                  판정 및 소견
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {reportData.analysis.map((item, i) => (
-                <tr key={i} className="hover:bg-white/[0.01] transition-colors">
-                  <td className="px-6 py-6 min-w-0">
-                    <p className="font-bold mb-1 break-keep [overflow-wrap:anywhere]">{item.university}</p>
-                    <p className="text-[11px] text-slate-500 break-keep [overflow-wrap:anywhere]">{item.method} | {item.major}</p>
+            <tbody>
+              {results.map((item, i) => (
+                <tr key={i} style={{ borderBottom: i === results.length - 1 ? "none" : "1px solid #ECE0D1" }}>
+                  
+                  {/* College / Dept Cell */}
+                  <td style={{ padding: "28px 24px", verticalAlign: "middle" }}>
+                    <p style={{ fontSize: "1.1rem", fontWeight: 950, color: "#111827", margin: "0 0 4px 0", letterSpacing: "-0.04em" }}>
+                      {item.university}
+                    </p>
+                    <p style={{ fontSize: "11px", color: "#6B7280", fontWeight: 800, margin: 0 }}>
+                      {item.track_name || "일반"} <span style={{ color: "#D1D5DB", margin: "0 4px" }}>|</span> {item.department}
+                    </p>
                   </td>
-                  <td className="px-4 py-6 text-center font-mono text-sm text-slate-400">{item.history.y2023}</td>
-                  <td className="px-4 py-6 text-center font-mono text-sm text-slate-400">{item.history.y2024}</td>
-                  <td className="px-4 py-6 text-center font-mono text-sm font-bold text-sky-400 bg-sky-500/5">{item.history.y2025}</td>
-                  <td className="px-4 py-6 text-center">
-                    {item.trend === 'up' ? <TrendingUp className="w-4 h-4 text-rose-500 mx-auto" /> : 
-                     item.trend === 'down' ? <TrendingDown className="w-4 h-4 text-sky-500 mx-auto" /> : 
-                     <Minus className="w-4 h-4 text-slate-500 mx-auto" />
+                  
+                  {/* Years */}
+                  <td style={{ padding: "28px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
+                    {item.y23 || "-"}
+                  </td>
+                  <td style={{ padding: "28px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
+                    {item.y24 || "-"}
+                  </td>
+                  <td style={{
+                    padding: "28px 12px",
+                    textAlign: "center",
+                    fontFamily: "monospace",
+                    fontSize: "15px",
+                    fontWeight: 900,
+                    color: "var(--suprima-burgundy)",
+                    backgroundColor: "rgba(139, 26, 26, 0.03)",
+                    verticalAlign: "middle"
+                  }}>
+                    {item.y25 || "-"}
+                  </td>
+                  
+                  {/* Trend Indicator */}
+                  <td style={{ padding: "28px 12px", textAlign: "center", verticalAlign: "middle" }}>
+                    {item.trend === 'up' ? <TrendingUp className="w-5 h-5 mx-auto" style={{ color: "#EF4444" }} /> : 
+                     item.trend === 'down' ? <TrendingDown className="w-5 h-5 mx-auto" style={{ color: "#3B82F6" }} /> : 
+                     <Minus className="w-5 h-5 mx-auto" style={{ color: "#D1D5DB" }} />
                     }
                   </td>
-                  <td className="px-6 py-6 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        item.status === '안정' ? 'bg-emerald-500/20 text-emerald-400' :
-                        item.status === '적정' ? 'bg-sky-500/20 text-sky-400' : 'bg-amber-500/20 text-amber-400'
-                      }`}>
-                        {item.status}
+                  
+                  {/* Evaluation / Comment */}
+                  <td style={{ padding: "28px 24px", verticalAlign: "middle" }}>
+                    <div style={{ marginBottom: "8px" }}>
+                      <span style={{
+                        display: "inline-block",
+                        padding: "4px 10px",
+                        borderRadius: "9999px",
+                        fontSize: "10px",
+                        fontWeight: 900,
+                        backgroundColor: 
+                          item.level === '매우 안정' || item.level === '안정' ? "#D1FAE5" :
+                          item.level === '적정' ? "#DBEAFE" : "#FEE2E2",
+                        color: 
+                          item.level === '매우 안정' || item.level === '안정' ? "#065F46" :
+                          item.level === '적정' ? "#1E40AF" : "#991B1B"
+                      }}>
+                        {item.level}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed max-w-xs break-keep [overflow-wrap:anywhere]">{item.remark}</p>
+                    <p style={{ fontSize: "11px", color: "#4B5563", lineHeight: "1.6", fontWeight: 700, margin: 0, wordBreak: "keep-all" }}>
+                      {item.comment}
+                    </p>
                   </td>
                 </tr>
               ))}
@@ -124,13 +223,34 @@ export default function ReportPage() {
           </table>
         </div>
 
-        {/* Legend / Info */}
-        <div className="mt-6 flex gap-6 text-[11px] text-slate-500">
-          <div className="flex items-center gap-1.5"><TrendingUp className="w-3 h-3 text-rose-500" /> 합격선 상승 (경쟁 심화)</div>
-          <div className="flex items-center gap-1.5"><TrendingDown className="w-3 h-3 text-sky-500" /> 합격선 하락 (기회 구간)</div>
-          <div className="flex items-center gap-1.5"><Minus className="w-3 h-3 text-slate-500" /> 보합세 유지</div>
+        {/* Legend / Footer Row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 12px" }}>
+          <div style={{ display: "flex", gap: "24px", fontSize: "10px", fontWeight: "bold", color: "#9CA3AF" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <TrendingUp className="w-3.5 h-3.5" style={{ color: "#EF4444" }} /> 합격선 상승 (경쟁 심화)
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <TrendingDown className="w-3.5 h-3.5" style={{ color: "#3B82F6" }} /> 합격선 하락 (기회 구간)
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <Minus className="w-3.5 h-3.5" style={{ color: "#D1D5DB" }} /> 보합세 유지
+            </div>
+          </div>
+          <div style={{ fontSize: "10px", fontWeight: "bold", color: "#9CA3AF" }}>
+            © 대치 수프리마 입시&코칭 센터. All Rights Reserved.
+          </div>
         </div>
       </div>
+
+      <style jsx global>{`
+        @media print {
+          body { background: white !important; }
+          .print-hidden { display: none !important; }
+          .print-mb-6 { margin-bottom: 24px !important; }
+          .print-p-0 { padding: 0 !important; }
+          tr { page-break-inside: avoid; }
+        }
+      `}</style>
     </div>
   );
 }

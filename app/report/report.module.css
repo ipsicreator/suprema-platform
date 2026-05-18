@@ -1,0 +1,200 @@
+.documentWrapper {
+  min-height: 100vh;
+  background-color: #f3f4f6; /* Subtle grey background to highlight the A4 page */
+  font-family: 'Pretendard', sans-serif;
+  color: #1a0f08;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 100px;
+}
+
+.topBar {
+  width: 100%;
+  height: 70px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.barContent {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+
+.barBtns { display: flex; gap: 10px; }
+.printBtn, .pdfBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdfBtn { background: #1a0f08; color: white; border: none; }
+
+/* The A4 Document Style */
+.a4Page {
+  width: 210mm; /* A4 Width */
+  min-height: 297mm; /* A4 Height */
+  background: white;
+  padding: 60px 80px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.docHeader {
+  border-bottom: 3px solid #1a0f08;
+  padding-bottom: 40px;
+  margin-bottom: 60px;
+}
+
+.docTitle {
+  font-size: 2.2rem;
+  font-weight: 950;
+  margin-bottom: 32px;
+  letter-spacing: -0.05em;
+}
+
+.docMeta {
+  display: flex;
+  justify-content: space-between;
+}
+
+.metaRow { margin-bottom: 12px; }
+.metaRow span { font-size: 13px; color: #666; width: 80px; display: inline-block; }
+.metaRow strong { font-size: 1rem; font-weight: 800; }
+
+/* Document Sections - Clean & Minimal */
+.docSection {
+  margin-bottom: 50px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #1a0f08;
+  padding-bottom: 8px;
+}
+
+.sectionNo { font-size: 18px; font-weight: 900; color: #a13e17; }
+.sectionTitle { font-size: 1.4rem; font-weight: 950; }
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.summaryCard {
+  background: #fdfaf5;
+  padding: 30px;
+  border: 1px solid #f0e6d6;
+}
+
+.sLabel { font-size: 13px; color: #8c7e6f; display: block; margin-bottom: 8px; font-weight: 700; }
+.sValue { font-size: 2.2rem; font-weight: 900; display: block; }
+.sValue span { font-size: 1.1rem; color: #ccc; }
+.sBadge { font-size: 12px; font-weight: 800; color: #a13e17; margin-top: 10px; }
+
+.insightBox {
+  background: #f9f9f9;
+  padding: 32px;
+  border-left: 5px solid #1a0f08;
+}
+
+.insightText {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* Precise Document Table */
+.docTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.docTable th, .docTable td {
+  border: 1px solid #ddd;
+  padding: 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.docTable th {
+  background: #f3f4f6;
+  font-weight: 800;
+  color: #555;
+}
+
+.docTable td { font-weight: 500; }
+
+/* Roadmap - No Fancy Effects */
+.roadmapBox {
+  padding-left: 20px;
+}
+
+.roadItem {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.roadDot {
+  width: 10px;
+  height: 10px;
+  background: #1a0f08;
+  border-radius: 50%;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.roadContent strong { display: block; font-size: 1.15rem; font-weight: 900; margin-bottom: 8px; }
+.roadContent p { font-size: 1rem; color: #666; line-height: 1.6; }
+
+.docFooter {
+  margin-top: auto;
+  padding-top: 40px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.docFooter p { font-size: 12px; color: #999; }
+.stampArea { text-align: right; }
+.stampArea span { font-size: 13px; font-weight: 700; color: #555; }
+.stamp {
+  margin-top: 10px;
+  width: 100px;
+  height: 40px;
+  border: 2px solid #a13e17;
+  color: #a13e17;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  border-radius: 4px;
+  transform: rotate(-5deg);
+}

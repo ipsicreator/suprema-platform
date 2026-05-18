@@ -12,6 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+
+    // Project-generated / non-source artifacts:
+    "consultant-app/dist/**",
+    "consultant-app/public/qa_captures/**",
+    "output_assets/**",
+    "scratch/**",
+    "recovered_thread_*.jsonl",
+    "recovered_thread_*_messages.txt",
   ]),
 ]);
 

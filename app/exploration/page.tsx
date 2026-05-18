@@ -110,20 +110,18 @@ export default function ExplorationPage() {
 
   return (
     <main className="min-h-screen p-8 pt-24 bg-[var(--bg-color)]">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <header className="mb-12 text-center">
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
-            <img src="/suprema-logo.png" alt="대치수프리마 로고" style={{ height: "50px", width: "auto" }} />
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-4xl font-bold gradient-text"
-              style={{ margin: 0 }}
-            >
-              대치수프리마 AI 탐구 주제 Explorer
-            </motion.h1>
+          <div className="flex flex-col items-center gap-4 mb-6">
+            <div className="v-badge">AI 기반 학생부 심층 분석</div>
+            <h1 className="text-5xl font-black tracking-tight">
+              AI <span className="v-highlight">탐구 브레인</span> Explorer
+            </h1>
           </div>
-          <p className="text-[var(--text-secondary)]">대치 수프리마 입시&코칭센터의 학생부 키워드 + 관심사 + 목표 대학 결합형 탐구 제안 시스템</p>
+          <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
+            수프리마만의 AI 알고리즘이 당신의 학생부 키워드와 관심사를 결합하여<br />
+            목표 대학 합격을 위한 최적의 탐구 주제를 제안합니다.
+          </p>
         </header>
 
         <RequireAuth>
