@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export default function IntroPage() {
   const totalPages = 8;
@@ -11,76 +9,33 @@ export default function IntroPage() {
   return (
     <div style={{ 
       minHeight: "100vh", 
-      backgroundColor: "var(--suprima-cream, #FDFBF7)", 
+      backgroundColor: "#fff", 
       display: "flex", 
       flexDirection: "column", 
       alignItems: "center", 
-      padding: "0"
+      padding: "0",
+      margin: "0"
     }}>
       
-      {/* Sticky Navigation Header */}
-      <div style={{
-        position: "sticky",
-        top: 0,
-        width: "100%",
-        backgroundColor: "rgba(253, 251, 247, 0.9)",
-        backdropFilter: "blur(10px)",
-        borderBottom: "1px solid #ECE0D1",
-        zIndex: 50,
-        display: "flex",
-        justifyContent: "center"
-      }}>
-        <div style={{
-          width: "100%",
-          maxWidth: "1150px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px 40px"
-        }}>
-          <Link href="/" style={{
-            display: "flex", 
-            alignItems: "center", 
-            gap: "8px", 
-            color: "#1a0f08", 
-            fontWeight: "900", 
-            fontSize: "16px",
-            textDecoration: "none"
-          }}>
-            <ArrowLeft size={20} /> 첫 화면으로
-          </Link>
-          <div style={{ fontSize: "14px", fontWeight: "800", color: "#A13E17", letterSpacing: "0.1em" }}>
-            대치 수프리마 통합 브로슈어
-          </div>
-        </div>
-      </div>
-
-      {/* 8 Pages Viewer Container */}
+      {/* 어떠한 상단 헤더, 로고, 그림자 흔적도 없이 오직 원본 이미지 8장만 100% 렌더링 */}
       <div style={{
         width: "100%",
         maxWidth: "1150px",
         display: "flex",
         flexDirection: "column",
-        gap: "40px",
-        padding: "40px 0 120px 0"
+        gap: "0", // 이미지 간격도 없애서 하나의 긴 통이미지처럼 매끄럽게 연결
+        padding: "0"
       }}>
         {pages.map((imgSrc, index) => (
-          <div key={index} style={{
-            width: "100%",
-            borderRadius: "20px",
-            overflow: "hidden",
-            boxShadow: "0 20px 60px rgba(44, 26, 10, 0.08)",
-            backgroundColor: "white"
-          }}>
-            <Image 
-              src={imgSrc} 
-              alt={`센터소개 ${index + 1}페이지`} 
-              width={1150} 
-              height={1600} 
-              priority={index < 2} // Preload first 2 pages
-              style={{ width: "100%", height: "auto", display: "block" }}
-            />
-          </div>
+          <Image 
+            key={index}
+            src={imgSrc} 
+            alt={`센터소개 ${index + 1}페이지`} 
+            width={1150} 
+            height={1600} 
+            priority={index < 2} // 처음 2장만 우선 로딩
+            style={{ width: "100%", height: "auto", display: "block", margin: 0, padding: 0 }}
+          />
         ))}
       </div>
 
