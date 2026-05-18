@@ -24,7 +24,7 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
       <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
         
         {/* Header Row */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "40px" }} className="print-mb-6">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "20px" }} className="print-mb-6">
           <div>
             <div style={{
               display: "inline-block",
@@ -40,10 +40,10 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
             }} className="print-hidden">
               Analysis Report
             </div>
-            <h1 className="heading-premium" style={{ fontSize: "2.25rem", fontWeight: 950, letterSpacing: "-0.05em", marginBottom: "8px", color: "#1a0f08" }}>
+            <h1 className="heading-premium" style={{ fontSize: "2rem", fontWeight: 950, letterSpacing: "-0.05em", marginBottom: "6px", color: "#1a0f08" }}>
               3개년 입결 추이 분석 리포트
             </h1>
-            <p style={{ color: "#6B7280", fontSize: "13px", fontWeight: 600, margin: 0 }}>
+            <p style={{ color: "#6B7280", fontSize: "12px", fontWeight: 600, margin: 0 }}>
               실제 입학 결과(2023-2025)를 바탕으로 분석한 대치 수프리마 정밀 진단 리포트입니다.
             </p>
           </div>
@@ -82,57 +82,57 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
         {/* Student Info Bar */}
         <div style={{
           backgroundColor: "white",
-          padding: "32px 40px",
-          borderRadius: "28px",
+          padding: "20px 32px",
+          borderRadius: "20px",
           border: "1px solid #ECE0D1",
           boxShadow: "0 10px 30px rgba(44, 26, 10, 0.03)",
-          marginBottom: "40px",
+          marginBottom: "24px",
           display: "flex",
           flexWrap: "wrap",
-          gap: "48px",
+          gap: "36px",
           alignItems: "center"
         }}>
           <div>
             <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "6px" }}>대상 학생</span>
-            <span style={{ fontSize: "1.6rem", fontWeight: 950, color: "#111827" }}>{studentInfo.name}</span>
+            <span style={{ fontSize: "1.4rem", fontWeight: 950, color: "#111827" }}>{studentInfo.name}</span>
           </div>
-          <div style={{ width: "1px", height: "40px", backgroundColor: "#ECE0D1" }} className="print-hidden" />
+          <div style={{ width: "1px", height: "30px", backgroundColor: "#ECE0D1" }} className="print-hidden" />
           <div>
-            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "6px" }}>내신 평균 지표</span>
-            <span style={{ fontSize: "1.6rem", fontWeight: 950, color: "var(--suprima-burgundy)" }}>
-              {studentInfo.score} <small style={{ fontSize: "12px", color: "#9CA3AF", fontWeight: "bold", marginLeft: "4px" }}>등급</small>
+            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>내신 평균 지표</span>
+            <span style={{ fontSize: "1.4rem", fontWeight: 950, color: "var(--suprima-burgundy)" }}>
+              {studentInfo.score} <small style={{ fontSize: "11px", color: "#9CA3AF", fontWeight: "bold", marginLeft: "4px" }}>등급</small>
             </span>
           </div>
-          <div style={{ width: "1px", height: "40px", backgroundColor: "#ECE0D1" }} className="print-hidden" />
+          <div style={{ width: "1px", height: "30px", backgroundColor: "#ECE0D1" }} className="print-hidden" />
           <div>
-            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "6px" }}>분석 기준 학년</span>
-            <span style={{ fontSize: "1.6rem", fontWeight: 950, color: "#111827" }}>{studentInfo.grade}</span>
+            <span style={{ color: "#9CA3AF", fontSize: "10px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>분석 기준 학년</span>
+            <span style={{ fontSize: "1.4rem", fontWeight: 950, color: "#111827" }}>{studentInfo.grade}</span>
           </div>
         </div>
 
         {/* 3-Year Comparison Table */}
         <div style={{
           backgroundColor: "white",
-          borderRadius: "28px",
+          borderRadius: "20px",
           border: "1px solid #ECE0D1",
           boxShadow: "0 10px 30px rgba(44, 26, 10, 0.03)",
           overflow: "hidden",
-          marginBottom: "32px"
+          marginBottom: "20px"
         }}>
           <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
             <thead>
               <tr style={{ backgroundColor: "#F9FAFB", borderBottom: "1px solid #ECE0D1" }}>
-                <th style={{ padding: "20px 24px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "left", width: "35%" }}>
+                <th style={{ padding: "12px 20px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "left", width: "35%" }}>
                   대학 / 전형 / 학과
                 </th>
-                <th style={{ padding: "20px 12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "12%" }}>
+                <th style={{ padding: "12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "12%" }}>
                   2023 실결
                 </th>
-                <th style={{ padding: "20px 12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "12%" }}>
+                <th style={{ padding: "12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "12%" }}>
                   2024 실결
                 </th>
                 <th style={{
-                  padding: "20px 12px",
+                  padding: "12px",
                   fontSize: "10px",
                   fontWeight: 800,
                   textTransform: "uppercase",
@@ -144,10 +144,10 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
                 }}>
                   2025 실결
                 </th>
-                <th style={{ padding: "20px 12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "10%" }}>
+                <th style={{ padding: "12px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", width: "10%" }}>
                   추이
                 </th>
-                <th style={{ padding: "20px 24px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "left", width: "27%" }}>
+                <th style={{ padding: "12px 20px", fontSize: "10px", fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "left", width: "27%" }}>
                   판정 및 소견
                 </th>
               </tr>
@@ -157,8 +157,8 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
                 <tr key={i} style={{ borderBottom: i === results.length - 1 ? "none" : "1px solid #ECE0D1" }}>
                   
                   {/* College / Dept Cell */}
-                  <td style={{ padding: "28px 24px", verticalAlign: "middle" }}>
-                    <p style={{ fontSize: "1.1rem", fontWeight: 950, color: "#111827", margin: "0 0 4px 0", letterSpacing: "-0.04em" }}>
+                  <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                    <p style={{ fontSize: "1.05rem", fontWeight: 950, color: "#111827", margin: "0 0 4px 0", letterSpacing: "-0.04em" }}>
                       {item.university}
                     </p>
                     <p style={{ fontSize: "11px", color: "#6B7280", fontWeight: 800, margin: 0 }}>
@@ -167,17 +167,17 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
                   </td>
                   
                   {/* Years */}
-                  <td style={{ padding: "28px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
+                  <td style={{ padding: "16px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
                     {item.y23 || "-"}
                   </td>
-                  <td style={{ padding: "28px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
+                  <td style={{ padding: "16px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
                     {item.y24 || "-"}
                   </td>
                   <td style={{
-                    padding: "28px 12px",
+                    padding: "16px 12px",
                     textAlign: "center",
                     fontFamily: "monospace",
-                    fontSize: "15px",
+                    fontSize: "14px",
                     fontWeight: 900,
                     color: "var(--suprima-burgundy)",
                     backgroundColor: "rgba(139, 26, 26, 0.03)",
@@ -187,7 +187,7 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
                   </td>
                   
                   {/* Trend Indicator */}
-                  <td style={{ padding: "28px 12px", textAlign: "center", verticalAlign: "middle" }}>
+                  <td style={{ padding: "16px 12px", textAlign: "center", verticalAlign: "middle" }}>
                     {item.trend === 'up' ? <TrendingUp className="w-5 h-5 mx-auto" style={{ color: "#EF4444" }} /> : 
                      item.trend === 'down' ? <TrendingDown className="w-5 h-5 mx-auto" style={{ color: "#3B82F6" }} /> : 
                      <Minus className="w-5 h-5 mx-auto" style={{ color: "#D1D5DB" }} />
@@ -195,13 +195,13 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
                   </td>
                   
                   {/* Evaluation / Comment */}
-                  <td style={{ padding: "28px 24px", verticalAlign: "middle" }}>
-                    <div style={{ marginBottom: "8px" }}>
+                  <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                    <div style={{ marginBottom: "6px" }}>
                       <span style={{
                         display: "inline-block",
-                        padding: "4px 10px",
+                        padding: "3px 8px",
                         borderRadius: "9999px",
-                        fontSize: "10px",
+                        fontSize: "9px",
                         fontWeight: 900,
                         backgroundColor: 
                           item.level === '매우 안정' || item.level === '안정' ? "#D1FAE5" :
@@ -213,7 +213,7 @@ export default function ReportComponent({ studentInfo, results, onBack }: Report
                         {item.level}
                       </span>
                     </div>
-                    <p style={{ fontSize: "11px", color: "#4B5563", lineHeight: "1.6", fontWeight: 700, margin: 0, wordBreak: "keep-all" }}>
+                    <p style={{ fontSize: "10.5px", color: "#4B5563", lineHeight: "1.4", fontWeight: 700, margin: 0, wordBreak: "keep-all" }}>
                       {item.comment}
                     </p>
                   </td>
