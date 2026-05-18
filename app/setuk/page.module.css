@@ -188,6 +188,7 @@ textarea.input {
   font-weight: 600;
   position: relative;
   box-shadow: 0 15px 30px rgba(139, 26, 26, 0.04);
+  white-space: pre-wrap;
 }
 
 .expertBadge {

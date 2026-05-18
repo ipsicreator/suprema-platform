@@ -139,7 +139,7 @@ export default function SolutionPage() {
                   </div>
                   <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 space-y-4">
                     <h4 className="text-2xl font-black text-white">{result.proposedTopic}</h4>
-                    <p className="text-slate-400 text-sm leading-relaxed">{result.explorationPath}</p>
+                    <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap">{result.explorationPath}</p>
                   </div>
                 </div>
 
