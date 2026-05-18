@@ -28,7 +28,7 @@ export default function Home() {
           height: "15%",
           zIndex: 10,
           cursor: "pointer"
-        }} aria-label="센터소개 (8P) 바로가기" />
+        }} aria-label="센터소개 바로가기" />
 
         {/* 투명한 클릭 영역 2: 시작하기 (하단 중앙 버튼 영역) */}
         <Link href="/diagnosis" style={{
