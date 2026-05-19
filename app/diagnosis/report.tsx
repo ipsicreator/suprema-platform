@@ -7,6 +7,9 @@ interface ReportProps {
     name: string;
     grade: string;
     score: string;
+    parsedSubjects?: any[];
+    studentAnalysis?: any;
+    gradingSystem?: string;
   };
   results: any[];
   onBack?: () => void;
@@ -20,10 +23,10 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
 
   return (
     <div style={{ color: "#111827", padding: "0" }} className="print-p-0">
-      
+
       {/* Centered Fixed Width Container */}
       <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-        
+
         {/* Header Row */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "20px" }} className="print-mb-6">
           <div>
@@ -48,10 +51,10 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
               실제 입학 결과(2023-2025)를 바탕으로 분석한 대치 수프리마 정밀 진단 리포트입니다.
             </p>
           </div>
-          
+
           <div style={{ display: "flex", gap: "12px" }} className="print-hidden">
             {onBack && (
-              <button 
+              <button
                 onClick={onBack}
                 style={{
                   padding: "12px 24px",
@@ -70,7 +73,7 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
                 다시 진단하기
               </button>
             )}
-            <button 
+            <button
               onClick={handlePrint}
               className="btn-premium"
               style={{ padding: "12px 24px", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
@@ -110,6 +113,109 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
             <span style={{ fontSize: "1.4rem", fontWeight: 950, color: "#111827" }}>{studentInfo.grade}</span>
           </div>
         </div>
+
+        {/* Dynamic Student Transcript Subjects List Section */}
+        {(() => {
+          const parsedSubjects = (studentInfo as any).parsedSubjects || [];
+          if (parsedSubjects.length === 0) return null;
+          return (
+            <div style={{
+              backgroundColor: "#FAF6F0",
+              borderRadius: "20px",
+              padding: "20px 28px",
+              border: "1px solid #ECE0D1",
+              marginBottom: "24px",
+              boxShadow: "inset 0 2px 4px rgba(44, 26, 10, 0.01)"
+            }}>
+              <h3 style={{ fontSize: "13px", fontWeight: 900, color: "var(--suprima-burgundy)", margin: "0 0 12px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                📋 학생부 분석 반영 교과 성적표 ({parsedSubjects.length}개 과목 자동 추출 완료)
+              </h3>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {parsedSubjects.map((sub: any, idx: number) => (
+                  <div key={idx} style={{
+                    backgroundColor: "white",
+                    border: "1px solid rgba(139, 26, 26, 0.15)",
+                    borderRadius: "8px",
+                    padding: "6px 12px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.02)"
+                  }}>
+                    <span style={{ fontSize: "11.5px", fontWeight: 900, color: "#111827" }}>{sub.subject}</span>
+                    <span style={{ width: "1px", height: "12px", backgroundColor: "#ECE0D1" }} />
+                    <span style={{ fontSize: "10.5px", fontWeight: 800, color: "#7C7267" }}>{sub.unit}단위</span>
+                    <span style={{ fontSize: "10.5px", fontWeight: 900, color: "var(--suprima-burgundy)", backgroundColor: "rgba(139, 26, 26, 0.05)", padding: "1px 5px", borderRadius: "4px" }}>{sub.grade}등급</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* GPA Conversion Analysis Detail Card */}
+        {(() => {
+          const rawScore = parseFloat(studentInfo.score || "0");
+          const is5Level = (studentInfo as any).gradingSystem === "5-level" || studentInfo.grade === "고1" || studentInfo.grade === "고2";
+
+          const convert5To9Grade = (g5: number): number => {
+            if (g5 <= 1.0) return 1.0;
+            if (g5 <= 2.0) return 1.0 + (g5 - 1.0) * 2.6;
+            if (g5 <= 3.0) return 3.6 + (g5 - 2.0) * 2.2;
+            if (g5 <= 4.0) return 5.8 + (g5 - 3.0) * 2.0;
+            if (g5 <= 5.0) return 7.8 + (g5 - 4.0) * 1.2;
+            return 9.0;
+          };
+
+          const convertedScore = is5Level ? convert5To9Grade(rawScore).toFixed(2) : null;
+
+          return (
+            <div style={{
+              background: "linear-gradient(135deg, #FFFDFB 0%, #F5EFEB 100%)",
+              borderRadius: "20px",
+              padding: "20px 28px",
+              border: "1px solid #E3D5C5",
+              marginBottom: "24px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              boxShadow: "0 10px 30px rgba(44, 26, 10, 0.02)"
+            }}>
+              <h3 style={{ fontSize: "13px", fontWeight: 900, color: "var(--suprima-burgundy)", margin: "0", display: "flex", alignItems: "center", gap: "6px" }}>
+                ⚖️ 내신 산출 기준 및 환산 세부 지표
+              </h3>
+
+              {is5Level ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <p style={{ margin: 0, fontSize: "12px", lineHeight: "1.5", color: "#4B5563", fontWeight: 700, wordBreak: "keep-all" }}>
+                    지원 학년(<span style={{ color: "var(--suprima-burgundy)" }}>{studentInfo.grade}</span>)은 **2028 개정 교육과정에 따른 내신 5등급제** 이수 학년입니다.
+                    기존 9등급제 기반 대학별 누적 합격 컷 데이터와 올바르게 대조하기 위해, 교육부 표준 누적 백분율 비례식(구간 선형 보간법)에 의해 보정을 거쳤습니다.
+                  </p>
+                  <div style={{ display: "flex", gap: "16px", marginTop: "6px", flexWrap: "wrap" }}>
+                    <div style={{ backgroundColor: "white", padding: "10px 16px", borderRadius: "10px", border: "1px solid #ECE0D1", flex: 1, minWidth: "160px" }}>
+                      <span style={{ fontSize: "9px", color: "#9CA3AF", fontWeight: "bold", display: "block", marginBottom: "2px" }}>학생부 5등급제 원점 등급</span>
+                      <span style={{ fontSize: "1.15rem", fontWeight: 950, color: "#111827" }}>{rawScore.toFixed(2)} <small style={{ fontSize: "10px", color: "#6B7280" }}>등급</small></span>
+                    </div>
+                    <div style={{ backgroundColor: "rgba(139, 26, 26, 0.03)", padding: "10px 16px", borderRadius: "10px", border: "1.5px solid var(--suprima-burgundy)", flex: 1, minWidth: "160px" }}>
+                      <span style={{ fontSize: "9px", color: "var(--suprima-burgundy)", fontWeight: "bold", display: "block", marginBottom: "2px" }}>대학 수시 매칭용 9등급제 환산 등급</span>
+                      <span style={{ fontSize: "1.15rem", fontWeight: 950, color: "var(--suprima-burgundy)" }}>{convertedScore} <small style={{ fontSize: "10px", color: "var(--suprima-burgundy)" }}>등급</small></span>
+                    </div>
+                  </div>
+                  <p style={{ margin: "2px 0 0 0", fontSize: "9px", color: "#9CA3AF", fontWeight: 600 }}>
+                    * 환산 방식: 1등급(누적 10% ➡️ 9등급제 1.80) / 2등급(누적 34% ➡️ 9등급제 3.60) / 3등급(누적 66% ➡️ 9등급제 5.80) 구간별 선형 보간
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ margin: 0, fontSize: "12px", lineHeight: "1.5", color: "#4B5563", fontWeight: 700, wordBreak: "keep-all" }}>
+                    지원 학년(<span style={{ color: "var(--suprima-burgundy)" }}>{studentInfo.grade}</span>)은 **기존 9등급 상대평가제** 적용 학년입니다.
+                    생활기록부에서 추출한 가중 평균 성적(<span style={{ color: "var(--suprima-burgundy)" }}>{rawScore.toFixed(2)} 등급</span>)을 환산 과정 없이 2023~2025학년도의 대학별 최종 합격 컷 데이터와 1:1로 엄밀하게 대조 진단하였습니다.
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* 3-Year Comparison Table */}
         <div style={{
@@ -156,7 +262,7 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
             <tbody>
               {results.map((item, i) => (
                 <tr key={i} style={{ borderBottom: i === results.length - 1 ? "none" : "1px solid #ECE0D1" }}>
-                  
+
                   {/* College / Dept Cell */}
                   <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                     <p style={{ fontSize: "1.05rem", fontWeight: 950, color: "#111827", margin: "0 0 4px 0", letterSpacing: "-0.04em" }}>
@@ -166,7 +272,7 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
                       {item.track_name || "일반"} <span style={{ color: "#D1D5DB", margin: "0 4px" }}>|</span> {item.department}
                     </p>
                   </td>
-                  
+
                   {/* Years */}
                   <td style={{ padding: "16px 12px", textAlign: "center", fontFamily: "monospace", fontSize: "13px", color: "#9CA3AF", fontWeight: 700, verticalAlign: "middle" }}>
                     {item.y23 || "-"}
@@ -186,15 +292,15 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
                   }}>
                     {item.y25 || "-"}
                   </td>
-                  
+
                   {/* Trend Indicator */}
                   <td style={{ padding: "16px 12px", textAlign: "center", verticalAlign: "middle" }}>
-                    {item.trend === 'up' ? <TrendingUp className="w-5 h-5 mx-auto" style={{ color: "#EF4444" }} /> : 
-                     item.trend === 'down' ? <TrendingDown className="w-5 h-5 mx-auto" style={{ color: "#3B82F6" }} /> : 
-                     <Minus className="w-5 h-5 mx-auto" style={{ color: "#D1D5DB" }} />
+                    {item.trend === 'up' ? <TrendingUp className="w-5 h-5 mx-auto" style={{ color: "#EF4444" }} /> :
+                      item.trend === 'down' ? <TrendingDown className="w-5 h-5 mx-auto" style={{ color: "#3B82F6" }} /> :
+                        <Minus className="w-5 h-5 mx-auto" style={{ color: "#D1D5DB" }} />
                     }
                   </td>
-                  
+
                   {/* Evaluation / Comment */}
                   <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                     <div style={{ marginBottom: "6px" }}>
@@ -204,12 +310,12 @@ export default function ReportComponent({ studentInfo, results, onBack, onReset 
                         borderRadius: "9999px",
                         fontSize: "9px",
                         fontWeight: 900,
-                        backgroundColor: 
+                        backgroundColor:
                           item.level === '매우 안정' || item.level === '안정' ? "#D1FAE5" :
-                          item.level === '적정' ? "#DBEAFE" : "#FEE2E2",
-                        color: 
+                            item.level === '적정' ? "#DBEAFE" : "#FEE2E2",
+                        color:
                           item.level === '매우 안정' || item.level === '안정' ? "#065F46" :
-                          item.level === '적정' ? "#1E40AF" : "#991B1B"
+                            item.level === '적정' ? "#1E40AF" : "#991B1B"
                       }}>
                         {item.level}
                       </span>

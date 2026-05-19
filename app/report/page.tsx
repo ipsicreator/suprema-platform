@@ -11,7 +11,15 @@ export default function ReportPage() {
   const sampleStudentInfo = {
     name: "김수프",
     grade: "고3",
-    score: "2.1",
+    score: "2.10",
+    gradingSystem: "9-level" as const,
+    parsedSubjects: [
+      { subject: "독서", unit: 3, grade: 2 },
+      { subject: "수학I", unit: 4, grade: 2 },
+      { subject: "영어I", unit: 4, grade: 1 },
+      { subject: "화학I", unit: 3, grade: 3 },
+      { subject: "생명과학I", unit: 3, grade: 2 }
+    ]
   };
 
   const sampleResults = [

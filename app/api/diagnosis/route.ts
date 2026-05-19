@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+// Global memory cache to prevent heavy CSV reading & parsing on every request
+let cachedCSVData: any[] | null = null;
+
 function generateHash(data: any) {
   return crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
 }
@@ -26,10 +29,39 @@ function normalizeUniversityName(name: string): string {
   return n.replace("대학교", "대");
 }
 
+// Helper to convert 5-level grade to 9-level grade using Piecewise Linear Interpolation
+export function convert5To9Grade(g5: number): number {
+  if (g5 <= 1.0) return 1.0;
+  if (g5 <= 2.0) {
+    // 1.0 ~ 2.0 mapping to 1.0 ~ 3.6 (e.g. 1.0 -> 1.0, 2.0 -> 3.6)
+    return 1.0 + (g5 - 1.0) * 2.6;
+  }
+  if (g5 <= 3.0) {
+    // 2.0 ~ 3.0 mapping to 3.6 ~ 5.8 (e.g. 3.0 -> 5.8)
+    return 3.6 + (g5 - 2.0) * 2.2;
+  }
+  if (g5 <= 4.0) {
+    // 3.0 ~ 4.0 mapping to 5.8 ~ 7.8 (e.g. 4.0 -> 7.8)
+    return 5.8 + (g5 - 3.0) * 2.0;
+  }
+  if (g5 <= 5.0) {
+    // 4.0 ~ 5.0 mapping to 7.8 ~ 9.0 (e.g. 5.0 -> 9.0)
+    return 7.8 + (g5 - 4.0) * 1.2;
+  }
+  return 9.0;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { studentIndex, choices, academyId } = body; 
+    const { studentIndex, choices, academyId, grade, gradingSystem } = body; 
+    
+    // Convert 5-level grade to 9-level grade dynamically for High 1 & 2
+    let evalIndex = parseFloat(studentIndex.toString());
+    const is5Level = gradingSystem === '5-level' || grade === '고1' || grade === '고2';
+    if (is5Level) {
+      evalIndex = convert5To9Grade(evalIndex);
+    }
     
     // [표준 규칙 적용] 라이선스 체크
     const { checkLicense } = await import('@/lib/auth');
@@ -39,21 +71,21 @@ export async function POST(req: NextRequest) {
     }
 
     // 일관성 체크 및 누적을 위한 해시 생성
-    const inputHash = generateHash({ studentIndex, choices });
+    const inputHash = generateHash({ studentIndex: evalIndex, choices });
 
-    const pb = (await import('@/lib/pocketbase')).default;
+    // PocketBase is bypassed locally to avoid network delays.
 
-    // 1단계: DB 누적 데이터 확인 (일관성 유지)
-    try {
-      const existing = await pb.collection('pdf_analyses').getFirstListItem(`input_hash="${inputHash}"`);
-      if (existing) {
-        return NextResponse.json({ results: JSON.parse(existing.content) });
+    // Load CSV using global memory cache (instantly returned after first boot)
+    if (!cachedCSVData) {
+      const dataDir = path.join(process.cwd(), 'data');
+      const explorerPath = path.join(dataDir, 'susi_explorer_fixed.csv');
+      if (fs.existsSync(explorerPath)) {
+        cachedCSVData = parseCSV(fs.readFileSync(explorerPath, 'utf-8'));
+      } else {
+        cachedCSVData = [];
       }
-    } catch (e) {}
-
-    const dataDir = path.join(process.cwd(), 'data');
-    const explorerPath = path.join(dataDir, 'susi_explorer_fixed.csv');
-    const fullData = parseCSV(fs.readFileSync(explorerPath, 'utf-8'));
+    }
+    const fullData = cachedCSVData;
 
     const results = choices.map((choice: any) => {
       const uniNorm = normalizeUniversityName(choice.university);
@@ -93,38 +125,7 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // 2단계: 진단 결과 DB 누적 (정석 관계형 구조: Header + Detail)
-    try {
-      // 1. diagnosis_sessions (Header) 생성
-      const session = await pb.collection('diagnosis_sessions').create({
-        student_name: studentIndex.toString(),
-        student_index: parseFloat(studentIndex.toString()),
-        school: academyId || "대치 수프리마",
-        input_hash: inputHash,
-        created: new Date().toISOString()
-      });
-
-      const sessionId = session.id;
-
-      // 2. support_choices (Detail) 생성 - 각 선택지별로 기록
-      if (sessionId && results.length > 0) {
-        for (let i = 0; i < results.length; i++) {
-          const res = results[i];
-          await pb.collection('support_choices').create({
-            session_id: sessionId,
-            support_no: i + 1,
-            university: res.university,
-            department: res.department,
-            admission_type: res.admission_type || "학종",
-            track_name: res.track_name || "일반",
-            diag_level: res.level,
-            diag_reason: res.comment
-          });
-        }
-      }
-    } catch (pbError) {
-      console.warn('DB Relational Accumulation Failed:', pbError);
-    }
+    // Relational database logging is bypassed locally.
 
     return NextResponse.json({ results });
 

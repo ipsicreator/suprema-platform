@@ -379,6 +379,9 @@ export default function DiagnosisPage() {
                   name: userInfo?.studentName || "학생",
                   grade: userInfo?.grade || "고3",
                   score: String(userInfo?.studentIndex || "2.5"),
+                  parsedSubjects: userInfo?.parsedSubjects || [],
+                  studentAnalysis: userInfo?.studentAnalysis,
+                  gradingSystem: userInfo?.gradingSystem || "9-level"
                 }}
                 evaluated={evaluated}
                 onReset={() => setStep(2)}
