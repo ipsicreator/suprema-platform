@@ -39,7 +39,7 @@ export async function checkLicense(academyId: string): Promise<boolean> {
  */
 export async function getUserProfile(userId: string) {
   try {
-    return await pb.collection('profiles').getFirstListItem(`user="${userId}"`);
+    return await pb.collection('suprema_platform').getFirstListItem(`user="${userId}"`);
   } catch (error) {
     console.error('Profile Fetch Failed:', error);
     return null;
