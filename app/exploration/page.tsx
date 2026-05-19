@@ -46,7 +46,7 @@ export default function ExplorationPage() {
       const kData = await kResp.json();
       if (kData.keywords) setAutoKeywords(kData.keywords);
 
-      const dResp = await pb.collection('diagnosis_sessions').getFirstListItem(`student_name = "${user.name}"`, { sort: '-created' }).catch(() => null);
+      const dResp = await pb.collection('suprema_diagnosis_sessions').getFirstListItem(`student_name = "${user.name}"`, { sort: '-created' }).catch(() => null);
       if (dResp && dResp.target_university) {
         setTargetGoal(`${dResp.target_university} ${dResp.target_department || ""}`);
       }

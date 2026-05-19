@@ -13,12 +13,12 @@ export async function GET(request: Request) {
     let history: HistoryRecord[] = [];
     if (type === 'setuk') {
       // setuk_history 컬렉션에서 데이터 가져오기
-      history = await pb.collection('setuk_history').getFullList({
+      history = await pb.collection('suprema_setuk_history').getFullList({
         sort: '-created',
       });
     } else if (type === 'diagnosis') {
       // diagnosis_sessions 컬렉션에서 데이터 가져오기
-      history = await pb.collection('diagnosis_sessions').getFullList({
+      history = await pb.collection('suprema_diagnosis_sessions').getFullList({
         sort: '-created',
         expand: 'support_choices_via_session_id',
       });

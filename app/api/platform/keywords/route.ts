@@ -14,13 +14,13 @@ export async function GET(request: Request) {
     // Note: We need to find the student associated with the user first, 
     // but in some flows user_id is directly used or via student_id.
     // Based on PB_STANDARD, we should look for students where user_id matches.
-    const student = await pb.collection('students').getFirstListItem(`user_id = "${userId}"`).catch(() => null);
+    const student = await pb.collection('suprema_students').getFirstListItem(`user_id = "${userId}"`).catch(() => null);
     
     if (!student) {
       return NextResponse.json({ keywords: [] });
     }
 
-    const latestAnalysis = await pb.collection('pdf_analyses').getFirstListItem(`student_id = "${student.id}"`, {
+    const latestAnalysis = await pb.collection('suprema_pdf_analyses').getFirstListItem(`student_id = "${student.id}"`, {
       sort: '-created',
     }).catch(() => null);
 

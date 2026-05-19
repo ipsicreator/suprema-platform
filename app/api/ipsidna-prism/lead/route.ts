@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   }
 
   const pb = await pbAdmin();
-  const created = await pb.collection("prism_leads").create({
+  const created = await pb.collection("suprema_prism_leads").create({
     name,
     school,
     grade,

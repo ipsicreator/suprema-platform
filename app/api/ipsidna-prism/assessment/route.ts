@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const engine_type = resolveType(score);
 
   const pb = await pbAdmin();
-  const created = await pb.collection("prism_assessments").create({
+  const created = await pb.collection("suprema_prism_assessments").create({
     lead_id,
     kind: "short",
     answers,

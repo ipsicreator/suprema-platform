@@ -10,7 +10,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   if (!rid) return NextResponse.json({ ok: false, error: "missing_id" }, { status: 400 });
 
   const pb = await pbAdmin();
-  const rec = await pb.collection("prism_assessments").getOne(rid).catch(() => null);
+  const rec = await pb.collection("suprema_prism_assessments").getOne(rid).catch(() => null);
   if (!rec) return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
 
   return NextResponse.json({

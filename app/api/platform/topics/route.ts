@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const records = await pb.collection('exploration_results').getList(1, 50, {
+    const records = await pb.collection('suprema_exploration_results').getList(1, 50, {
       filter: `user_id = "${userId}"`,
       sort: '-created',
     });
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     // Here we save them as separate entries for easier history viewing
     const savedRecords = [];
     for (const topic of topics) {
-      const record = await pb.collection('exploration_results').create({
+      const record = await pb.collection('suprema_exploration_results').create({
         user_id: userId,
         subject,
         topic_title: topic.title,
