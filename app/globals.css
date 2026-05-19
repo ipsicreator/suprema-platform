@@ -58,39 +58,8 @@ body {
 }
 
 #diagnosis-wrapper {
-  transition: zoom 0.2s ease-in-out;
-}
-
-/* Premium High-DPI Auto-Scaling for Large & Ultra-Wide Viewports */
-@media (min-width: 1200px) {
-  #diagnosis-wrapper {
-    zoom: 1.15;
-  }
-}
-@media (min-width: 1400px) {
-  #diagnosis-wrapper {
-    zoom: 1.35;
-  }
-}
-@media (min-width: 1800px) {
-  #diagnosis-wrapper {
-    zoom: 1.75;
-  }
-}
-@media (min-width: 2400px) {
-  #diagnosis-wrapper {
-    zoom: 2.3;
-  }
-}
-@media (min-width: 3200px) {
-  #diagnosis-wrapper {
-    zoom: 3.0;
-  }
-}
-@media (min-width: 4200px) {
-  #diagnosis-wrapper {
-    zoom: 3.8; /* Perfect legibility on 5K display! Scale by 380% */
-  }
+  width: 100%;
+  max-width: 1150px;
 }
 
 .v-container {

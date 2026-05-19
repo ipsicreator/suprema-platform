@@ -39,7 +39,7 @@ export default function Home() {
       }}>
         
         <img 
-          src="/template_frame_draft.png" 
+          src="/5_16_IMAGE.png" 
           alt="대치 수프리마 랜딩" 
           style={{ 
             display: "block",
