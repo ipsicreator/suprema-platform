@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     // 1단계: DB에서 기존에 누적된 동일한 결과가 있는지 확인 (일관성 유지)
     try {
-      const existingRecord = await pb.collection('pdf_analyses').getFirstListItem(`input_hash="${inputHash}"`);
+      const existingRecord = await pb.collection('suprema_pdf_analyses').getFirstListItem(`input_hash="${inputHash}"`);
       if (existingRecord) {
         console.log('Existing consistent record found in DB.');
         return NextResponse.json(JSON.parse(existingRecord.content));
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     // 3단계: 결과값 DB 누적 (매번 달라지지 않게 자산화)
     try {
-      await pb.collection('pdf_analyses').create({
+      await pb.collection('suprema_pdf_analyses').create({
         student_name: "통합사용자",
         analysis_type: "AI_EXPLORATION",
         input_hash: inputHash, // 일관성 체크용 필드
