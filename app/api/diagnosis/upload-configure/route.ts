@@ -5,6 +5,16 @@ export const runtime = "nodejs";
 
 const COLLECTION = "suprema_pdf_uploads";
 
+async function findCollectionIdByName(pb: any, name: string): Promise<string | null> {
+  try {
+    const list = await pb.collections.getFullList();
+    const found = (list || []).find((c: any) => c?.name === name);
+    return found?.id || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST() {
   try {
     if (!hasPocketBaseAdmin()) {
@@ -17,8 +27,9 @@ export async function POST() {
     const pb = await pbAdmin();
 
     let col: any;
+    const collectionId = (await findCollectionIdByName(pb, COLLECTION)) || COLLECTION;
     try {
-      col = await pb.collections.getOne(COLLECTION);
+      col = await pb.collections.getOne(collectionId);
     } catch {
       // Collection missing in this PocketBase instance: create it.
       col = await pb.collections.create({
@@ -57,7 +68,8 @@ export async function POST() {
       deleteRule: "false",
     };
 
-    await pb.collections.update(COLLECTION, desired as any);
+    const updateId = desired?.id || (await findCollectionIdByName(pb, COLLECTION)) || COLLECTION;
+    await pb.collections.update(updateId, desired as any);
 
     return NextResponse.json({
       ok: true,
