@@ -16,7 +16,35 @@ export async function POST() {
 
     const pb = await pbAdmin();
 
-    const col = await pb.collections.getOne(COLLECTION);
+    let col: any;
+    try {
+      col = await pb.collections.getOne(COLLECTION);
+    } catch {
+      // Collection missing in this PocketBase instance: create it.
+      col = await pb.collections.create({
+        name: COLLECTION,
+        type: "base",
+        listRule: "false",
+        viewRule: "false",
+        createRule: "true",
+        updateRule: "false",
+        deleteRule: "false",
+        fields: [
+          {
+            name: "file",
+            type: "file",
+            required: true,
+            options: {
+              maxSelect: 1,
+              maxSize: 50 * 1024 * 1024,
+              mimeTypes: ["application/pdf"],
+            },
+          },
+          { name: "student_name", type: "text", required: false },
+          { name: "school_name", type: "text", required: false },
+        ],
+      });
+    }
 
     // Ensure direct browser upload works (bypass Vercel request size limits).
     // Disallow list/view/update/delete to keep it private.
