@@ -105,6 +105,16 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
       setPdfError("올바른 PDF 성적표 파일을 업로드해주세요.");
       return;
     }
+    // Vercel/Serverless request body size is limited. Pre-check to avoid opaque 413.
+    const maxUploadBytes = 4 * 1024 * 1024; // 4MB safety margin
+    if (file.size > maxUploadBytes) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      setPdfError(
+        `PDF 용량이 너무 큽니다(${mb}MB). 서버 업로드 한도(약 4MB)를 초과하면 413 오류로 차단됩니다. ` +
+          `PDF를 4MB 이하로 줄이거나(스캔 해상도 낮추기/압축 저장), 수동으로 내신 등급을 입력해 주세요.`,
+      );
+      return;
+    }
 
     setIsLoadingPDF(true);
     setPdfError(null);
