@@ -109,6 +109,9 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
     setPdfError(null);
 
     try {
+      // Ensure PocketBase collection rules allow direct client uploads (admin-configured only)
+      await fetch("/api/diagnosis/upload-configure", { method: "POST" }).catch(() => null);
+
       // 1) Get PocketBase direct upload URL (also bootstraps collection if admin env is set)
       const initRes = await fetch("/api/diagnosis/upload-init", { method: "GET" });
       const init = await initRes.json().catch(() => null);
