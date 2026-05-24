@@ -491,7 +491,15 @@ function loadPDFJS(): Promise<any> {
     script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
     script.onload = () => {
       const pdfjsLib = (window as any).pdfjsLib;
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      try {
+        // Securely load the worker cross-origin by creating a Blob URL
+        const workerCode = `importScripts('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js');`;
+        const blob = new Blob([workerCode], { type: "application/javascript" });
+        pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
+      } catch (err) {
+        console.warn("Failed to create blob worker URL, falling back to direct CDN link.");
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      }
       resolve(pdfjsLib);
     };
     script.onerror = (err) => {
@@ -547,9 +555,9 @@ async function extractTextFromPDFClient(
   const { createWorker } = await import("tesseract.js");
   
   onProgress("[2단계/2] OCR 인식기 초기화 중...");
+  
+  // Create worker with default CDNs but override langPath to use local fast models
   const worker = await createWorker("kor+eng", 1, {
-    workerPath: "https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.5/worker.min.js",
-    corePath: "https://cdnjs.cloudflare.com/ajax/libs/tesseract.js-core/5.0.4/tesseract-core.wasm.js",
     langPath: window.location.origin, // Fetch traineddata from local public folder
     gzip: false,
   });
