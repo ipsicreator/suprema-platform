@@ -105,59 +105,53 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
       setPdfError("올바른 PDF 성적표 파일을 업로드해주세요.");
       return;
     }
-    // Vercel/Serverless request body size is limited. Pre-check to avoid opaque 413.
-    const maxUploadBytes = 4 * 1024 * 1024; // 4MB safety margin
-    if (file.size > maxUploadBytes) {
-      const mb = (file.size / (1024 * 1024)).toFixed(1);
-      setPdfError(
-        `PDF 용량이 너무 큽니다(${mb}MB). 서버 업로드 한도(약 4MB)를 초과하면 413 오류로 차단됩니다. ` +
-          `PDF를 4MB 이하로 줄이거나(스캔 해상도 낮추기/압축 저장), 수동으로 내신 등급을 입력해 주세요.`,
-      );
-      return;
-    }
-
     setIsLoadingPDF(true);
     setPdfError(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("gradingSystem", info.gradingSystem || "9-level");
-    formData.append("studentName", info.studentName || "임시학생");
-    formData.append("schoolName", info.schoolName || "임시대기교");
-
     try {
-      const res = await fetch("/api/diagnosis/upload-pdf", {
-        method: "POST",
-        body: formData,
-      });
-
-      const contentType = res.headers.get("content-type") || "";
-
-      if (!res.ok) {
-        const text = await res.text();
-        let message = `업로드에 실패했습니다. (HTTP ${res.status})`;
-        if (contentType.includes("application/json")) {
-          try {
-            const json = JSON.parse(text);
-            message = json?.error || json?.message || message;
-          } catch {}
-        }
-        setPdfError(message);
+      // 1) Get PocketBase direct upload URL (also bootstraps collection if admin env is set)
+      const initRes = await fetch("/api/diagnosis/upload-init", { method: "GET" });
+      const init = await initRes.json().catch(() => null);
+      if (!initRes.ok || !init?.ok || !init?.uploadUrl) {
+        setPdfError("PDF 업로드 초기화에 실패했습니다. (서버 설정 확인 필요)");
         return;
       }
 
-      const data = contentType.includes("application/json") ? await res.json() : null;
+      // 2) Direct upload to PocketBase (bypasses Vercel request size limit)
+      const uploadFd = new FormData();
+      uploadFd.append("file", file);
+      uploadFd.append("student_name", info.studentName || "임시학생");
+      uploadFd.append("school_name", info.schoolName || "임시대기교");
 
-      if (data?.success) {
+      const uploadRes = await fetch(init.uploadUrl, { method: "POST", body: uploadFd });
+      const uploadJson = await uploadRes.json().catch(() => null);
+      if (!uploadRes.ok || !uploadJson?.id) {
+        setPdfError(uploadJson?.message || uploadJson?.error || `PocketBase 업로드 실패 (HTTP ${uploadRes.status})`);
+        return;
+      }
+
+      // 3) Ask our server to download from PB (admin) and parse
+      const parseRes = await fetch("/api/diagnosis/upload-pdf-record", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recordId: uploadJson.id,
+          gradingSystem: info.gradingSystem || "9-level",
+        }),
+      });
+
+      const parseJson = await parseRes.json().catch(() => null);
+
+      if (parseRes.ok && parseJson?.success) {
         setInfo((prev) => ({
           ...prev,
-          studentIndex: data.gpa,
-          parsedSubjects: data.subjects,
-          studentAnalysis: data.studentAnalysis,
+          studentIndex: parseJson.gpa,
+          parsedSubjects: parseJson.subjects,
+          studentAnalysis: parseJson.studentAnalysis,
         }));
         setPdfError(null);
       } else {
-        setPdfError(data?.error || "성적 정보를 파싱하지 못했습니다. 수동으로 입력해 주세요.");
+        setPdfError(parseJson?.error || `PDF 분석 실패 (HTTP ${parseRes.status})`);
       }
     } catch (err) {
       console.error(err);
