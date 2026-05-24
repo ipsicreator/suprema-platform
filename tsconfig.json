@@ -33,6 +33,10 @@
   "exclude": [
     "node_modules",
     "consultant-app",
-    "consultant-app/**"
+    "consultant-app/**",
+    "StudyEngine",
+    "StudyEngine/**",
+    "_study-engine-standalone",
+    "_study-engine-standalone/**"
   ]
 }
