@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { extractTextFromPDFBuffer, calculateGPAFromText } from "@/lib/pdf-parser";
 import pb from "@/lib/pocketbase";
 
+export const runtime = "nodejs";
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();

@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+export const runtime = "nodejs";
+
 // Global memory cache to prevent heavy CSV reading & parsing on every request
 let cachedCSVData: any[] | null = null;
 
