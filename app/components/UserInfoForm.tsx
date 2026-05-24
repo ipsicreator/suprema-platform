@@ -121,8 +121,24 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         body: formData,
       });
 
-      const data = await res.json();
-      if (data.success) {
+      const contentType = res.headers.get("content-type") || "";
+
+      if (!res.ok) {
+        const text = await res.text();
+        let message = `업로드에 실패했습니다. (HTTP ${res.status})`;
+        if (contentType.includes("application/json")) {
+          try {
+            const json = JSON.parse(text);
+            message = json?.error || json?.message || message;
+          } catch {}
+        }
+        setPdfError(message);
+        return;
+      }
+
+      const data = contentType.includes("application/json") ? await res.json() : null;
+
+      if (data?.success) {
         setInfo((prev) => ({
           ...prev,
           studentIndex: data.gpa,
@@ -131,7 +147,7 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         }));
         setPdfError(null);
       } else {
-        setPdfError(data.error || "성적 정보를 파싱하지 못했습니다. 수동으로 입력해 주세요.");
+        setPdfError(data?.error || "성적 정보를 파싱하지 못했습니다. 수동으로 입력해 주세요.");
       }
     } catch (err) {
       console.error(err);
