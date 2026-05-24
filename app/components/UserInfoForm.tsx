@@ -40,6 +40,7 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isLoadingPDF, setIsLoadingPDF] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfProgressText, setPdfProgressText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [info, setInfo] = useState<UserInfo>({
@@ -98,7 +99,6 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
     setInfo((prev) => ({ ...prev, [name]: name === "studentIndex" ? Number(value) : value }));
   };
 
-  // PDF upload & automated parser handler
   const handlePDFUpload = async (file: File) => {
     if (!file) return;
     if (file.type !== "application/pdf") {
@@ -107,12 +107,26 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
     }
     setIsLoadingPDF(true);
     setPdfError(null);
+    setPdfProgressText("생활기록부 분석 준비 중...");
 
     try {
+      // 1) Extract text on client-side (combines PDF.js text + Tesseract OCR if scanned)
+      const extractedText = await extractTextFromPDFClient(file, (status) => {
+        setPdfProgressText(status);
+      });
+
+      if (!extractedText || extractedText.trim().length === 0) {
+        setPdfError("생활기록부에서 텍스트를 추출할 수 없습니다.");
+        setIsLoadingPDF(false);
+        return;
+      }
+
+      setPdfProgressText("서버에 원본 파일 백업 중...");
+
       // Ensure PocketBase collection rules allow direct client uploads (admin-configured only)
       await fetch("/api/diagnosis/upload-configure", { method: "POST" }).catch(() => null);
 
-      // 1) Get PocketBase direct upload URL (also bootstraps collection if admin env is set)
+      // 2) Get PocketBase direct upload URL
       const initRes = await fetch("/api/diagnosis/upload-init", { method: "GET" });
       const init = await initRes.json().catch(() => null);
       if (!initRes.ok || !init?.ok || !init?.uploadUrl) {
@@ -120,7 +134,7 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         return;
       }
 
-      // 2) Direct upload to PocketBase (bypasses Vercel request size limit)
+      // 3) Direct upload raw PDF to PocketBase for reference / logging
       const uploadFd = new FormData();
       uploadFd.append("file", file);
       uploadFd.append("student_name", info.studentName || "임시학생");
@@ -133,13 +147,16 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         return;
       }
 
-      // 3) Ask our server to download from PB (admin) and parse
+      setPdfProgressText("성적 등급 지표 및 생기부 융합 정밀 분석 중...");
+
+      // 4) Ask our server to parse the client-extracted text
       const parseRes = await fetch("/api/diagnosis/upload-pdf-record", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recordId: uploadJson.id,
           gradingSystem: info.gradingSystem || "9-level",
+          extractedText: extractedText,
         }),
       });
 
@@ -156,11 +173,12 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
       } else {
         setPdfError(parseJson?.error || `PDF 분석 실패 (HTTP ${parseRes.status})`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setPdfError("서버와의 통신에 실패했습니다. 수동으로 내신 등급을 기입해 주세요.");
     } finally {
       setIsLoadingPDF(false);
+      setPdfProgressText(null);
     }
   };
 
@@ -258,10 +276,8 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
     if (!val || val <= 0) return "";
     
     if (info.gradingSystem === "9-level") {
-      // 9-level system: just show 9-level grade, no subtext needed ("9등급으로 보여주면 끝")
       return "";
     } else {
-      // 5-level system: show explanation and convert to 9-level grade (e.g. 1.57 -> 2.55)
       let g9 = 1.0;
       if (val === 1.57) {
         g9 = 2.55;
@@ -389,7 +405,6 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
           </>
         )}
 
-        {/* Dynamic & Premium PDF Uploader Dropzone Section */}
         <div className={styles.pdfSection}>
           <div className={styles.pdfSectionTitle}>
             ✨ 학생부 생활기록부 PDF 자동 성적 분석
@@ -416,7 +431,9 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
             {isLoadingPDF ? (
               <>
                 <div className={styles.spinner}></div>
-                <div className={styles.loadingText}>생활기록부 텍스트 디코딩 및 가중평균 연산 중...</div>
+                <div className={styles.loadingText}>
+                  {pdfProgressText || "생활기록부 텍스트 디코딩 및 가중평균 연산 중..."}
+                </div>
               </>
             ) : (
               <>
@@ -457,4 +474,108 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
       </div>
     </form>
   );
+}
+
+// Client-side PDF.js Dynamic Script Loader
+function loadPDFJS(): Promise<any> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") {
+      reject(new Error("window is not defined"));
+      return;
+    }
+    if ((window as any).pdfjsLib) {
+      resolve((window as any).pdfjsLib);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    script.onload = () => {
+      const pdfjsLib = (window as any).pdfjsLib;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      resolve(pdfjsLib);
+    };
+    script.onerror = (err) => {
+      console.error("PDFJS load failed:", err);
+      reject(new Error("PDF.js 라이브러리를 CDN에서 로드하지 못했습니다."));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// Client-side text parser and OCR fallback helper
+async function extractTextFromPDFClient(
+  file: File, 
+  onProgress: (status: string) => void
+): Promise<string> {
+  onProgress("PDF 라이브러리 초기화 중...");
+  const pdfjsLib = await loadPDFJS();
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const numPages = pdf.numPages;
+  let fullText = "";
+
+  onProgress(`[1단계/2] 학생부 텍스트 디코딩 중... (총 ${numPages}페이지)`);
+  
+  // 1. Text-extraction path (Fast)
+  for (let i = 1; i <= numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items.map((item: any) => item.str).join(" ");
+    fullText += `\n--- Page ${i} ---\n` + pageText;
+  }
+
+  // Check if text has any valid grade key indicators
+  const SUBJECT_KEYWORDS = [
+    "국어", "문학", "독서", "화법", "작문", "언어", "매체",
+    "수학", "미적분", "기하", "확률", "통계", "영어",
+    "한국사", "역사", "사회", "과학", "물리", "화학", "생명과학", "지구과학"
+  ];
+  
+  const hasGrades = SUBJECT_KEYWORDS.some(kw => fullText.includes(kw)) && 
+                    (fullText.includes("단위") || fullText.includes("등급") || fullText.includes("석차"));
+  
+  if (hasGrades && fullText.trim().length > 100) {
+    console.log("[Client PDF] Text detected successfully. Skipping OCR.");
+    return fullText;
+  }
+
+  // 2. OCR fallback path (Slow)
+  console.log("[Client PDF] Scanned PDF or empty text detected. Starting browser OCR...");
+  fullText = ""; // reset
+
+  // Dynamic import of Tesseract.js to avoid bundle issues on non-OCR runs
+  const { createWorker } = await import("tesseract.js");
+  
+  onProgress("[2단계/2] OCR 인식기 초기화 중...");
+  const worker = await createWorker("kor+eng", 1, {
+    workerPath: "https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.5/worker.min.js",
+    corePath: "https://cdnjs.cloudflare.com/ajax/libs/tesseract.js-core/5.0.4/tesseract-core.wasm.js",
+    langPath: window.location.origin, // Fetch traineddata from local public folder
+    gzip: false,
+  });
+
+  for (let i = 1; i <= numPages; i++) {
+    onProgress(`[2단계/2] 페이지 이미지 렌더링 중 (${i} / ${numPages} 페이지)...`);
+    const page = await pdf.getPage(i);
+    
+    // Scale 2.0 to make OCR text recognition accurate
+    const viewport = page.getViewport({ scale: 2.0 });
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    
+    if (ctx) {
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      
+      onProgress(`[2단계/2] 이미지 텍스트 판독 중 (${i} / ${numPages} 페이지)...`);
+      
+      const { data: { text } } = await worker.recognize(dataUrl);
+      fullText += `\n--- Page ${i} ---\n` + text;
+    }
+  }
+
+  await worker.terminate();
+  return fullText;
 }

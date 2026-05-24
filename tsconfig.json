@@ -37,6 +37,10 @@
     "StudyEngine",
     "StudyEngine/**",
     "_study-engine-standalone",
-    "_study-engine-standalone/**"
+    "_study-engine-standalone/**",
+    "scratch",
+    "scratch/**",
+    "scripts",
+    "scripts/**"
   ]
 }
