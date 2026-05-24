@@ -451,18 +451,48 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
           {pdfError && <div className={styles.errorText}>⚠️ {pdfError}</div>}
 
           {info.parsedSubjects && info.parsedSubjects.length > 0 && (
-            <div className={styles.successBox}>
-              <div className={styles.successHeader}>
-                ✅ 성적 분석 완료 (자동 계산 가중내신: **{info.studentIndex}** 등급)
+            <>
+              <div className={styles.successBox}>
+                <div className={styles.successHeader}>
+                  ✅ 성적 분석 완료 (자동 계산 가중내신: **{info.studentIndex}** 등급)
+                </div>
+                <div className={styles.badgeList}>
+                  {info.parsedSubjects.map((sub, idx) => (
+                    <span key={idx} className={styles.badge}>
+                      {sub.subject} ({sub.unit}단위/{sub.grade}등급)
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className={styles.badgeList}>
-                {info.parsedSubjects.map((sub, idx) => (
-                  <span key={idx} className={styles.badge}>
-                    {sub.subject} ({sub.unit}단위/{sub.grade}등급)
-                  </span>
-                ))}
-              </div>
-            </div>
+
+              {info.studentAnalysis && (
+                <div className={styles.analysisPreviewBox}>
+                  <div className={styles.analysisPreviewTitle}>
+                    ✨ AI 생활기록부 비교과 융합 진단서 프리뷰
+                  </div>
+                  <div className={styles.analysisPreviewGrid}>
+                    <div className={styles.analysisPreviewItem}>
+                      <span className={styles.analysisPreviewLabel}>전공 적합성 및 진로</span>
+                      <p className={styles.analysisPreviewText}>
+                        <strong>[{info.studentAnalysis.majorField || "공학 계열"}]</strong> {info.studentAnalysis.majorSuitability}
+                      </p>
+                    </div>
+                    <div className={styles.analysisPreviewItem}>
+                      <span className={styles.analysisPreviewLabel}>핵심 학업 역량</span>
+                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.academicCapacity}</p>
+                    </div>
+                    <div className={styles.analysisPreviewItem}>
+                      <span className={styles.analysisPreviewLabel}>세특 종합 분석</span>
+                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.seTeukAnalysis}</p>
+                    </div>
+                    <div className={styles.analysisPreviewItem}>
+                      <span className={styles.analysisPreviewLabel}>컨설턴트 종합 의견</span>
+                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.comprehensiveOpinion}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
