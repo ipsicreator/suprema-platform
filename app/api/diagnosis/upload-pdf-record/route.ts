@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     if (geminiApiKey) {
       console.log("[PDF Parser] Gemini API key detected. Running Gemini 1.5 Flash parser...");
       try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
         const geminiRes = await fetch(geminiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
