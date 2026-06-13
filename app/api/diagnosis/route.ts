@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 import crypto from 'crypto';
 import { diagnoseAdmissionRange, type YearCutoff } from '@/lib/utils/admission/admissionDiagnosis';
+import admissionData from '@/data/admission/admissionData.json';
 
 export const runtime = "nodejs";
 
@@ -37,7 +36,7 @@ type DiagnosisRequestBody = {
   gradingSystem?: string;
 };
 
-let cachedAdmissionData: AdmissionDataRow[] | null = null;
+const cachedAdmissionData = admissionData as AdmissionDataRow[];
 
 function generateHash(data: unknown) {
   return crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
@@ -63,23 +62,6 @@ function convert5To9Grade(g5: number): number {
   if (g5 <= 4.0) return 5.8 + (g5 - 3.0) * 2.0;
   if (g5 <= 5.0) return 7.8 + (g5 - 4.0) * 1.2;
   return 9.0;
-}
-
-function loadAdmissionData(): AdmissionDataRow[] {
-  if (cachedAdmissionData) return cachedAdmissionData;
-  const dataDir = path.join(process.cwd(), 'data');
-  const admissionPath = path.join(dataDir, 'admission', 'admissionData.json');
-  if (!fs.existsSync(admissionPath)) {
-    cachedAdmissionData = [];
-    return cachedAdmissionData;
-  }
-  try {
-    const parsed = JSON.parse(fs.readFileSync(admissionPath, 'utf-8')) as AdmissionDataRow[];
-    cachedAdmissionData = Array.isArray(parsed) ? parsed : [];
-  } catch {
-    cachedAdmissionData = [];
-  }
-  return cachedAdmissionData ?? [];
 }
 
 function resolveRow(choice: DiagnosisChoice, fullData: AdmissionDataRow[]) {
@@ -137,7 +119,7 @@ export async function POST(req: NextRequest) {
 
     generateHash({ studentIndex: evalIndex, choices });
 
-    const fullData = loadAdmissionData();
+    const fullData = cachedAdmissionData;
 
     const results = choices.map((choice) => {
       const row = resolveRow(choice, fullData);

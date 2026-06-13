@@ -82,8 +82,8 @@ interface PlatformData {
   usage: ServiceUsage[];
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "platform-db.json");
+const STORAGE_DIR = path.join(process.cwd(), ".cache", "suprema-platform");
+const DATA_FILE = path.join(STORAGE_DIR, "platform-db.json");
 
 const defaultPlans: ProductPlan[] = [
   { planId: "plan_free", name: "Free", tier: "free", monthlyPriceKrw: 0, oneTimePriceKrw: 0, availableTermsMonths: [1, 3, 6], includes: ["setuk", "diagnosis"] },
@@ -100,7 +100,7 @@ function randomId(prefix: string) {
 }
 
 async function ensureDataFile() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.mkdir(STORAGE_DIR, { recursive: true });
   try {
     await fs.access(DATA_FILE);
   } catch {
