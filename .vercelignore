@@ -1,4 +1,4 @@
-# Exclude non-Next subprojects and local artifacts
+﻿# Exclude non-Next subprojects and local artifacts
 consultant-app/
 .npm-cache/
 output_assets/
@@ -9,3 +9,23 @@ utils/*.py
 lib/engines/*.py
 ai_setuk_generator.py
 requirements.txt
+
+# Exclude large local data/assets not needed for Vercel
+backend/
+fly/
+captures/
+scratch/
+StudyEngine/
+StudyEngine/.cache/
+StudyEngine/.vercel/
+data/2028_pdf_extracted/
+public/uploads/
+public/**/*.pdf
+public/**/*.zip
+public/*.pdf
+public/*.zip
+public/*.traineddata
+*.traineddata
+*.pdf
+*.hwp
+*.zip
