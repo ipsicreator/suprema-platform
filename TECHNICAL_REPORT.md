@@ -175,3 +175,49 @@ powershell -ExecutionPolicy Bypass -File scripts/keep_pb_alive.ps1
 - Root app remains the canonical source; consultant app is synced via `scripts/sync_consultant_app.js`.
 - Validation completed: focused ESLint pass, `npm.cmd run build`, and Vercel production deploy.
 - Production URL: `https://suprema-platform.vercel.app`
+
+## [2026-06-13 Update] Workspace Cleanup & Separation
+
+- Moved `StudyEngine` out of the root workspace to `C:\Users\chris\Desktop\StudyEngine` so `suprema-platform` stays focused on the main app.
+- Removed safe local clutter from the root workspace: `.next/`, `.codex-work/`, `outputs/`, `scratch/`, `.codex_spreadsheet_inspect.mjs`, `.ignore`, and `tsconfig.tsbuildinfo`.
+- Left source/data folders in place, including `data/2028_pdf_extracted/`, because they are still referenced by scripts and are not safe to delete.
+- Final judgment: build caches and temporary artifacts are safe to remove; admission source data and extracted inputs should be kept or archived separately.
+
+## [2026-06-13 Update] Aggressive Cleanup Scope
+
+- Removed the root `node_modules/` folder as a regenerable dependency cache.
+- If you need to work in this repo again, run `npm.cmd install` before build or verification.
+- The aggressive cleanup list is now limited to cache/output directories and other regenerable artifacts; source/data folders remain untouched.
+
+## [2026-06-13 Update] Three-Tier Cleanup Policy
+
+1. **Keep**: active app source, shared data, and the root `suprema-platform` workspace.
+2. **Delete when needed**: regenerable build/runtime clutter such as `.next/`, `node_modules/`, `outputs/`, `scratch/`, `.codex-work/`, and `tsconfig.tsbuildinfo`.
+3. **Review before deleting**: tooling and deployment metadata such as `.vercel/` and `.cursor/`; keep them unless you are willing to relink or recreate the workspace configuration.
+
+- New projects must live in separate folders or separate repos.
+- The root `suprema-platform` folder is now for modification of the current platform only.
+
+## [2026-06-13 Update] Vercel Relink Cleanup
+
+- Removed the root `.vercel/` directory as requested under the relink-based cleanup tier.
+- The repository will need a fresh Vercel relink before deployment commands or project metadata lookups.
+- `.cursor/` remains in place for now because it contains workspace/editor configuration, not deployment metadata.
+
+## [2026-06-13 Update] Vercel Link Restored
+
+- Restored the root `.vercel/` metadata directory with the original project linkage.
+- The repository is again locally linked to the `suprema-platform` Vercel project.
+
+## [2026-06-13 Update] Vercel Bundle Size Fix
+
+- Removed server-side OCR fallback from `app/api/diagnosis/upload-pdf/route.ts` and `app/api/diagnosis/upload-pdf-record/route.ts`.
+- Split `lib/pdf-parser.ts` back down to pure text-extraction and GPA logic so the server bundle no longer pulls `tesseract.js`.
+- Client-side OCR in `app/components/UserInfoForm.tsx` remains available for scanned PDFs.
+- This change targets the Vercel 250 MB unzipped serverless limit that blocked production deploys.
+
+## [2026-06-13 Update] Bundle Fix Verified
+
+- Reinstalled dependencies and verified the root app with `npm.cmd run build`.
+- The production build now completes successfully after removing server-side OCR from the diagnosis upload routes.
+- This confirms the serverless bundle reduction addressed the Vercel 250 MB limit issue.
