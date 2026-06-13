@@ -4,8 +4,8 @@ import { TrendingUp, TrendingDown, Minus, Printer } from "lucide-react";
 
 type ParsedSubject = {
   subject: string;
-  unit: string;
-  grade: string;
+  unit: string | number;
+  grade: string | number;
 };
 
 type StudentAnalysis = {
@@ -20,7 +20,7 @@ type ReportResult = {
   y24?: string;
   y25?: string;
   y26?: string;
-  trend?: "up" | "down" | "flat";
+  trend?: string;
   level: string;
   comment: string;
 };
@@ -36,6 +36,7 @@ interface ReportProps {
   };
   results: ReportResult[];
   onBack?: () => void;
+  onReset?: () => void;
 }
 
 export default function ReportComponent({ studentInfo, results, onBack }: ReportProps) {

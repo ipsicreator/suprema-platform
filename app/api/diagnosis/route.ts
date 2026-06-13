@@ -74,11 +74,12 @@ function loadAdmissionData(): AdmissionDataRow[] {
     return cachedAdmissionData;
   }
   try {
-    cachedAdmissionData = JSON.parse(fs.readFileSync(admissionPath, 'utf-8'));
+    const parsed = JSON.parse(fs.readFileSync(admissionPath, 'utf-8')) as AdmissionDataRow[];
+    cachedAdmissionData = Array.isArray(parsed) ? parsed : [];
   } catch {
     cachedAdmissionData = [];
   }
-  return cachedAdmissionData;
+  return cachedAdmissionData ?? [];
 }
 
 function resolveRow(choice: DiagnosisChoice, fullData: AdmissionDataRow[]) {
