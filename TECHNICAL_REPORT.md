@@ -164,3 +164,14 @@ powershell -ExecutionPolicy Bypass -File scripts/keep_pb_alive.ps1
 2. **컨설턴트 앱** 저장소에서 변경된 \dmissionData.json\ 파일을 Commit 하고 Push 합니다.
 3. **수프리마 플랫폼** 저장소에서도 동일하게 Commit 하고 Push 합니다.
 4. Github에 Push가 완료되면, Vercel 시스템이 이를 감지하여 1~2분 내로 두 가지 웹앱 모두 자동으로 최신 데이터 버전으로 재배포합니다.
+
+---
+
+## [2026-06-13 Update] Admission Data & Diagnosis Logic
+
+- Updated the admission data pipeline to use `data/admission/admissionData.json` as the source of truth.
+- Diagnosis now evaluates 2026, 2025, and 2024 in order and uses year-by-year feedback plus weighted final judgment.
+- Added range-based decisioning for 50% / 70% cutoffs in `app/api/diagnosis/route.ts`.
+- Root app remains the canonical source; consultant app is synced via `scripts/sync_consultant_app.js`.
+- Validation completed: focused ESLint pass, `npm.cmd run build`, and Vercel production deploy.
+- Production URL: `https://suprema-platform.vercel.app`
