@@ -2,6 +2,10 @@
 .vercel/
 node_modules/
 .git/
+.codex-work/
+outputs/
+StudyEngine/
+public/uploads/
 *.tsbuildinfo
 tsconfig.tsbuildinfo
 dist/
@@ -9,3 +13,9 @@ build/
 venv/
 .env.local
 .env
+data/pdf_raw_text/
+data/2028_pdf_extracted/
+*.zip
+*.traineddata
+*.pdf
+*.hwp

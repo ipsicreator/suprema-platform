@@ -63,7 +63,7 @@ export default function Home() {
         }} aria-label="센터소개 바로가기" />
 
         {/* 투명한 클릭 영역 2: 시작하기 (하단 중앙 버튼 영역) */}
-        <Link href="/diagnosis" style={{
+        <Link href="/diagnosis/step1" style={{
           position: "absolute",
           bottom: "1%",
           left: "20%",
