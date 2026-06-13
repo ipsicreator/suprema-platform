@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { EvaluationSimulation, PositionDiagnosis } from "../components/admission/screens";
+import { EvaluationSimulation, PositionDiagnosis } from "../components/admission";
 import { Search, Activity } from "lucide-react";
 
 export default function DiagnosisPage() {
