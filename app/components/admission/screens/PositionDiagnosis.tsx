@@ -1,8 +1,8 @@
 "use client";
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Compass, Printer, Save, CheckCircle2, Search, Filter } from 'lucide-react';
-import { parseGpaTextToNumber } from '../../../lib/utils/admission/admissionLines';
-import rawData from '../../../data/admission/admissionData.json';
+import { parseGpaTextToNumber } from '../../../../lib/utils/admission/admissionLines';
+import rawData from '../../../../data/admission/admissionData.json';
 
 interface AdmissionRow {
   region: string;
