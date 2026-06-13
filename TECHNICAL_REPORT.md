@@ -233,3 +233,9 @@ powershell -ExecutionPolicy Bypass -File scripts/keep_pb_alive.ps1
 - Moved the two admission screen components into `app/components/admission/screens/`.
 - Added `app/components/admission/screens/index.ts` as the single import entrypoint for the diagnosis page.
 - Updated the consultant app sync script so the same folder structure is mirrored into `src/components/admission/screens/`.
+
+## [2026-06-13 Update] Admission Data Grouping
+
+- Added `app/components/admission/data/` as the shared admission-data entrypoint.
+- Screens now import `ADMISSION_DATA` from the local admission data module instead of reading the JSON directly.
+- Consultant app sync now mirrors the `screens`, `charts`, `evaluation`, and `data` admission folders together.

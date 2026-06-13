@@ -2,28 +2,12 @@
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Compass, Printer, Save, CheckCircle2, Search, Filter } from 'lucide-react';
 import { parseGpaTextToNumber } from '../../../../lib/utils/admission/admissionLines';
-import rawData from '../../../../data/admission/admissionData.json';
-
-interface AdmissionRow {
-  region: string;
-  subRegion: string;
-  univ: string;
-  track: string;
-  dept: string;
-  type: string;
-  name: string;
-  cutoff26: number | null;
-  cutoff25: number | null;
-  cutoff24: number | null;
-  req: string;
-}
+import { ADMISSION_DATA } from '../data';
 
 interface PositionDiagnosisProps {
   onBack?: () => void;
   studentData?: { id: string; name: string } | null;
 }
-
-const ADMISSION_DATA: AdmissionRow[] = rawData as AdmissionRow[];
 
 export default function PositionDiagnosis({ onBack, studentData }: PositionDiagnosisProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
