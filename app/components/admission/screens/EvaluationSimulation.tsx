@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import pb from "../../../../lib/pocketbase";
 import { MOCK_CANDIDATE, SUCCESSFUL_CANDIDATES, UNIVERSITIES } from "../../../../lib/utils/evaluationLogic";
 import { parseGpaTextToNumber } from "../../../../lib/utils/admission/admissionLines";
-import rawData from "../../../../data/admission/admissionData.json";
+import { ADMISSION_DATA } from "../data";
 import RadarEvaluationChart from "../charts/RadarEvaluationChart";
 import RubricPanel from "../evaluation/RubricPanel";
 import SepecViewer from "../evaluation/SepecViewer";
@@ -13,20 +13,6 @@ import { ArrowLeft, Save, CheckCircle2, Target, Printer, Trophy, Activity } from
 interface EvaluationSimulationProps {
   onBack?: () => void;
   studentData?: { id: string; name: string } | null;
-}
-
-interface AdmissionRow {
-  region: string;
-  subRegion: string;
-  univ: string;
-  track: string;
-  dept: string;
-  type: string;
-  name: string;
-  cutoff26: number | null;
-  cutoff25: number | null;
-  cutoff24: number | null;
-  req: string;
 }
 
 type CandidateEntry = { tag: string; text: string };
@@ -55,7 +41,6 @@ type AnalysisContent = {
   detectedGpa?: string | number;
 };
 
-const ADMISSION_DATA: AdmissionRow[] = rawData as AdmissionRow[];
 const RUBRIC_KEYS = ["academic", "career", "community", "inquiry", "attitude", "growth"] as const;
 
 function buildRubricState(labels: string[]) {
