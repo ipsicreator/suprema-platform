@@ -227,3 +227,9 @@ powershell -ExecutionPolicy Bypass -File scripts/keep_pb_alive.ps1
 - Moved platform runtime state out of `data/` and into `.cache/suprema-platform/platform-db.json`.
 - Converted `app/api/universities/route.ts` to a static JSON import so the route no longer traces CSV files from the `data/` tree.
 - Rebuilt successfully and verified the `app/api/platform/*` manifests no longer include `data/2028_pdf_extracted/` or `data/pdf_raw_text/`.
+
+## [2026-06-13 Update] Admission Screen Grouping
+
+- Moved the two admission screen components into `app/components/admission/screens/`.
+- Added `app/components/admission/screens/index.ts` as the single import entrypoint for the diagnosis page.
+- Updated the consultant app sync script so the same folder structure is mirrored into `src/components/admission/screens/`.

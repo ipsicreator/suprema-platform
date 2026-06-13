@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import pb from "../../../lib/pocketbase";
-import { MOCK_CANDIDATE, SUCCESSFUL_CANDIDATES, UNIVERSITIES } from "../../../lib/utils/evaluationLogic";
-import { parseGpaTextToNumber } from "../../../lib/utils/admission/admissionLines";
-import rawData from "../../../data/admission/admissionData.json";
-import RadarEvaluationChart from "./charts/RadarEvaluationChart";
-import RubricPanel from "./evaluation/RubricPanel";
-import SepecViewer from "./evaluation/SepecViewer";
+import pb from "../../../../lib/pocketbase";
+import { MOCK_CANDIDATE, SUCCESSFUL_CANDIDATES, UNIVERSITIES } from "../../../../lib/utils/evaluationLogic";
+import { parseGpaTextToNumber } from "../../../../lib/utils/admission/admissionLines";
+import rawData from "../../../../data/admission/admissionData.json";
+import RadarEvaluationChart from "../charts/RadarEvaluationChart";
+import RubricPanel from "../evaluation/RubricPanel";
+import SepecViewer from "../evaluation/SepecViewer";
 import { ArrowLeft, Save, CheckCircle2, Target, Printer, Trophy, Activity } from "lucide-react";
 
 interface EvaluationSimulationProps {

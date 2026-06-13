@@ -9,29 +9,33 @@ const syncTargets = [
   ['lib/utils/admission/admissionDiagnosis.ts', 'src/utils/admission/admissionDiagnosis.ts'],
   ['data/admission/admissionData.json', 'src/data/admission/admissionData.json'],
   {
-    source: 'app/components/admission/PositionDiagnosis.tsx',
-    destination: 'src/components/admission/PositionDiagnosis.tsx',
+    source: 'app/components/admission/screens/PositionDiagnosis.tsx',
+    destination: 'src/components/admission/screens/PositionDiagnosis.tsx',
     replacements: [
-      ['../../../lib/utils/admission/admissionLines', '../../utils/admission/admissionLines'],
-      ['../../../data/admission/admissionData.json', '../../data/admission/admissionData.json'],
+      ['../../../../lib/utils/admission/admissionLines', '../../../utils/admission/admissionLines'],
+      ['../../../../data/admission/admissionData.json', '../../../data/admission/admissionData.json'],
     ],
   },
   {
-    source: 'app/components/admission/EvaluationSimulation.tsx',
-    destination: 'src/components/admission/EvaluationSimulation.tsx',
+    source: 'app/components/admission/screens/EvaluationSimulation.tsx',
+    destination: 'src/components/admission/screens/EvaluationSimulation.tsx',
     replacements: [
-      ['../../../lib/pocketbase', '../lib/pocketbase'],
-      ['../../../lib/utils/evaluationLogic', '../utils/evaluationLogic'],
-      ['../../../lib/utils/admission/admissionLines', '../../utils/admission/admissionLines'],
-      ['../../../data/admission/admissionData.json', '../../data/admission/admissionData.json'],
-      ['./charts/RadarEvaluationChart', '../charts/RadarEvaluationChart'],
-      ['./evaluation/RubricPanel', '../evaluation/RubricPanel'],
-      ['./evaluation/SepecViewer', '../evaluation/SepecViewer'],
+      ['../../../../lib/pocketbase', '../../../lib/pocketbase'],
+      ['../../../../lib/utils/evaluationLogic', '../../../utils/evaluationLogic'],
+      ['../../../../lib/utils/admission/admissionLines', '../../../utils/admission/admissionLines'],
+      ['../../../../data/admission/admissionData.json', '../../../data/admission/admissionData.json'],
+      ['../charts/RadarEvaluationChart', '../../charts/RadarEvaluationChart'],
+      ['../evaluation/RubricPanel', '../../evaluation/RubricPanel'],
+      ['../evaluation/SepecViewer', '../../evaluation/SepecViewer'],
     ],
+  },
+  {
+    source: 'app/components/admission/screens/index.ts',
+    destination: 'src/components/admission/screens/index.ts',
   },
   {
     source: 'app/components/admission/charts/RadarEvaluationChart.tsx',
-    destination: 'src/components/charts/RadarEvaluationChart.tsx',
+    destination: 'src/components/admission/charts/RadarEvaluationChart.tsx',
   },
   {
     source: 'app/components/admission/charts/AdmissionTierChart.tsx',
@@ -42,11 +46,11 @@ const syncTargets = [
   },
   {
     source: 'app/components/admission/evaluation/RubricPanel.tsx',
-    destination: 'src/components/evaluation/RubricPanel.tsx',
+    destination: 'src/components/admission/evaluation/RubricPanel.tsx',
   },
   {
     source: 'app/components/admission/evaluation/SepecViewer.tsx',
-    destination: 'src/components/evaluation/SepecViewer.tsx',
+    destination: 'src/components/admission/evaluation/SepecViewer.tsx',
   },
 ];
 
