@@ -171,7 +171,7 @@ export default function ExplorationPage() {
       title="탐구/독서 제안"
       subtitle="학생부 3개 신호와 직접 입력 3개를 결합해 탐구/독서 제안을 생성하고, 자료 파일과 API 결과를 함께 보여줍니다."
       steps={[
-        { no: "01", title: "학생부 신호", description: "학생부에서 추출한 핵심 신호를 확인합니다.", icon: <Brain className="h-5 w-5" /> },
+        { no: "01", title: "학생부/성적분석", description: "학생부에서 추출한 핵심 신호를 확인합니다.", icon: <Brain className="h-5 w-5" /> },
         { no: "02", title: "직접 입력", description: "개인이 직접 넣는 키워드와 진로 힌트를 받습니다.", icon: <FileSearch className="h-5 w-5" /> },
         { no: "03", title: "자료 추천", description: "과목별 자료 파일과 연결합니다.", icon: <BookOpen className="h-5 w-5" /> },
         { no: "04", title: "탐구/독서 제안", description: "주제, 개요, 책 제안으로 이어집니다.", icon: <Target className="h-5 w-5" /> },
@@ -185,7 +185,7 @@ export default function ExplorationPage() {
       <div className="max-w-5xl mx-auto">
         <header className="mb-10 text-center">
           <div className="flex flex-col items-center gap-4 mb-6">
-            <div className="v-badge">학생부 기반 탐구 주제 추천</div>
+            <div className="v-badge">학생부/성적분석 → 탐구/독서 제안</div>
             <h1 className="text-5xl font-black tracking-tight">
               AI <span className="v-highlight">탐구/독서 제안</span>
             </h1>
