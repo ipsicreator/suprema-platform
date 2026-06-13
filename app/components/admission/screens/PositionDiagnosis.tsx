@@ -87,7 +87,7 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
           )}
           <div>
             <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Compass size={24} color="#3b82f6" /> 입시위치 진단 (입결 검색기)
+              <Compass size={24} color="#3b82f6" /> 입시위치 진단
             </h1>
             <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>
               {studentData ? `${studentData.name} 학생의 내신(${parsedGpa || '없음'})을 기준으로 합격 가능성을 진단합니다.` : '2027학년도 수시전형 입결 데이터를 조건별로 검색합니다.'}

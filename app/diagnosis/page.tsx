@@ -10,9 +10,9 @@ export default function DiagnosisPage() {
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>입시위치 진단 및 시뮬레이션</h1>
+        <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.5rem" }}>입시위치 진단</h1>
         <p style={{ color: "#64748b", marginBottom: "2rem" }}>
-          실제 입결 데이터를 기반으로 합격 가능성을 진단하고 세특 역전 시뮬레이션을 수행합니다.
+          학생부/성적분석 결과를 바탕으로 합격 가능성을 진단하고 입학사정관 평가까지 연결합니다.
         </p>
         
         <div style={{ display: "flex", gap: "1rem", borderBottom: "2px solid #e2e8f0", paddingBottom: "1rem" }}>
@@ -32,7 +32,7 @@ export default function DiagnosisPage() {
               transition: "all 0.2s"
             }}
           >
-            <Search size={18} /> 입결 검색기
+            <Search size={18} /> 입시위치 진단
           </button>
           
           <button
@@ -51,7 +51,7 @@ export default function DiagnosisPage() {
               transition: "all 0.2s"
             }}
           >
-            <Activity size={18} /> 고교 유형별 합산 시뮬레이션
+            <Activity size={18} /> 입학사정관 평가
           </button>
         </div>
       </div>
