@@ -7,6 +7,8 @@ export interface ExtractedSubject {
   subject: string;
   unit: number;
   grade: number;
+  year?: number;
+  semester?: number;
 }
 
 export interface UserInfo {

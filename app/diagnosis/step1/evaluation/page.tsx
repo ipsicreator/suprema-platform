@@ -94,7 +94,7 @@ export default function StudentAnalysisPage() {
     return Number((sum / subjects.length).toFixed(2));
   }, [subjects]);
 
-  const topKeywords = (studentInfo?.studentAnalysis?.keyKeywords ?? []).slice(0, 6);
+  const topKeywords = ((studentInfo?.studentAnalysis?.keyKeywords ?? []) as string[]).slice(0, 6);
   const subjectCount = subjects.length;
   const strongestSubject = subjectData[0]?.subject ?? "미확인";
   const weakestGrade = subjects.length > 0 ? Math.max(...subjects.map((item) => Number(item.grade || 0))) : null;
