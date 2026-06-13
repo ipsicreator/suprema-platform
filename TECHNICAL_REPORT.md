@@ -239,3 +239,9 @@ powershell -ExecutionPolicy Bypass -File scripts/keep_pb_alive.ps1
 - Added `app/components/admission/data/` as the shared admission-data entrypoint.
 - Screens now import `ADMISSION_DATA` from the local admission data module instead of reading the JSON directly.
 - Consultant app sync now mirrors the `screens`, `charts`, `evaluation`, and `data` admission folders together.
+
+## [2026-06-13 Update] Admission Barrel Export
+
+- Added `app/components/admission/index.ts` as the top-level barrel for admission screens and shared admission modules.
+- `app/diagnosis/page.tsx` now imports from `../components/admission` instead of reaching into the `screens` folder directly.
+- Consultant app sync now copies the same top-level barrel into `src/components/admission/index.ts`.

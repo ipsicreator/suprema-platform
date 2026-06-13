@@ -10,6 +10,7 @@ const syncTargets = [
   ['data/admission/admissionData.json', 'src/data/admission/admissionData.json'],
   ['app/components/admission/data/admissionData.ts', 'src/components/admission/data/admissionData.ts'],
   ['app/components/admission/data/index.ts', 'src/components/admission/data/index.ts'],
+  ['app/components/admission/index.ts', 'src/components/admission/index.ts'],
   {
     source: 'app/components/admission/screens/PositionDiagnosis.tsx',
     destination: 'src/components/admission/screens/PositionDiagnosis.tsx',
