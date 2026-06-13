@@ -1,9 +1,8 @@
 "use client";
 import { useState, useMemo } from 'react';
-import { ArrowLeft, MapPin, AlertCircle, Compass, Activity, Printer, Save, CheckCircle2, Search, Filter, Sparkles } from 'lucide-react';
-import { parseGpaTextToNumber } from '../../../lib/utils/admissionLines';
-// @ts-ignore
-import rawData from '../../../data/admissionData.json';
+import { ArrowLeft, Compass, Printer, Save, CheckCircle2, Search, Filter } from 'lucide-react';
+import { parseGpaTextToNumber } from '../../../lib/utils/admission/admissionLines';
+import rawData from '../../../data/admission/admissionData.json';
 
 interface AdmissionRow {
   region: string;
@@ -15,12 +14,18 @@ interface AdmissionRow {
   name: string;
   cutoff26: number | null;
   cutoff25: number | null;
+  cutoff24: number | null;
   req: string;
+}
+
+interface PositionDiagnosisProps {
+  onBack?: () => void;
+  studentData?: { id: string; name: string } | null;
 }
 
 const ADMISSION_DATA: AdmissionRow[] = rawData as AdmissionRow[];
 
-export default function PositionDiagnosis({ onBack, studentData }: any) {
+export default function PositionDiagnosis({ onBack, studentData }: PositionDiagnosisProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedSubRegion, setSelectedSubRegion] = useState<string>('');
   const [selectedUniv, setSelectedUniv] = useState<string>('');
@@ -191,13 +196,14 @@ export default function PositionDiagnosis({ onBack, studentData }: any) {
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>전형명</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1', color: '#4f46e5' }}>26예상컷</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>25실제컷</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>24실제컷</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>수능최저/비고</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>내신격차(진단)</th>
               </tr>
             </thead>
             <tbody>
               {filteredData.slice(0, 100).map((row, idx) => {
-                const cutoff = row.cutoff26 || row.cutoff25 || null;
+                const cutoff = row.cutoff26 ?? row.cutoff25 ?? row.cutoff24 ?? null;
                 let gapMsg = '-';
                 let gapColor = '#64748b';
                 
@@ -230,6 +236,7 @@ export default function PositionDiagnosis({ onBack, studentData }: any) {
                     <td style={{ padding: '0.75rem', color: '#475569' }}>{row.name}</td>
                     <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#4f46e5' }}>{row.cutoff26 ? row.cutoff26.toFixed(2) : '-'}</td>
                     <td style={{ padding: '0.75rem', color: '#64748b' }}>{row.cutoff25 ? row.cutoff25.toFixed(2) : '-'}</td>
+                    <td style={{ padding: '0.75rem', color: '#64748b' }}>{row.cutoff24 ? row.cutoff24.toFixed(2) : '-'}</td>
                     <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={row.req}>{row.req || '-'}</td>
                     <td style={{ padding: '0.75rem', fontWeight: 600, color: gapColor }}>{gapMsg}</td>
                   </tr>
