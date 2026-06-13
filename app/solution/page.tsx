@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Sparkles, FileSearch, User, Brain, ArrowRight, Loader2, BookOpen, Quote, X, Plus, Book } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +22,14 @@ type ReportResult = {
 };
 
 export default function SolutionPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#020617]" />}>
+      <SolutionContent />
+    </Suspense>
+  );
+}
+
+function SolutionContent() {
   const searchParams = useSearchParams();
   const initialTopic = searchParams.get("topic") || "";
   const initialKeywords = (searchParams.get("keywords") || "")
@@ -225,3 +233,4 @@ export default function SolutionPage() {
     </div>
   );
 }
+
