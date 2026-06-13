@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Compass, Printer, Save, CheckCircle2, Search, Filter } from 'lucide-react';
 import { parseGpaTextToNumber } from '../../../../lib/utils/admission/admissionLines';
+import AdmissionOfficerEvaluation from '../AdmissionOfficerEvaluation';
 import { ADMISSION_DATA } from '../data';
 
 interface PositionDiagnosisProps {
@@ -164,6 +165,16 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
         </div>
       </div>
 
+      <div style={{ marginBottom: '2rem' }}>
+        <AdmissionOfficerEvaluation
+          averageGrade={parsedGpa}
+          strongestSubject={selectedDept || '전공 탐색 중'}
+          weakestGrade={parsedGpa ? Math.ceil(parsedGpa) : null}
+          subjectCount={filteredData.length}
+          compact
+        />
+      </div>
+
       <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Search size={20} color="#64748b" /> 검색 결과 ({filteredData.length}건)
@@ -178,9 +189,9 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>모집단위명</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>전형유형</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>전형명</th>
-                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1', color: '#4f46e5' }}>26예상컷</th>
-                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>25실제컷</th>
-                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>24실제컷</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1', color: '#4f46e5' }}>26컷</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>25컷</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>24컷</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>수능최저/비고</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>내신격차(진단)</th>
               </tr>

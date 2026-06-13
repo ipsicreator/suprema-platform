@@ -1,10 +1,12 @@
-import zlib from "zlib";
+﻿import zlib from "zlib";
 
 
 export interface ExtractedSubject {
   subject: string;
   unit: number;
   grade: number;
+  year?: number;
+  semester?: number;
 }
 
 export interface PDFAnalysisResult {
@@ -12,7 +14,7 @@ export interface PDFAnalysisResult {
   subjects: ExtractedSubject[];
   message: string;
   success: boolean;
-  studentAnalysis?: any;
+  studentAnalysis?: Record<string, unknown>;
 }
 
 // Extract pure text from raw PDF buffer using built-in zlib FlateDecode streams
@@ -84,7 +86,7 @@ export function extractTextFromPDFBuffer(buffer: Buffer): string {
           text += buf.toString("utf16le") + " ";
         } catch {}
       }
-    } catch (e) {
+    } catch {
       // Pass other uncompressed / binary streams
     }
     
@@ -96,68 +98,42 @@ export function extractTextFromPDFBuffer(buffer: Buffer): string {
 
 // Match subjects, units, and rank grades to compute GPA
 const SUBJECT_KEYWORDS = [
-  "국어", "문학", "독서", "화법", "작문", "언어", "매체", "고전",
-  "수학", "미적분", "기하", "확률", "통계", "영어", "회화", "독해",
-  "한국사", "역사", "세계사", "동아시아사", "윤리", "사상", "지리", "정치", "법", "경제", "사회", "문화",
-  "과학", "물리", "화학", "생명과학", "지구과학", "정보", "한문", "중국어", "일본어"
+  "국어",
+  "수학",
+  "영어",
+  "한국사",
+  "사회",
+  "과학",
+  "통합사회",
+  "통합과학",
+  "정보",
+  "기술",
+  "미술",
+  "음악",
+  "체육",
+  "진로",
+  "한문",
+  "독서",
+  "문학",
+  "화법",
+  "작문",
+  "확률과통계",
+  "미적분",
+  "기하"
 ];
 
 export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9-level"): PDFAnalysisResult {
   const normalized = text.replace(/\s+/g, " ");
-  
-  // Advanced check for Hyunwoo's PDF file (detects by name or key identifiers)
-  const isHyunwoo = text.includes("현우") || text.includes("성덕고") || text.includes("티에스아이") || text.includes("기욱") || text.includes("이기욱");
-  
-  if (isHyunwoo) {
-    const hyunwooSubjects = [
-      // 1학기 (1st Semester)
-      { subject: "국어", unit: 4, grade: 2 },
-      { subject: "수학", unit: 4, grade: 1 },
-      { subject: "영어", unit: 4, grade: 2 },
-      { subject: "한국사", unit: 3, grade: 2 },
-      { subject: "사회", unit: 4, grade: 1 }, // 통합사회1
-      { subject: "과학", unit: 4, grade: 1 }, // 통합과학1
-      
-      // 2학기 (2nd Semester)
-      { subject: "국어", unit: 4, grade: 2 },
-      { subject: "수학", unit: 4, grade: 1 },
-      { subject: "영어", unit: 4, grade: 2 },
-      { subject: "한국사", unit: 3, grade: 2 },
-      { subject: "사회", unit: 4, grade: 2 }, // 통합사회2
-      { subject: "과학", unit: 4, grade: 1 }  // 통합과학2
-    ];
-    
-    const studentAnalysis = {
-      majorSuitability: "S등급 (전국 최상위 0.1%)",
-      majorField: "건축공학 / 토목공학 / 스마트 건설공학",
-      keyKeywords: ["구조안정성", "하중분산", "내진설계", "TSI 물리실험", "스마트건설 AI-드론"],
-      academicCapacity: "수학 및 과학 핵심 교과 성적이 1학기/2학기 연속 1등급(공통수학 1등급, 통합과학 1등급)으로 공학 분야 연구에 필요한 학술적 기초 체력이 매우 탁월합니다. 또한, 수학적 개념을 공학적 물리 현상(원운동 궤적, 이차함수 모델링)에 적용하는 직관적 탐구력이 돋보입니다.",
-      activityAutonomous: "학급 부회장으로서 탁월한 경청과 소통을 통해 갈등을 조율하는 협업 능력을 입증했습니다. 독서캠프 활동을 통해 '인공지능 시대의 건축'이라는 융합 주제를 선정하고 인문학적 윤리와 건축 기술의 확장 가능성을 탐구한 진로 주도성이 뛰어납니다.",
-      activityClub: "TSI(물리/공학) 동아리에서 Faraday 법칙 실험 시 유도전류 상쇄 현상을 규명하는 등 학문적 집요함이 뛰어납니다. 특히 디지털화가 미비한 건설 분야에 'AI 기반 시뮬레이션 및 드론 외관 검사 데이터 연구'를 독자 기획하여 발표한 스마트 건설 공학자로서의 자질이 돋보입니다.",
-      activityCareer: "물리학 저서 '멸림과 울림'을 적외선 센서의 구조적 응용으로 연결하고, '다리 구조와 하중 분산 원리' 심화 탐구를 통해 트러스 구조의 삼각형 하중 분산과 아치 구조의 곡선 압축력을 물리학적으로 정교하게 비교 분석한 학술적 깊이가 남다릅니다.",
-      seTeukAnalysis: "국어(거대 구조물의 외부 압력 및 지속 가능한 인프라 공학자 자질 성찰), 통합과학(지반 성질에 따른 진동 전달 실험), 과학탐구실험(트러스-아치 내진 모형 비교 실험) 등 본인이 희망하는 '건축 구조 안정성 및 내진 공학' 테마로 1학년 생기부 전반이 완벽한 하나의 스토리라인으로 촘촘히 엮여 있어, 전국 특목/일반고를 통틀어 최상위 수준의 학생부종합전형(학종) 서류 경쟁력을 확보하고 있습니다.",
-      comprehensiveOpinion: "학급의 리더(부회장)로서 뛰어난 소통 능력을 갖추었으며, 교과 성적(수학·과학 전과목 1등급)과 비교과(내진/스마트 건설 심화 탐구)의 완벽한 융합 시너지를 실현하는 대치동 최우수 수준의 미래 공학 인재입니다."
-    };
-    
-    return {
-      gpa: 1.57,
-      subjects: hyunwooSubjects,
-      studentAnalysis,
-      message: "성공적으로 학생부 PDF 성적(12개 과목) 및 비교과(세특/창체/행발) 융합 정밀 분석을 완료했습니다.",
-      success: true
-    };
-  }
-
   const defaultAnalysis = {
-    majorSuitability: "A등급 (우수)",
-    majorField: "일반공학 / 융합학술 계열",
-    keyKeywords: ["학업역량", "교과연계", "자기주도성"],
-    academicCapacity: "제출된 성적 지표 기준 평균적인 학업 성취도가 고르게 유지되고 있으며, 주요 교과의 학습 루틴과 복습 태도가 잘 형성되어 있습니다.",
-    activityAutonomous: "학급 구성원 간의 소통에 주도적으로 참여하며, 협력적인 공동체 성장에 기여한 부분이 관찰됩니다.",
-    activityClub: "동아리 탐구 주제 선정에 성실히 임하며, 실험 과정의 변수 통제와 분석에 적극적으로 참여하였습니다.",
-    activityCareer: "독서 및 진로 탐색을 통해 본인의 흥미 분야를 구체화해 나가는 자기주도성이 입증됩니다.",
-    seTeukAnalysis: "과목별 세부능력 및 특기사항에 본인의 진로 분야 핵심 개념들이 자연스럽게 녹아 있어, 향후 심화 연구 주제와 연계하여 서류 경쟁력을 더욱 극대화할 수 있는 잠재력이 큽니다.",
-    comprehensiveOpinion: "성실한 학업 태도와 성취도를 바탕으로, 학업과 비교과의 균형 잡힌 성장이 매우 기대되는 인재입니다."
+    majorSuitability: "기본 분석",
+    majorField: "인문 / 사회 / 자연 / 공학 계열",
+    keyKeywords: ["탐구역량", "교과역량", "자기주도성"],
+    academicCapacity: "학생부 항목을 바탕으로 기본 분석을 수행합니다.",
+    activityAutonomous: "탐구 활동과 자율적 학습 흔적을 함께 확인합니다.",
+    activityClub: "동아리 활동은 탐구 주제와 연결해 해석합니다.",
+    activityCareer: "진로 관련 기록은 주제 탐구 흐름에 반영합니다.",
+    seTeukAnalysis: "학생부 핵심 문장을 기반으로 진단합니다.",
+    comprehensiveOpinion: "기본 학생부 분석 결과입니다."
   };
 
   const lines = text.split(/[\r\n]+/);
@@ -170,6 +146,11 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
     
     const matchedSubject = SUBJECT_KEYWORDS.find(sub => line.includes(sub));
     if (matchedSubject) {
+      const yearMatch = line.match(/([1-3])\s*?숇뀈/);
+      const semesterMatch = line.match(/([12])\s*?숆린/);
+      const year = yearMatch ? parseInt(yearMatch[1], 10) : undefined;
+      const semester = semesterMatch ? parseInt(semesterMatch[1], 10) : undefined;
+
       // Find numbers representing [units, grade] in standard transcript row
       const numbers = line.match(/\b([1-9])\b/g);
       if (numbers && numbers.length >= 2) {
@@ -181,7 +162,9 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
           extracted.push({
             subject: matchedSubject,
             unit,
-            grade
+            grade,
+            year,
+            semester
           });
         }
       }
@@ -192,7 +175,7 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
   if (extracted.length === 0) {
     for (const sub of SUBJECT_KEYWORDS) {
       // Matches pattern: "Subject (Any spacing) Units (Any spacing) Grade"
-      const regex = new RegExp(`${sub}[가-힣A-Za-z0-9\\s]{0,8}?\\s*\\(?([1-6])\\)?\\s*(?:단위)?\\s*(?:[A-E]\\(?\\d*\\)?|성취도)?\\s*\\(?([1-9])\\)?\\s*(?:등급)?`, "g");
+      const regex = new RegExp(`${sub}[媛-?쥱-Za-z0-9\\s]{0,8}?\\s*\\(?([1-6])\\)?\\s*(?:?⑥쐞)?\\s*(?:[A-E]\\(?\\d*\\)?|?깆랬???\\s*\\(?([1-9])\\)?\\s*(?:?깃툒)?`, "g");
       let match;
       while ((match = regex.exec(normalized)) !== null) {
         const unit = parseInt(match[1], 10);
@@ -224,7 +207,7 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
     return {
       gpa: 0,
       subjects: [],
-      message: "성적표 영역에서 유효한 교과 성적(단위수 및 석차등급) 정보를 식별하지 못했습니다.",
+      message: "?깆쟻???곸뿭?먯꽌 ?좏슚??援먭낵 ?깆쟻(?⑥쐞??諛??앹감?깃툒) ?뺣낫瑜??앸퀎?섏? 紐삵뻽?듬땲??",
       success: false
     };
   }
@@ -243,7 +226,7 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
     gpa,
     subjects: uniqueExtracted,
     studentAnalysis: defaultAnalysis,
-    message: `성공적으로 학생부 PDF 성적(${uniqueExtracted.length}개 과목)을 자동 분석했습니다.`,
+    message: `?깃났?곸쑝濡??숈깮遺 PDF ?깆쟻(${uniqueExtracted.length}媛?怨쇰ぉ)???먮룞 遺꾩꽍?덉뒿?덈떎.`,
     success: true
   };
 }

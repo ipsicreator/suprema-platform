@@ -42,9 +42,21 @@ next-env.d.ts
 
 # local caches and generated artifacts
 .npm-cache/
+.codex-work/
+outputs/
+StudyEngine/
+public/uploads/
 **/__pycache__/
 output_assets/
 consultant-app/dist/
+StudyEngine/.cache/
+StudyEngine/.vercel/
+data/pdf_raw_text/
+data/2028_pdf_extracted/
+*.traineddata
+*.zip
+*.pdf
+*.hwp
 
 .env
 .env.*

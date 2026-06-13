@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import pb from '@/lib/pocketbase';
 import { recommendTopics } from '@/lib/topicRecommender';
 
@@ -17,16 +17,16 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(records.items);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to fetch history:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'fetch_history_failed' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, subject, interests, careerHint, targetGoal, grade, count } = body;
+    const { userId, subject, interests, studentSignals, careerHint, targetGoal, grade, count } = body;
 
     if (!userId || !subject) {
       return NextResponse.json({ error: 'User ID and Subject are required' }, { status: 400 });
@@ -34,7 +34,18 @@ export async function POST(request: Request) {
 
     // Generate topics
     const interestsList = interests ? interests.split(',').map((i: string) => i.trim()) : [];
-    const topics = recommendTopics(subject, interestsList, careerHint, targetGoal || '', grade || 'high', count || 5);
+    const studentSignalsList = Array.isArray(studentSignals) ? studentSignals.map((item: string) => String(item).trim()).filter(Boolean) : [];
+    if (interestsList.length === 0 && subject) {
+      interestsList.push(subject);
+    }
+    const topics = recommendTopics(
+      subject,
+      [...studentSignalsList, ...interestsList],
+      careerHint,
+      targetGoal || '',
+      grade || 'high',
+      count || 5
+    );
 
     // Save each topic to history (optional: save all as one session or separate)
     // Here we save them as separate entries for easier history viewing
@@ -56,8 +67,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ topics: savedRecords });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to generate topics:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'generate_topics_failed' }, { status: 500 });
   }
 }
+
