@@ -221,3 +221,9 @@ powershell -ExecutionPolicy Bypass -File scripts/keep_pb_alive.ps1
 - Reinstalled dependencies and verified the root app with `npm.cmd run build`.
 - The production build now completes successfully after removing server-side OCR from the diagnosis upload routes.
 - This confirms the serverless bundle reduction addressed the Vercel 250 MB limit issue.
+
+## [2026-06-13 Update] Vercel Trace Cleanup
+
+- Moved platform runtime state out of `data/` and into `.cache/suprema-platform/platform-db.json`.
+- Converted `app/api/universities/route.ts` to a static JSON import so the route no longer traces CSV files from the `data/` tree.
+- Rebuilt successfully and verified the `app/api/platform/*` manifests no longer include `data/2028_pdf_extracted/` or `data/pdf_raw_text/`.
