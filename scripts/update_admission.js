@@ -1,97 +1,203 @@
 const fs = require('fs');
 const path = require('path');
-const xlsx = require('xlsx');
+const XLSX = require('xlsx');
 
-// 1. 엑셀 파일이 위치한 폴더
-const EXCEL_DIR = 'C:/Users/chris/Desktop/새 폴더/suprima_교과세특/consultant_app_independent/public/';
+const repoRoot = process.cwd();
+const dataDir = path.join(repoRoot, 'data');
 
-// 2. 저장할 두 가지 프로젝트의 JSON 경로
-const TARGET_CONSULTANT = 'C:/Users/chris/Desktop/새 폴더/suprima_교과세특/consultant_app_independent/src/data/admissionData.json';
-const TARGET_PLATFORM = 'C:/Users/chris/Desktop/suprema-platform/data/admissionData.json';
-
-console.log('엑셀 파일을 찾고 있습니다...');
-
-const files = fs.readdirSync(EXCEL_DIR);
-// .xlsx 확장자이면서 백업이나 임시파일(~$)이 아닌 파일 찾기
-const excelFile = files.find(f => f.endsWith('.xlsx') && !f.startsWith('~$'));
-
-if (!excelFile) {
-    console.error('오류: public 폴더에 엑셀 파일(.xlsx)이 없습니다!');
-    process.exit(1);
+function normalizeHeader(value) {
+  return String(value ?? '')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, '')
+    .replace(/_/g, '')
+    .trim();
 }
 
-const excelPath = path.join(EXCEL_DIR, excelFile);
-console.log(`발견된 엑셀 파일: ${excelFile}`);
-console.log('엑셀 데이터를 읽는 중 (시간이 조금 걸릴 수 있습니다)...');
+function parseNumber(value) {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const numeric = String(value).replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+  return numeric ? Number(numeric[0]) : null;
+}
 
-// 엑셀 파싱
-const wb = xlsx.readFile(excelPath);
-const sheetName = wb.SheetNames[0]; // 첫 번째 시트 사용
-const sheet = wb.Sheets[sheetName];
+function readField(lookup, aliases) {
+  for (const alias of aliases) {
+    const value = lookup.get(normalizeHeader(alias));
+    if (value !== undefined && value !== null && String(value).trim() !== '') {
+      return value;
+    }
+  }
+  return null;
+}
 
-// 엑셀 -> JSON 변환
-const rawData = xlsx.utils.sheet_to_json(sheet);
+function buildLookup(row) {
+  const lookup = new Map();
+  for (const [key, value] of Object.entries(row)) {
+    lookup.set(normalizeHeader(key), value);
+  }
+  return lookup;
+}
 
-console.log(`총 ${rawData.length}개의 데이터를 성공적으로 읽었습니다.`);
-console.log('앱에 맞게 데이터 포맷을 변환 중입니다...');
+function latestWorkbookFromArgs() {
+  const inputArg = process.argv.slice(2).find((arg) => arg && !arg.startsWith('--'));
+  if (inputArg) {
+    const resolved = path.resolve(inputArg);
+    if (!fs.existsSync(resolved)) {
+      throw new Error(`Workbook not found: ${resolved}`);
+    }
+    return resolved;
+  }
 
-// JSON 구조 매핑
-const mappedData = rawData.map(row => {
-    // 줄바꿈이 있는 헤더를 대응하기 위한 함수
-    const findValue = (possibleKeys) => {
-        for (const key of possibleKeys) {
-            if (row[key] !== undefined) return row[key];
-        }
-        return null;
-    };
+  const searchDirs = [path.join(repoRoot, 'public'), path.join(repoRoot, 'outputs'), repoRoot];
+  const workbookPaths = [];
+  for (const searchDir of searchDirs) {
+    if (!fs.existsSync(searchDir)) continue;
+    for (const entry of fs.readdirSync(searchDir, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.xlsx')) continue;
+      if (entry.name.startsWith('~$')) continue;
+      workbookPaths.push(path.join(searchDir, entry.name));
+    }
+  }
 
-    // 입결 숫자로 변환 (숫자가 아닌 텍스트는 null 또는 필터링)
-    const parseGrade = (val) => {
-        if (!val) return null;
-        if (typeof val === 'number') return val;
-        const num = parseFloat(String(val).replace(/[^0-9.]/g, ''));
-        return isNaN(num) ? null : num;
-    };
+  if (workbookPaths.length === 0) {
+    throw new Error('No workbook found. Pass the .xlsx path as an argument.');
+  }
+
+  workbookPaths.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  return workbookPaths[0];
+}
+
+function extractRows(workbookPath) {
+  const workbook = XLSX.readFile(workbookPath, { cellDates: true });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  if (!sheet) throw new Error(`No worksheet found in ${workbookPath}`);
+  const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: null });
+
+  return rawRows.map((row) => {
+    const lookup = buildLookup(row);
+    const cutoff26Original = parseNumber(
+      readField(lookup, [
+        '2026학년도 입결(등급)_원본',
+        '2026학년도 입결(등급) 원본',
+        '2026학년도입결(등급)_원본',
+      ]),
+    );
+    const cutoff26 = parseNumber(
+      readField(lookup, [
+        '2026학년도 입결(등급)',
+        '2026학년도입결(등급)',
+        '2026학년도 입결(등급) ',
+      ]) ?? cutoff26Original,
+    );
+    const cutoff26_50 = parseNumber(
+      readField(lookup, ['입결(50%)', '2026학년도 입결(50%)', '2026학년도입결(50%)']),
+    );
+    const cutoff26_70 = parseNumber(
+      readField(lookup, ['입결(70%)', '2026학년도 입결(70%)', '2026학년도입결(70%)']),
+    );
+    const cutoff25 = parseNumber(
+      readField(lookup, [
+        '2025학년도 입결(등급)',
+        '2025학년도입결(등급)',
+      ]),
+    );
+    const cutoff24 = parseNumber(
+      readField(lookup, [
+        '2024학년도 입결(등급)',
+        '2024학년도입결(등급)',
+      ]),
+    );
 
     return {
-        region: findValue(['광역']),
-        subRegion: findValue(['기초']),
-        univ: findValue(['대학교']),
-        track: findValue(['계열']),
-        dept: findValue(['모집단위명', '모집단위']),
-        type: findValue(['전형유형']),
-        name: findValue(['전형명']),
-        req: findValue(['최저학력기준']),
-        method: findValue(['전형방법']),
-        cutoff26: parseGrade(findValue(['2026학년도\r\n입결(등급)', '2026학년도 입결(등급)', '2026학년도 입결'])),
-        cutoff25: parseGrade(findValue(['2025학년도\r\n입결(등급)', '2025학년도 입결(등급)', '2025학년도 입결'])),
-        competition: findValue(['2026학년도\r\n경쟁률', '2026학년도 경쟁률'])
+      region: readField(lookup, ['광역', 'region']),
+      subRegion: readField(lookup, ['기초', 'subRegion']),
+      univ: readField(lookup, ['대학교', 'univ', 'university']),
+      track: readField(lookup, ['계열', 'track']),
+      dept: readField(lookup, ['모집단위명', 'dept', 'department']),
+      type: readField(lookup, ['전형유형', 'type', 'admission_type']),
+      name: readField(lookup, ['전형명', 'name', 'track_name']),
+      req: readField(lookup, ['지원자격', 'req']),
+      method: readField(lookup, ['전형방법', 'method']),
+      cutoff26,
+      cutoff26_50,
+      cutoff26_70,
+      cutoff26_original: cutoff26Original,
+      cutoff25,
+      cutoff24,
+      competition26: parseNumber(readField(lookup, ['2026학년도 경쟁률'])),
+      competition25: parseNumber(readField(lookup, ['2025학년도 경쟁률'])),
+      competition24: parseNumber(readField(lookup, ['2024학년도 경쟁률'])),
+      reference26: readField(lookup, ['2026학년도 기준']),
+      reference25: readField(lookup, ['2025학년도 기준2']),
+      supportNotes: readField(lookup, ['지원시 유의사항']),
+      verificationStatus: readField(lookup, ['검증상태']),
+      verificationMemo: readField(lookup, ['검증메모']),
+      verificationAt: readField(lookup, ['검증일시']),
+      remarks: readField(lookup, ['비고']),
     };
-});
-
-// JSON 문자열 변환
-const jsonOutput = JSON.stringify(mappedData, null, 2);
-
-console.log('\n변환 완료! 두 프로젝트에 모두 업데이트를 시작합니다.');
-
-try {
-    fs.writeFileSync(TARGET_CONSULTANT, jsonOutput, 'utf8');
-    console.log('✅ 컨설턴트 앱 업데이트 성공: ' + TARGET_CONSULTANT);
-} catch (e) {
-    console.error('❌ 컨설턴트 앱 업데이트 실패:', e.message);
+  });
 }
 
-try {
-    // suprema-platform/data 폴더가 없을 수도 있으니 확인 후 생성
-    const platformDir = path.dirname(TARGET_PLATFORM);
-    if (!fs.existsSync(platformDir)) {
-        fs.mkdirSync(platformDir, { recursive: true });
+function writeJson(filePath, value) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(value, null, 2), 'utf8');
+}
+
+function writeCsv(filePath, rows) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  const sheet = XLSX.utils.json_to_sheet(rows);
+  const csv = XLSX.utils.sheet_to_csv(sheet);
+  fs.writeFileSync(filePath, csv, 'utf8');
+}
+
+function buildDiagnosisCsv(rows) {
+  return rows.map((row) => ({
+    year: 2026,
+    university: row.univ ?? '',
+    department: row.dept ?? '',
+    admission_type: row.type ?? '',
+    track_name: row.name ?? '',
+    cutoff_score_50: row.cutoff26_50 ?? row.cutoff26 ?? '',
+    cutoff_score_70: row.cutoff26_70 ?? row.cutoff25 ?? '',
+  }));
+}
+
+function buildCutoffCsv(rows, year) {
+  return rows.flatMap((row) => {
+    const base = {
+      year,
+      university: row.univ ?? '',
+      department: row.dept ?? '',
+      admission_type: row.type ?? '',
+      track_name: row.name ?? '',
+    };
+    const result = [];
+    if (row.cutoff26_50 !== null && row.cutoff26_50 !== undefined) {
+      result.push({ ...base, percentile_type: 50, cutoff_score: row.cutoff26_50 });
     }
-    fs.writeFileSync(TARGET_PLATFORM, jsonOutput, 'utf8');
-    console.log('✅ 수프리마 플랫폼 앱 업데이트 성공: ' + TARGET_PLATFORM);
-} catch (e) {
-    console.error('❌ 수프리마 플랫폼 앱 업데이트 실패:', e.message);
+    if (row.cutoff26_70 !== null && row.cutoff26_70 !== undefined) {
+      result.push({ ...base, percentile_type: 70, cutoff_score: row.cutoff26_70 });
+    }
+    return result;
+  });
 }
 
-console.log('\n모든 업데이트가 완료되었습니다!');
-console.log('이제 각 앱(저장소)에서 npm run dev 로 확인 후, Git 푸시(배포) 하시면 반영됩니다.');
+function main() {
+  const workbookPath = latestWorkbookFromArgs();
+  console.log(`Reading workbook: ${workbookPath}`);
+
+  const rows = extractRows(workbookPath);
+  const admissionDataPath = path.join(dataDir, 'admission', 'admissionData.json');
+  const diagnosisCsvPath = path.join(dataDir, 'susi_explorer_fixed.csv');
+  const cutoff2027Path = path.join(dataDir, 'admission_cutoffs_2027.csv');
+
+  writeJson(admissionDataPath, rows);
+  writeCsv(diagnosisCsvPath, buildDiagnosisCsv(rows));
+  writeCsv(cutoff2027Path, buildCutoffCsv(rows, 2027));
+
+  console.log(`Wrote ${rows.length} rows to ${admissionDataPath}`);
+  console.log(`Wrote diagnosis CSV to ${diagnosisCsvPath}`);
+  console.log(`Wrote 2027 cutoff CSV to ${cutoff2027Path}`);
+}
+
+main();

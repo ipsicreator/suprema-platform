@@ -2,136 +2,185 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { diagnoseAdmissionRange, type YearCutoff } from '@/lib/utils/admission/admissionDiagnosis';
 
 export const runtime = "nodejs";
 
-// Global memory cache to prevent heavy CSV reading & parsing on every request
-let cachedCSVData: any[] | null = null;
+type AdmissionDataRow = {
+  univ: string;
+  dept?: string;
+  type?: string;
+  name?: string;
+  cutoff24?: number | string | null;
+  cutoff25?: number | string | null;
+  cutoff26_50?: number | string | null;
+  cutoff26_70?: number | string | null;
+};
 
-function generateHash(data: any) {
+type DiagnosisChoice = {
+  university?: string;
+  univ?: string;
+  department?: string;
+  dept?: string;
+  admission_type?: string;
+  type?: string;
+  track_name?: string;
+  track?: string;
+  [key: string]: unknown;
+};
+
+type DiagnosisRequestBody = {
+  studentIndex?: string | number;
+  choices?: DiagnosisChoice[];
+  academyId?: string;
+  grade?: string;
+  gradingSystem?: string;
+};
+
+let cachedAdmissionData: AdmissionDataRow[] | null = null;
+
+function generateHash(data: unknown) {
   return crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
 }
 
-function parseCSV(content: string) {
-  const lines = content.split('\n');
-  if (lines.length === 0) return [];
-  const headers = lines[0].split(',').map(h => h.trim());
-  return lines.slice(1).filter(l => l.trim()).map(line => {
-    const values = line.split(',');
-    return headers.reduce((obj: any, header, i) => {
-      obj[header] = values[i]?.trim();
-      return obj;
-    }, {});
-  });
-}
-
 function normalizeUniversityName(name: string): string {
-  let n = (name || "").trim().replace(/\s/g, "");
-  if (n.includes("(")) n = n.split("(")[0];
-  return n.replace("대학교", "대");
+  let value = (name || "").trim().replace(/\s/g, "");
+  if (value.includes("(")) value = value.split("(")[0];
+  return value;
 }
 
-// Helper to convert 5-level grade to 9-level grade using Piecewise Linear Interpolation
-export function convert5To9Grade(g5: number): number {
+function parseNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const parsed = String(value).replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+  return parsed ? Number(parsed[0]) : null;
+}
+
+function convert5To9Grade(g5: number): number {
   if (g5 <= 1.0) return 1.0;
-  if (g5 <= 2.0) {
-    // 1.0 ~ 2.0 mapping to 1.0 ~ 3.6 (e.g. 1.0 -> 1.0, 2.0 -> 3.6)
-    return 1.0 + (g5 - 1.0) * 2.6;
-  }
-  if (g5 <= 3.0) {
-    // 2.0 ~ 3.0 mapping to 3.6 ~ 5.8 (e.g. 3.0 -> 5.8)
-    return 3.6 + (g5 - 2.0) * 2.2;
-  }
-  if (g5 <= 4.0) {
-    // 3.0 ~ 4.0 mapping to 5.8 ~ 7.8 (e.g. 4.0 -> 7.8)
-    return 5.8 + (g5 - 3.0) * 2.0;
-  }
-  if (g5 <= 5.0) {
-    // 4.0 ~ 5.0 mapping to 7.8 ~ 9.0 (e.g. 5.0 -> 9.0)
-    return 7.8 + (g5 - 4.0) * 1.2;
-  }
+  if (g5 <= 2.0) return 1.0 + (g5 - 1.0) * 2.6;
+  if (g5 <= 3.0) return 3.6 + (g5 - 2.0) * 2.2;
+  if (g5 <= 4.0) return 5.8 + (g5 - 3.0) * 2.0;
+  if (g5 <= 5.0) return 7.8 + (g5 - 4.0) * 1.2;
   return 9.0;
+}
+
+function loadAdmissionData(): AdmissionDataRow[] {
+  if (cachedAdmissionData) return cachedAdmissionData;
+  const dataDir = path.join(process.cwd(), 'data');
+  const admissionPath = path.join(dataDir, 'admission', 'admissionData.json');
+  if (!fs.existsSync(admissionPath)) {
+    cachedAdmissionData = [];
+    return cachedAdmissionData;
+  }
+  try {
+    cachedAdmissionData = JSON.parse(fs.readFileSync(admissionPath, 'utf-8'));
+  } catch {
+    cachedAdmissionData = [];
+  }
+  return cachedAdmissionData;
+}
+
+function resolveRow(choice: DiagnosisChoice, fullData: AdmissionDataRow[]) {
+  const university = String(choice.university ?? choice.univ ?? '').trim();
+  const department = String(choice.department ?? choice.dept ?? '').trim();
+  const admissionType = String(choice.admission_type ?? choice.type ?? '').trim();
+  const trackName = String(choice.track_name ?? choice.track ?? '').trim();
+  const uniNorm = normalizeUniversityName(university);
+
+  const exact = fullData.find((row) =>
+    normalizeUniversityName(row.univ) === uniNorm &&
+    String(row.dept ?? '').trim() === department &&
+    String(row.type ?? '').trim() === admissionType &&
+    String(row.name ?? '').trim() === trackName,
+  );
+  if (exact) return exact;
+
+  const typeMatch = fullData.find((row) =>
+    normalizeUniversityName(row.univ) === uniNorm &&
+    String(row.dept ?? '').trim() === department &&
+    String(row.type ?? '').trim() === admissionType,
+  );
+  if (typeMatch) return typeMatch;
+
+  return fullData.find((row) =>
+    normalizeUniversityName(row.univ) === uniNorm &&
+    String(row.dept ?? '').trim() === department,
+  ) ?? null;
+}
+
+function formatCutoff(value: number | null) {
+  return value === null ? null : Number(value.toFixed(2));
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { studentIndex, choices, academyId, grade, gradingSystem } = body; 
-    
-    // Convert 5-level grade to 9-level grade dynamically for High 1 & 2
+    const body = (await req.json()) as DiagnosisRequestBody;
+    const { studentIndex, choices, academyId, grade, gradingSystem } = body;
+
+    if (studentIndex === undefined || studentIndex === null || !choices?.length) {
+      return NextResponse.json({ error: 'Invalid diagnosis request' }, { status: 400 });
+    }
+
     let evalIndex = parseFloat(studentIndex.toString());
-    const is5Level = gradingSystem === '5-level' || grade === '고1' || grade === '고2';
+    const is5Level = gradingSystem === '5-level' || grade === '5' || grade === 'five' || grade === '5-level';
     if (is5Level) {
       evalIndex = convert5To9Grade(evalIndex);
     }
-    
-    // [표준 규칙 적용] 라이선스 체크
+
     const { checkLicense } = await import('@/lib/auth');
     const isLicensed = process.env.NODE_ENV === 'development' || await checkLicense(academyId || "demo_academy");
     if (!isLicensed) {
       return NextResponse.json({ error: '유효한 라이선스가 없습니다.' }, { status: 403 });
     }
 
-    // 일관성 체크 및 누적을 위한 해시 생성
-    const inputHash = generateHash({ studentIndex: evalIndex, choices });
+    generateHash({ studentIndex: evalIndex, choices });
 
-    // PocketBase is bypassed locally to avoid network delays.
+    const fullData = loadAdmissionData();
 
-    // Load CSV using global memory cache (instantly returned after first boot)
-    if (!cachedCSVData) {
-      const dataDir = path.join(process.cwd(), 'data');
-      const explorerPath = path.join(dataDir, 'susi_explorer_fixed.csv');
-      if (fs.existsSync(explorerPath)) {
-        cachedCSVData = parseCSV(fs.readFileSync(explorerPath, 'utf-8'));
-      } else {
-        cachedCSVData = [];
-      }
-    }
-    const fullData = cachedCSVData;
+    const results = choices.map((choice) => {
+      const row = resolveRow(choice, fullData);
+      const diagnosis = row
+        ? diagnoseAdmissionRange(evalIndex, [
+            {
+              year: 2026,
+              cutoff50: parseNumber(row.cutoff26_50),
+              cutoff70: parseNumber(row.cutoff26_70),
+            },
+            {
+              year: 2025,
+              cutoff50: parseNumber(row.cutoff25),
+              cutoff70: parseNumber(row.cutoff25),
+            },
+            {
+              year: 2024,
+              cutoff50: parseNumber(row.cutoff24),
+              cutoff70: parseNumber(row.cutoff24),
+            },
+          ] as YearCutoff[])
+        : diagnoseAdmissionRange(evalIndex, []);
 
-    const results = choices.map((choice: any) => {
-      const uniNorm = normalizeUniversityName(choice.university);
-      const matches = fullData.filter(c => 
-        normalizeUniversityName(c.university) === uniNorm &&
-        c.department === choice.department
-      );
-
-      const base70 = matches.length > 0 ? parseFloat(matches[0].cutoff_score_70 || matches[0].score) : 2.5;
-      const base50 = matches.length > 0 ? parseFloat(matches[0].cutoff_score_50 || matches[0].score) : 2.2;
-
-      let level = "위험/하향";
-      let comment = "";
-
-      if (studentIndex <= base50 - 0.2) {
-        level = "매우 안정";
-        comment = "최우수 지표입니다. 상향 지원을 적극 고려하세요.";
-      } else if (studentIndex <= base50) {
-        level = "안정";
-        comment = "합격 가시권입니다. 서류 보강 시 합격 확률이 높습니다.";
-      } else if (studentIndex <= base70) {
-        level = "적정";
-        comment = "합격 컷 내에 위치합니다. 경쟁률 추이를 주시하세요.";
-      } else {
-        level = "도전/상향";
-        comment = "공격적인 지원이 필요합니다. 독보적인 세특이 필수입니다.";
-      }
+      const yearMap = new Map(diagnosis.yearly.map((item) => [item.year, item]));
+      const year2026 = yearMap.get(2026);
+      const year2025 = yearMap.get(2025);
+      const year2024 = yearMap.get(2024);
 
       return {
         ...choice,
-        level,
-        comment,
-        y23: (base70 - 0.1).toFixed(2),
-        y24: (base70 - 0.05).toFixed(2),
-        y25: base70.toFixed(2),
-        trend: 'up'
+        level: diagnosis.finalLevel,
+        comment: diagnosis.finalComment,
+        safeCutoff: formatCutoff(diagnosis.safeCutoff),
+        reachCutoff: formatCutoff(diagnosis.reachCutoff),
+        spread: formatCutoff(diagnosis.spread),
+        y26: year2026?.cutoff70 !== null && year2026?.cutoff70 !== undefined ? year2026.cutoff70.toFixed(2) : '-',
+        y25: year2025?.cutoff70 !== null && year2025?.cutoff70 !== undefined ? year2025.cutoff70.toFixed(2) : '-',
+        y24: year2024?.cutoff70 !== null && year2024?.cutoff70 !== undefined ? year2024.cutoff70.toFixed(2) : '-',
+        yearly: diagnosis.yearly,
       };
     });
 
-    // Relational database logging is bypassed locally.
-
     return NextResponse.json({ results });
-
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Diagnosis Accumulation Error' }, { status: 500 });
   }
 }
