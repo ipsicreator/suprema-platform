@@ -1,0 +1,126 @@
+From 12c64528b1a3aa3b2f6b5f5406c953788d09ea8f Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.com>
+Date: Mon, 22 Jun 2026 18:50:13 +0900
+Subject: [PATCH] Refine diagnosis branding and step1 input screen
+
+---
+ app/components/FlowShell.tsx           |  2 +-
+ app/components/UserInfoForm.module.css | 54 --------------------------
+ app/components/UserInfoForm.tsx        | 25 ------------
+ 3 files changed, 1 insertion(+), 80 deletions(-)
+
+diff --git a/app/components/FlowShell.tsx b/app/components/FlowShell.tsx
+index 690521e..c188cec 100644
+--- a/app/components/FlowShell.tsx
++++ b/app/components/FlowShell.tsx
+@@ -44,7 +44,7 @@ export default function FlowShell({
+           </Link>
+           <div className="pt-2 text-left leading-tight text-[#1a0f08]" spellCheck={false}>
+             <div className="text-[15px] font-black tracking-[-0.03em]">나의 입시멘토</div>
+-            <div className="text-[22px] font-black tracking-[-0.02em]">탐구·세특 입시위치진단</div>
++            <div className="text-[22px] font-black tracking-[-0.02em]">탐구·세특·입시위치진단</div>
+           </div>
+           <div className="justify-self-end pt-2 text-[11px] font-bold uppercase tracking-[0.34em] text-[#a7adb8]">
+             {badge}
+diff --git a/app/components/UserInfoForm.module.css b/app/components/UserInfoForm.module.css
+index 30dd0f6..04fe334 100644
+--- a/app/components/UserInfoForm.module.css
++++ b/app/components/UserInfoForm.module.css
+@@ -287,58 +287,4 @@
+   border: 1px solid rgba(211, 47, 47, 0.15);
+ }
+ 
+-.analysisPreviewBox {
+-  background: rgba(139, 26, 26, 0.03);
+-  border: 1px solid rgba(139, 26, 26, 0.12);
+-  border-radius: 16px;
+-  padding: 20px;
+-  margin-top: 16px;
+-  display: flex;
+-  flex-direction: column;
+-  gap: 12px;
+-  box-sizing: border-box;
+-}
+-
+-.analysisPreviewTitle {
+-  font-size: 13px;
+-  font-weight: 900;
+-  color: var(--suprima-burgundy);
+-  margin: 0 0 4px 0;
+-  letter-spacing: -0.02em;
+-}
+-
+-.analysisPreviewGrid {
+-  display: flex;
+-  flex-direction: column;
+-  gap: 10px;
+-}
+-
+-.analysisPreviewItem {
+-  display: flex;
+-  flex-direction: column;
+-  gap: 6px;
+-  background: white;
+-  padding: 12px 16px;
+-  border-radius: 10px;
+-  border: 1px solid #ECE0D1;
+-  text-align: left;
+-}
+-
+-.analysisPreviewLabel {
+-  font-size: 11px;
+-  font-weight: 900;
+-  color: #8B1A1A;
+-  background: rgba(139, 26, 26, 0.05);
+-  padding: 2px 8px;
+-  border-radius: 4px;
+-  width: max-content;
+-}
+-
+-.analysisPreviewText {
+-  font-size: 12px;
+-  color: #5C4E43;
+-  margin: 0;
+-  line-height: 1.5;
+-  font-weight: 600;
+-}
+ 
+diff --git a/app/components/UserInfoForm.tsx b/app/components/UserInfoForm.tsx
+index 08e9497..845c351 100644
+--- a/app/components/UserInfoForm.tsx
++++ b/app/components/UserInfoForm.tsx
+@@ -384,31 +384,6 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
+                 </div>
+               </div>
+ 
+-              {info.studentAnalysis && (
+-                <div className={styles.analysisPreviewBox}>
+-                  <div className={styles.analysisPreviewTitle}>학생부 분석 프리뷰</div>
+-                  <div className={styles.analysisPreviewGrid}>
+-                    <div className={styles.analysisPreviewItem}>
+-                      <span className={styles.analysisPreviewLabel}>전공 적합성 및 진로</span>
+-                      <p className={styles.analysisPreviewText}>
+-                        <strong>[{info.studentAnalysis.majorField || "희망 진로"}]</strong> {info.studentAnalysis.majorSuitability || "분석 결과 없음"}
+-                      </p>
+-                    </div>
+-                    <div className={styles.analysisPreviewItem}>
+-                      <span className={styles.analysisPreviewLabel}>핵심 학업 역량</span>
+-                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.academicCapacity || "분석 결과 없음"}</p>
+-                    </div>
+-                    <div className={styles.analysisPreviewItem}>
+-                      <span className={styles.analysisPreviewLabel}>세특 종합 분석</span>
+-                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.seTeukAnalysis || "분석 결과 없음"}</p>
+-                    </div>
+-                    <div className={styles.analysisPreviewItem}>
+-                      <span className={styles.analysisPreviewLabel}>컨설턴트 종합 의견</span>
+-                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.comprehensiveOpinion || "분석 결과 없음"}</p>
+-                    </div>
+-                  </div>
+-                </div>
+-              )}
+             </>
+           )}
+         </div>
+-- 
+2.54.0.windows.1
+
