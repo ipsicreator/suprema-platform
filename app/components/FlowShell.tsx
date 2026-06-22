@@ -1,69 +1,103 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 export type FlowStep = {
   no: string;
   title: string;
-  description: string;
-  icon: ReactNode;
+  description?: string;
+  icon?: ReactNode;
 };
 
 type FlowShellProps = {
-  badge: string;
+  badge?: string;
   title: string;
   subtitle: string;
   steps?: FlowStep[];
+  currentStep?: number;
   footer?: ReactNode;
   children: ReactNode;
 };
 
-export default function FlowShell({ badge, title, subtitle, steps, footer, children }: FlowShellProps) {
+export default function FlowShell({
+  badge = "PREMIUM DIAGNOSIS",
+  title,
+  subtitle,
+  steps = [],
+  currentStep = 1,
+  footer,
+  children,
+}: FlowShellProps) {
   return (
-    <main className="min-h-screen bg-[#f8f5f1] px-4 py-8 md:px-6">
-      <div className="mx-auto max-w-6xl rounded-[32px] border border-[#eadfce] bg-white p-5 shadow-[0_24px_70px_rgba(44,26,10,0.08)] md:p-8">
-        <div className="mb-8 flex flex-col gap-4 border-b border-[#ece0d1] pb-6 md:flex-row md:items-start md:justify-between">
-          <div>
-            <div className="inline-flex rounded-full bg-[#8b1a1a]/5 px-3 py-1 text-xs font-extrabold tracking-[0.2em] text-[#8b1a1a]">
-              {badge}
-            </div>
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-[#1a0f08] md:text-5xl">{title}</h1>
-            <p className="mt-3 max-w-3xl text-sm font-medium text-slate-500 md:text-base">{subtitle}</p>
-          </div>
-          <Link href="/diagnosis/step1" className="rounded-full border border-[#d7c8b8] bg-[#faf6f0] px-4 py-3 text-sm font-bold text-slate-700">
-            학생부 다시 입력
+    <main className="min-h-screen bg-[#f7f4ee] px-4 py-4 text-[#1a0f08] md:px-6 md:py-6">
+      <div className="mx-auto max-w-[1120px] overflow-hidden rounded-[32px] border border-[#eadfce] bg-white shadow-[0_28px_90px_rgba(44,26,10,0.08)]">
+        <header className="grid grid-cols-[1fr_auto_1fr] items-start gap-4 px-6 pt-6 md:px-8 md:pt-7">
+          <Link href="/" className="shrink-0">
+            <Image
+              src="/suprema-logo.png"
+              alt="대치 수프리마"
+              width={160}
+              height={48}
+              priority
+              className="h-11 w-auto object-contain"
+            />
           </Link>
-        </div>
+          <div className="pt-2 text-left leading-tight text-[#1a0f08]" spellCheck={false}>
+            <div className="text-[15px] font-black tracking-[-0.03em]">나의 입시멘토</div>
+            <div className="text-[22px] font-black tracking-[-0.02em]">탐구·세특 입시위치진단</div>
+          </div>
+          <div className="justify-self-end pt-2 text-[11px] font-bold uppercase tracking-[0.34em] text-[#a7adb8]">
+            {badge}
+          </div>
+        </header>
 
-        {steps?.length ? (
-          <section className="rounded-[28px] border border-[#ece0d1] bg-[#fffdf9] p-5 shadow-[0_18px_44px_rgba(44,26,10,0.05)] md:p-7">
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 className="text-xl font-extrabold text-[#1a0f08]">진행 단계</h2>
-              <span className="rounded-full border border-[#e4d7c9] bg-white px-3 py-1 text-xs font-bold text-[#8b1a1a]">
-                {steps.length} STEP
-              </span>
-            </div>
-            <div className="grid gap-4 md:grid-cols-4">
-              {steps.map((step) => (
-                <div key={step.no} className="rounded-[24px] border border-[#ece0d1] bg-white p-5 shadow-[0_10px_26px_rgba(44,26,10,0.04)]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#efe5d8] bg-[#f8f5f1] text-[#1a0f08]">
-                      {step.icon}
-                    </div>
-                    <div className="rounded-full border border-[#eadfce] bg-[#fff8f0] px-3 py-1 text-sm font-black text-[#8b1a1a]">
-                      {step.no}
-                    </div>
-                  </div>
-                  <h3 className="mt-4 text-lg font-black text-[#1a0f08]">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{step.description}</p>
-                </div>
-              ))}
+        {steps.length ? (
+          <section className="px-6 pt-6 md:px-8 md:pt-7">
+            <div className="relative">
+              <div className="absolute left-[5%] right-[5%] top-[20px] h-px bg-[#eadfce]" />
+              <ol className={`relative grid gap-3 ${steps.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
+                {steps.map((step, index) => {
+                  const active = index + 1 === currentStep;
+                  return (
+                    <li key={step.no} className="flex flex-col items-center text-center">
+                      <div
+                        className={[
+                          "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold",
+                          active
+                            ? "border-[#8b1a1a] bg-[#8b1a1a] text-white shadow-[0_8px_18px_rgba(139,26,26,0.18)]"
+                            : "border-[#eadfce] bg-white text-[#9ca3af]",
+                        ].join(" ")}
+                      >
+                        {step.no}
+                      </div>
+                      <span className={`mt-3 text-sm font-semibold ${active ? "text-[#8b1a1a]" : "text-[#6f7480]"}`}>
+                        {step.title}
+                      </span>
+                      {step.description ? (
+                        <span className="mt-1 max-w-[13rem] text-[11px] leading-5 text-[#9ca3af]">
+                          {step.description}
+                        </span>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ol>
             </div>
           </section>
         ) : null}
 
-        <div className="mt-6">{children}</div>
+        <section className="px-6 pt-8 text-center md:px-8 md:pt-10">
+          <h1 className="text-[clamp(2rem,4vw,3.2rem)] font-black tracking-[-0.06em] text-[#1a0f08]">
+            {title}
+          </h1>
+          <p className="mx-auto mt-4 max-w-3xl text-[15px] font-semibold leading-7 text-[#5f5549] md:text-[16px]">
+            {subtitle}
+          </p>
+        </section>
 
-        {footer ? <div className="mt-6">{footer}</div> : null}
+        <section className="px-6 pt-8 pb-6 md:px-8 md:pt-10 md:pb-8">{children}</section>
+
+        {footer ? <div className="border-t border-[#ece0d1] px-6 py-6 md:px-8">{footer}</div> : null}
       </div>
     </main>
   );

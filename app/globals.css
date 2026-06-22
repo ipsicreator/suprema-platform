@@ -2,6 +2,7 @@
 @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff');
 @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff');
 @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff');
+@import "tailwindcss";
 
 :root {
   /* Suprima Premium Palette */
@@ -28,12 +29,11 @@
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
   user-select: text !important;
 }
 
 body {
+  margin: 0;
   background-color: var(--suprima-cream);
   background-image: 
     radial-gradient(at 0% 0%, hsla(30, 80%, 95%, 1) 0, transparent 50%), 
