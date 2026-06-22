@@ -12,6 +12,8 @@
 - `3b1e220` `Add portable git bundle for handoff`
 - `815bf8e` `Refresh handoff bundle metadata`
 - `3c9a878` `Sync handoff notes with latest bundle`
+- `7452940` `Add handoff apply instructions`
+- `3c9a878` `Sync handoff notes with latest bundle`
 
 ## 2. 번들로 이관하는 방법
 
@@ -37,6 +39,7 @@ git cherry-pick 87dc056
 git cherry-pick 3b1e220
 git cherry-pick 815bf8e
 git cherry-pick 3c9a878
+git cherry-pick 7452940
 ```
 
 ## 3. 패치로 이관하는 방법
