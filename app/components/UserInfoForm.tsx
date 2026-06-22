@@ -384,31 +384,6 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
                 </div>
               </div>
 
-              {info.studentAnalysis && (
-                <div className={styles.analysisPreviewBox}>
-                  <div className={styles.analysisPreviewTitle}>학생부 분석 프리뷰</div>
-                  <div className={styles.analysisPreviewGrid}>
-                    <div className={styles.analysisPreviewItem}>
-                      <span className={styles.analysisPreviewLabel}>전공 적합성 및 진로</span>
-                      <p className={styles.analysisPreviewText}>
-                        <strong>[{info.studentAnalysis.majorField || "희망 진로"}]</strong> {info.studentAnalysis.majorSuitability || "분석 결과 없음"}
-                      </p>
-                    </div>
-                    <div className={styles.analysisPreviewItem}>
-                      <span className={styles.analysisPreviewLabel}>핵심 학업 역량</span>
-                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.academicCapacity || "분석 결과 없음"}</p>
-                    </div>
-                    <div className={styles.analysisPreviewItem}>
-                      <span className={styles.analysisPreviewLabel}>세특 종합 분석</span>
-                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.seTeukAnalysis || "분석 결과 없음"}</p>
-                    </div>
-                    <div className={styles.analysisPreviewItem}>
-                      <span className={styles.analysisPreviewLabel}>컨설턴트 종합 의견</span>
-                      <p className={styles.analysisPreviewText}>{info.studentAnalysis.comprehensiveOpinion || "분석 결과 없음"}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </>
           )}
         </div>

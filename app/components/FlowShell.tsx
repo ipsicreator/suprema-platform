@@ -44,7 +44,7 @@ export default function FlowShell({
           </Link>
           <div className="pt-2 text-left leading-tight text-[#1a0f08]" spellCheck={false}>
             <div className="text-[15px] font-black tracking-[-0.03em]">나의 입시멘토</div>
-            <div className="text-[22px] font-black tracking-[-0.02em]">탐구·세특 입시위치진단</div>
+            <div className="text-[22px] font-black tracking-[-0.02em]">탐구·세특·입시위치진단</div>
           </div>
           <div className="justify-self-end pt-2 text-[11px] font-bold uppercase tracking-[0.34em] text-[#a7adb8]">
             {badge}
