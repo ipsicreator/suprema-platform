@@ -34,6 +34,15 @@ type SubjectRow = {
   scoreAverage: number;
 };
 
+type ParsedSubjectRow = {
+  subject?: string;
+  grade?: number | string;
+  year?: number | string;
+  semester?: number | string;
+  rawScore?: number | string;
+  scoreAverage?: number | string;
+};
+
 export default function DiagnosisStep2Page() {
   const [info] = useState<Partial<UserInfo> | null>(() => {
     if (typeof window === "undefined") return null;
@@ -54,8 +63,8 @@ export default function DiagnosisStep2Page() {
   const keywords = reportData.studentAnalysis?.keyKeywords || [];
 
   const subjects = useMemo<SubjectRow[]>(() => {
-    return reportData.parsedSubjects.map((item, index) => ({
-      subject: item.subject,
+    return (reportData.parsedSubjects as ParsedSubjectRow[]).map((item, index) => ({
+      subject: item.subject || "과목",
       grade: Number(item.grade ?? 3),
       term: `${item.year || Math.floor(index / 2) + 1}-${item.semester || (index % 2) + 1}`,
       rawScore: Number(item.rawScore ?? 0),
