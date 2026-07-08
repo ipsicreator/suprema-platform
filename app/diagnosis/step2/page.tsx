@@ -23,6 +23,7 @@ import FlowShell from "@/app/components/FlowShell";
 import AppFooter from "@/app/components/AppFooter";
 import { toStudentRecordReportData } from "@/lib/report-data";
 import { buildStudentRecordMappingRows } from "@/lib/student-record-mapping";
+import type { StudentRecordSection } from "@/lib/student-record";
 import type { UserInfo } from "@/lib/user-info";
 import { diagnosisSteps } from "../steps";
 
@@ -121,7 +122,7 @@ export default function DiagnosisStep2Page() {
     [reportData],
   );
 
-  const sourceSections = useMemo(
+  const sourceSections = useMemo<StudentRecordSection[]>(
     () =>
       [
         reportData.studentRecord?.schoolInfo,
@@ -130,7 +131,7 @@ export default function DiagnosisStep2Page() {
         reportData.studentRecord?.sepec,
         reportData.studentRecord?.creativeActivities,
         reportData.studentRecord?.behaviorSummary,
-      ].filter((section): section is NonNullable<typeof section> => Boolean(section)),
+      ].filter((section): section is StudentRecordSection => Boolean(section)),
     [reportData.studentRecord],
   );
 
@@ -316,7 +317,7 @@ export default function DiagnosisStep2Page() {
             <Panel title="핵심 키워드">
               <div className="flex flex-wrap gap-2">
                 {keywords.length ? (
-                  keywords.map((item) => (
+                  keywords.map((item: string) => (
                     <span key={item} className="rounded-full bg-[#8b1a1a]/10 px-3 py-1 text-xs font-black text-[#8b1a1a]">
                       #{item}
                     </span>
