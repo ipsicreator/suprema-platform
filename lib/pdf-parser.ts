@@ -146,8 +146,8 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
     
     const matchedSubject = SUBJECT_KEYWORDS.find(sub => line.includes(sub));
     if (matchedSubject) {
-      const yearMatch = line.match(/([1-3])\s*?숇뀈/);
-      const semesterMatch = line.match(/([12])\s*?숆린/);
+      const yearMatch = line.match(/([1-3])\s*?학년/);
+      const semesterMatch = line.match(/([12])\s*?학기/);
       const year = yearMatch ? parseInt(yearMatch[1], 10) : undefined;
       const semester = semesterMatch ? parseInt(semesterMatch[1], 10) : undefined;
 
@@ -175,7 +175,10 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
   if (extracted.length === 0) {
     for (const sub of SUBJECT_KEYWORDS) {
       // Matches pattern: "Subject (Any spacing) Units (Any spacing) Grade"
-      const regex = new RegExp(`${sub}[媛-?쥱-Za-z0-9\\s]{0,8}?\\s*\\(?([1-6])\\)?\\s*(?:?⑥쐞)?\\s*(?:[A-E]\\(?\\d*\\)?|?깆랬???\\s*\\(?([1-9])\\)?\\s*(?:?깃툒)?`, "g");
+      const regex = new RegExp(
+        `${sub}[가-힣A-Za-z0-9\\s]{0,8}?\\s*\\(?([1-6])\\)?\\s*(?:단위)?\\s*(?:[A-E]\\(?\\d*\\)?|성취도)?\\s*\\(?([1-9])\\)?\\s*(?:등급)?`,
+        "g",
+      );
       let match;
       while ((match = regex.exec(normalized)) !== null) {
         const unit = parseInt(match[1], 10);
@@ -207,7 +210,7 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
     return {
       gpa: 0,
       subjects: [],
-      message: "?깆쟻???곸뿭?먯꽌 ?좏슚??援먭낵 ?깆쟻(?⑥쐞??諛??앹감?깃툒) ?뺣낫瑜??앸퀎?섏? 紐삵뻽?듬땲??",
+      message: "성적표 영역에서 유효한 교과 성적(단위수 및 석차등급) 정보를 찾지 못했습니다.",
       success: false
     };
   }
@@ -226,7 +229,7 @@ export function calculateGPAFromText(text: string, gradingSystem: "5-level" | "9
     gpa,
     subjects: uniqueExtracted,
     studentAnalysis: defaultAnalysis,
-    message: `?깃났?곸쑝濡??숈깮遺 PDF ?깆쟻(${uniqueExtracted.length}媛?怨쇰ぉ)???먮룞 遺꾩꽍?덉뒿?덈떎.`,
+    message: `성공적으로 학생부 PDF 성적(${uniqueExtracted.length}개 과목)을 자동 분석했습니다.`,
     success: true
   };
 }

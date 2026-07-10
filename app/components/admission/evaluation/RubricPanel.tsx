@@ -17,7 +17,7 @@ export default function RubricPanel({ rubricState, setRubricState, labels }: Rub
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
-      <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#1e293b' }}>??웾 ?됯?(猷⑤툕由?</h3>
+      <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#1e293b' }}>역량 평가(루브릭)</h3>
       {labels.map((label, i) => {
         const key = keys[i] || keys[0];
         const currentGrade = rubricState[key] || 'B';

@@ -25,7 +25,7 @@ export default function GradeTrendChart({ studentTrend }: GradeTrendChartProps) 
           <YAxis reversed domain={[1, 6]} />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="student" name="?숈깮(議고빀)" stroke="#8884d8" strokeWidth={3} connectNulls />
+        <Line type="monotone" dataKey="student" name="학생(종합)" stroke="#8884d8" strokeWidth={3} connectNulls />
           <Line type="monotone" dataKey="refAvg" name="?좎궗吏묐떒" stroke="#82ca9d" strokeWidth={2} strokeDasharray="5 5" />
         </LineChart>
       </ResponsiveContainer>

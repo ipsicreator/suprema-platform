@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { success: false, error: "?낅줈?쒕맂 ?뚯씪???놁뒿?덈떎." },
+        { success: false, error: "업로드한 파일이 없습니다." },
         { status: 400 }
       );
     }
@@ -38,10 +38,11 @@ export async function POST(req: NextRequest) {
       studentAnalysis: result.studentAnalysis,
       message: result.message,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "PDF 분석 요청 중 서버 오류가 발생했습니다.";
     console.error("PDF upload and analysis failed:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "PDF 遺꾩꽍 ?꾩쨷 ?쒕쾭 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎." },
+      { success: false, error: message },
       { status: 500 }
     );
   }

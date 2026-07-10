@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "check:mojibake": "node scripts/check-mojibake.js",
     "start": "next start",
     "lint": "eslint",
     "update:admissions": "node scripts/update_admission.js && node scripts/sync_consultant_app.js",

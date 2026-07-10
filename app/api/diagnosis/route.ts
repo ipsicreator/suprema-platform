@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { diagnoseAdmissionRange, type YearCutoff } from '@/lib/utils/admission/admissionDiagnosis';
 import admissionData from '@/data/admission/admissionData.json';
+import universityGuides from '@/data/university_guides.json';
 
 export const runtime = "nodejs";
 
@@ -10,10 +11,25 @@ type AdmissionDataRow = {
   dept?: string;
   type?: string;
   name?: string;
+  req?: string | null;
+  minRequirement?: string | null;
+  method?: string | null;
+  documents?: string | null;
+  duplicateSupport?: string | null;
+  gradeRatio?: string | null;
+  subjects?: string | null;
+  careerSelectionSubjects?: string | null;
+  resultGradeCompetition?: string | null;
   cutoff24?: number | string | null;
   cutoff25?: number | string | null;
   cutoff26_50?: number | string | null;
   cutoff26_70?: number | string | null;
+  competition24?: number | string | null;
+  competition25?: number | string | null;
+  competition26?: number | string | null;
+  supportNotes?: string | null;
+  remarks?: string | null;
+  reference26?: string | null;
 };
 
 type DiagnosisChoice = {
@@ -96,6 +112,34 @@ function formatCutoff(value: number | null) {
   return value === null ? null : Number(value.toFixed(2));
 }
 
+function buildFallbackGuide(row: AdmissionDataRow) {
+  const guideKey = Object.keys((universityGuides as { universities?: Record<string, { official_guide_summary?: string[]; description?: string }> }).universities || {}).find((key) => {
+    const normalized = normalizeUniversityName(key);
+    return normalized && normalizeUniversityName(row.univ).includes(normalized);
+  });
+  const guide = guideKey
+    ? (universityGuides as { universities?: Record<string, { official_guide_summary?: string[]; description?: string }> }).universities?.[guideKey]
+    : null;
+  const summary = guide?.official_guide_summary?.[0] || guide?.description || '학교 요강 참조';
+  return {
+    req: row.req ?? '학교 요강 참조',
+    minRequirement: row.minRequirement ?? '요강 참조',
+    method: row.method ?? '학교 요강 참조',
+    documents: row.documents ?? '요강 참조',
+    duplicateSupport: row.duplicateSupport ?? '요강 참조',
+    gradeRatio: row.gradeRatio ?? '요강 참조',
+    subjects: row.subjects ?? '요강 참조',
+    careerSelectionSubjects: row.careerSelectionSubjects ?? '요강 참조',
+    resultGradeCompetition: row.resultGradeCompetition ?? summary,
+    competition26: formatCutoff(parseNumber(row.competition26)),
+    competition25: formatCutoff(parseNumber(row.competition25)),
+    competition24: formatCutoff(parseNumber(row.competition24)),
+    supportNotes: row.supportNotes ?? summary,
+    remarks: row.remarks ?? '',
+    reference26: row.reference26 ?? guide?.official_guide_summary?.join(' / ') ?? '',
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as DiagnosisRequestBody;
@@ -158,6 +202,9 @@ export async function POST(req: NextRequest) {
         y26: year2026?.cutoff70 !== null && year2026?.cutoff70 !== undefined ? year2026.cutoff70.toFixed(2) : '-',
         y25: year2025?.cutoff70 !== null && year2025?.cutoff70 !== undefined ? year2025.cutoff70.toFixed(2) : '-',
         y24: year2024?.cutoff70 !== null && year2024?.cutoff70 !== undefined ? year2024.cutoff70.toFixed(2) : '-',
+        admissionGuide: row
+          ? buildFallbackGuide(row)
+          : null,
         yearly: diagnosis.yearly,
       };
     });

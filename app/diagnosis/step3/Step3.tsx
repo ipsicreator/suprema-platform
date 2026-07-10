@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type TopicResult = {
   id: string;
@@ -16,44 +16,47 @@ type TopicResult = {
   tip?: string;
 };
 
-const fallbackKeywords = ["구조안정성", "내진설계", "스마트건설"];
+const fallbackKeywords = ["구조 안정성", "에너지 설계", "도시 환경"];
 const subjectOptions = ["국어", "영어", "수학", "사회탐구", "과학탐구", "정보(IT)"];
 const initialBaseTopics: TopicResult[] = [
   {
     id: "initial-1",
     subject: "과학탐구",
-    keyword: "구조안정성",
-    topic_title: "태양광 패널 각도와 오염이 발전 효율에 미치는 영향",
-    topic_direction: "태양광 패널의 각도를 조정하고 표면 오염 조건을 비교해 발전 효율 변화를 분석합니다.",
-    books: ["신재생에너지", "태양광 발전"],
-    papers: ["태양광 발전 효율 최적화 연구", "패널 성능 분석"],
+    keyword: "구조 안정성",
+    topic_title: "태양광 모듈 각도와 기울기가 발전 효율에 미치는 영향",
+    topic_direction: "태양광 모듈의 각도와 기울기 조건을 비교하여 발전 효율 변화를 분석합니다.",
+    books: ["친환경 에너지", "태양광 발전의 이해"],
+    papers: ["태양광 발전 효율 최적화 연구", "모듈 성능 분석"],
     data_sources: ["한국에너지공단 데이터", "공공데이터포털", "기상청 일사량 데이터"],
-    expected_conclusion: "패널 각도와 오염 정도가 발전 효율에 미치는 영향을 정량적으로 제시합니다.",
-    setuk_sentence: "구조안정성, 내진설계, 스마트건설을 바탕으로 태양광 패널 각도와 오염이 발전 효율에 미치는 영향 주제를 설정하고, 조건별 발전량을 비교 분석하며 자료 수집과 해석 역량을 보임.",
+    expected_conclusion: "기울기와 방위각 조합에 따른 발전 효율 차이를 정량적으로 제시합니다.",
+    setuk_sentence:
+      "구조 안정성과 에너지 설계 관심을 바탕으로 태양광 모듈의 기울기와 각도에 따른 효율 차이를 비교 분석하고, 실험 설계와 자료 해석 역량을 보여줌.",
   },
   {
     id: "initial-2",
     subject: "과학탐구",
-    keyword: "내진설계",
-    topic_title: "교실 CO₂ 농도와 학생 집중도의 상관 분석",
-    topic_direction: "CO₂ 센서로 교실 농도를 측정하고 같은 시간대 집중도 지표와 비교합니다.",
-    books: ["실험 설계와 데이터 분석", "환경과학"],
-    papers: ["실내 공기질과 학습 성과의 관계", "CO₂ 농도 연구"],
-    data_sources: ["환경부 대기질 데이터", "공공데이터포털", "센서 데이터"],
-    expected_conclusion: "실내 CO₂ 농도 변화가 학습 환경에 미치는 영향을 설명합니다.",
-    setuk_sentence: "내진설계와 스마트건설 관심을 바탕으로 교실 CO₂ 농도와 학생 집중도의 관계를 분석하고, 측정값과 설문 결과를 연결해 환경 개선 필요성을 도출함.",
+    keyword: "에너지 설계",
+    topic_title: "교실 CO2 농도와 학생 집중도의 상관 분석",
+    topic_direction: "교실 내 CO2 농도를 측정하고 집중도와의 관계를 데이터로 비교합니다.",
+    books: ["실내 환경과 데이터 분석", "환경과학 개론"],
+    papers: ["실내 공기질과 학습 성과의 관계", "CO2 농도 연구"],
+    data_sources: ["환경부 대기질 데이터", "공공데이터포털", "센서 측정 데이터"],
+    expected_conclusion: "교실 공기질 변화가 학습 환경에 미치는 영향을 설명합니다.",
+    setuk_sentence:
+      "에너지 설계와 환경 데이터 분석에 대한 관심을 바탕으로 교실 CO2 농도와 집중도의 상관관계를 분석하고, 측정값과 설문 결과를 연결해 개선 방향을 도출함.",
   },
   {
     id: "initial-3",
     subject: "과학탐구",
-    keyword: "스마트건설",
-    topic_title: "세제 성분별 계면활성제 거품 지속 시간 비교",
-    topic_direction: "세제 종류별 계면활성제 함량을 조사하고 동일 조건에서 거품 지속 시간을 측정합니다.",
-    books: ["화학과 생활", "물질의 성질"],
-    papers: ["계면활성제의 물리화학적 성질", "세제 성분 분석"],
-    data_sources: ["화학물질정보시스템", "제품 성분 정보", "실험 측정 데이터"],
-    expected_conclusion: "성분 차이가 거품 지속성과 세정 성능에 미치는 영향을 비교합니다.",
-    setuk_sentence: "스마트건설과 환경 소재 관심을 확장해 세제 성분별 계면활성제 거품 지속 시간을 비교하고, 성분과 성능의 관계를 분석해 화학 개념을 생활 문제 해결에 적용함.",
+    keyword: "도시 환경",
+    topic_title: "미세먼지 성분과 건물 외장재 종류별 오염 지수 비교",
+    topic_direction: "외장재 종류별 표면 오염도와 유지 시간을 측정해 차이를 비교합니다.",
+    books: ["화학과 생활", "도시 환경과 오염"],
+    papers: ["외장재 오염도와 화학적 분석", "도시 미세먼지 연구"],
+    data_sources: ["환경통계정보서비스", "제품 성분 정보", "실험 측정 데이터"],
+    expected_conclusion: "표면 특성과 외장재 조합에 따른 오염 지수 차이를 분석합니다.",
+    setuk_sentence:
+      "도시 환경 문제에 대한 관심을 확장하여 미세먼지 성분과 외장재 종류별 오염 지수를 비교하고, 측정 결과를 근거로 해석하는 탐구 태도를 보여줌.",
   },
 ];
 
@@ -86,12 +89,13 @@ function readUserContext() {
 }
 
 export default function Step3() {
+  const [initialContext] = useState(() => readUserContext());
   const [baseTopics, setBaseTopics] = useState<TopicResult[]>(initialBaseTopics);
   const [customTopics, setCustomTopics] = useState<TopicResult[]>([]);
-  const [subject, setSubject] = useState("과학탐구");
+  const [subject, setSubject] = useState(initialContext.subject);
   const [customKeyword, setCustomKeyword] = useState("");
-  const [careerHint, setCareerHint] = useState("건축공학");
-  const [email, setEmail] = useState("");
+  const [careerHint, setCareerHint] = useState(initialContext.careerHint);
+  const [email, setEmail] = useState(initialContext.email);
   const [mailOpen, setMailOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
@@ -113,15 +117,7 @@ export default function Step3() {
     } catch {}
   }, [allTopics, careerHint, subject]);
 
-  useEffect(() => {
-    const context = readUserContext();
-    setSubject(context.subject);
-    setCareerHint(context.careerHint);
-    setEmail(context.email);
-    void generateBaseTopics(context.subject, context.keywords, context.careerHint);
-  }, []);
-
-  async function requestTopics(payload: { subject: string; keywords: string[]; careerHint: string; count: number }) {
+  const requestTopics = useCallback(async (payload: { subject: string; keywords: string[]; careerHint: string; count: number }) => {
     const response = await fetch("/api/diagnosis/exploration-topics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -130,9 +126,9 @@ export default function Step3() {
     const data = await response.json();
     if (!response.ok) throw new Error(data?.error || "탐구 주제 생성 실패");
     return Array.isArray(data?.topics) ? (data.topics as TopicResult[]) : [];
-  }
+  }, []);
 
-  async function generateBaseTopics(nextSubject: string, keywords: string[], nextCareerHint: string) {
+  const generateBaseTopics = useCallback(async (nextSubject: string, keywords: string[], nextCareerHint: string) => {
     setLoading(true);
     setStatus("");
     try {
@@ -148,7 +144,14 @@ export default function Step3() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [requestTopics]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void generateBaseTopics(initialContext.subject, initialContext.keywords, initialContext.careerHint);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [generateBaseTopics, initialContext]);
 
   async function handleAddCustomTopic() {
     const keyword = customKeyword.trim();
@@ -176,7 +179,7 @@ export default function Step3() {
   async function handleSendMail() {
     const trimmed = email.trim();
     if (!trimmed) {
-      setStatus("메일주소를 입력하세요.");
+      setStatus("메일주소를 입력해 주세요.");
       return;
     }
     if (allTopics.length < 3) {
@@ -225,7 +228,10 @@ export default function Step3() {
           <button onClick={() => window.print()} className="rounded-full bg-[#8b1a1a] px-5 py-3 text-sm font-black text-white">
             인쇄
           </button>
-          <button onClick={() => setMailOpen((prev) => !prev)} className="rounded-full border border-[#8b1a1a] bg-white px-5 py-3 text-sm font-black text-[#8b1a1a]">
+          <button
+            onClick={() => setMailOpen((prev) => !prev)}
+            className="rounded-full border border-[#8b1a1a] bg-white px-5 py-3 text-sm font-black text-[#8b1a1a]"
+          >
             메일 보내기
           </button>
         </div>
@@ -238,7 +244,11 @@ export default function Step3() {
               placeholder="메일주소 입력"
               className="min-w-[260px] flex-1 rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold text-slate-700"
             />
-            <button onClick={handleSendMail} disabled={mailSending} className="rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-60">
+            <button
+              onClick={handleSendMail}
+              disabled={mailSending}
+              className="rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-60"
+            >
               {mailSending ? "발송 중" : "현재 3~6개 전체 발송"}
             </button>
           </div>
@@ -256,7 +266,9 @@ export default function Step3() {
           {loading ? <span className="text-sm font-bold text-[#8b1a1a]">생성 중</span> : null}
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
-          {baseTopics.map((topic, index) => <TopicCard key={topic.id} topic={topic} index={index + 1} />)}
+          {baseTopics.map((topic, index) => (
+            <TopicCard key={topic.id} topic={topic} index={index + 1} />
+          ))}
         </div>
       </section>
 
@@ -265,12 +277,14 @@ export default function Step3() {
           <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">CUSTOM TOPICS</div>
           <h3 className="mt-1 text-xl font-black text-[#1f1720]">개인 주제 추가 검색</h3>
           <p className="mt-1 text-sm font-semibold text-[#6c6256]">
-            과목과 주제를 설정해 검색하면 최대 3개까지 추가됩니다.
+            과목과 주제를 입력해 최대 3개까지 추가할 수 있습니다.
           </p>
         </div>
         <div className="grid gap-3 md:grid-cols-[180px_1fr_1fr_auto]">
           <select value={subject} onChange={(event) => setSubject(event.target.value)} className="rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-bold">
-            {subjectOptions.map((item) => <option key={item}>{item}</option>)}
+            {subjectOptions.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
           </select>
           <input value={customKeyword} onChange={(event) => setCustomKeyword(event.target.value)} placeholder="추가 주제 입력" className="rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold" />
           <input value={careerHint} onChange={(event) => setCareerHint(event.target.value)} placeholder="진로/학과 힌트" className="rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold" />
@@ -285,7 +299,9 @@ export default function Step3() {
         <section>
           <div className="mb-3 text-xs font-black tracking-[0.16em] text-[#8b1a1a]">ADDED TOPICS</div>
           <div className="grid gap-4 lg:grid-cols-3">
-            {customTopics.map((topic, index) => <TopicCard key={topic.id} topic={topic} index={baseTopics.length + index + 1} />)}
+            {customTopics.map((topic, index) => (
+              <TopicCard key={topic.id} topic={topic} index={baseTopics.length + index + 1} />
+            ))}
           </div>
         </section>
       ) : null}

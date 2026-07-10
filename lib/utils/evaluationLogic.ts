@@ -50,7 +50,23 @@ export const MAJORS = [
 
 export const REF_AVG = [3.5, 3.4, 3.3, 3.2, 3.1];
 
-export const DISTRIBUTION_BY_SUBJECT: Record<string, any> = {
+type SubjectDistribution = {
+  A: number;
+  B: number;
+  C: number;
+  n: number;
+};
+
+type SuccessfulCandidate = {
+  univ: string;
+  major: string;
+  gpaTrend: number[];
+  keywords: string[];
+  sepecSnippet: string;
+  rubricAvg: Record<string, string>;
+};
+
+export const DISTRIBUTION_BY_SUBJECT: Record<string, SubjectDistribution> = {
   "수학Ⅰ": { A: 18, B: 44, C: 38, n: 176 },
   "수학Ⅱ": { A: 16, B: 46, C: 38, n: 172 },
   "미적분": { A: 14, B: 48, C: 38, n: 168 },
@@ -86,7 +102,7 @@ export const MOCK_CANDIDATE = {
 };
 
 // Successful Candidate Mock Data (합격자 사례)
-export const SUCCESSFUL_CANDIDATES: Record<string, any> = {
+export const SUCCESSFUL_CANDIDATES: Record<string, SuccessfulCandidate> = {
   "snu_engineering": {
     univ: "서울대학교",
     major: "공학계열",

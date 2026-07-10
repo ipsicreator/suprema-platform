@@ -44,13 +44,13 @@ body {
   letter-spacing: -0.05em;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  min-width: var(--fixed-width);
-  overflow-x: auto;
+  min-width: 320px;
+  overflow-x: hidden;
 }
 
 #root-wrapper {
-  width: var(--fixed-width);
-  max-width: var(--fixed-width);
+  width: min(var(--fixed-width), 100vw);
+  max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
@@ -59,7 +59,7 @@ body {
 
 #diagnosis-wrapper {
   width: 100%;
-  max-width: 1150px;
+  max-width: min(1150px, 100vw);
 }
 
 .v-container {
@@ -117,6 +117,11 @@ body {
   transform: translateY(0);
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Custom Scrollbar for Premium Feel */
 ::-webkit-scrollbar {
   width: 8px;
@@ -140,5 +145,15 @@ button {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --fixed-width: 100vw;
+  }
+
+  body {
+    min-width: 0;
+  }
 }
 

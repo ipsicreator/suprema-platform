@@ -6,6 +6,10 @@ const PB_ADMIN_PASSWORD = process.env.PB_ADMIN_PASSWORD || "";
 
 let cached: { pb: PocketBase; authed: boolean } | null = null;
 
+type LegacyAdminAuthResponse = {
+  token: string;
+};
+
 export function hasPocketBaseAdmin(): boolean {
   return Boolean(PB_URL && PB_ADMIN_EMAIL && PB_ADMIN_PASSWORD);
 }
@@ -23,7 +27,7 @@ export async function pbAdmin(): Promise<PocketBase> {
     try {
       // PocketBase v0.23.0+ uses _superusers collection
       await pb.collection("_superusers").authWithPassword(PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD);
-    } catch (e: any) {
+    } catch {
       // Fallback for older servers (< v0.23) using a raw fetch, because JS SDK v0.23+ removed pb.admins entirely
       const res = await fetch(`${PB_URL.endsWith('/') ? PB_URL.slice(0, -1) : PB_URL}/api/admins/auth-with-password`, {
         method: "POST",
@@ -36,8 +40,8 @@ export async function pbAdmin(): Promise<PocketBase> {
         throw new Error(`Admin auth failed on both _superusers and legacy admins endpoint. Legacy status: ${res.status}`);
       }
       
-      const data = await res.json();
-      pb.authStore.save(data.token, data.admin);
+      const data = (await res.json()) as LegacyAdminAuthResponse;
+      pb.authStore.save(data.token);
     }
     
     cached.authed = true;

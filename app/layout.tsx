@@ -3,8 +3,8 @@ import "./globals.css";
 import SessionProviders from "./components/auth/SessionProviders";
 
 export const metadata: Metadata = {
-  title: "수프리마 AI 입시 플랫폼",
-  description: "입시 위치진단과 AI 학생부 분석을 통합 운영하는 수프리마 AI 입시 플랫폼",
+  title: "나의 입시멘토 | 탐구·세특·입시위치진단",
+  description: "탐구·세특·입시위치진단을 하나의 흐름으로 제공하는 나의 입시멘토 서비스",
 };
 
 export default function RootLayout({
@@ -16,7 +16,6 @@ export default function RootLayout({
     <html lang="ko">
       <body suppressHydrationWarning>
         <SessionProviders>{children}</SessionProviders>
-        {/* Force Enable Copy/Paste/Selection Script */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -28,10 +27,10 @@ export default function RootLayout({
                 document.addEventListener('contextmenu', allowEvent, true);
                 document.addEventListener('selectstart', allowEvent, true);
                 document.addEventListener('mousedown', (e) => {
-                  if (e.detail > 1) e.preventDefault(); // Keep double click selection
+                  if (e.detail > 1) e.preventDefault();
                 }, true);
               })();
-            `
+            `,
           }}
         />
       </body>

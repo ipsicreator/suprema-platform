@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>PDF 인쇄 결과물 미리보기</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #525659; /* PDF 뷰어 배경색 느낌 */
+      display: flex;
+      justify-content: center;
+      padding: 2rem 0;
+      margin: 0;
+      font-family: 'Malgun Gothic', sans-serif;
+    }
+    
+    /* 실제 A4 용지 사이즈 및 스타일 */
+    .a4-paper {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      padding: 20mm;
+      box-sizing: border-box;
+      color: #0f172a;
+    }
+
+    h1 { margin: 0 0 0.5rem 0; font-size: 2rem; color: #1e3a8a; border-bottom: 3px solid #1e3a8a; padding-bottom: 0.5rem; }
+    .subtitle { color: #475569; font-size: 1rem; margin-bottom: 2rem; }
+    
+    .section-title {
+      background: #f1f5f9; padding: 0.5rem; border-left: 5px solid #1e3a8a; font-size: 1.2rem; font-weight: bold; margin: 2rem 0 1rem 0;
+    }
+
+    .flex-row { display: flex; gap: 1.5rem; }
+    .flex-col { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+    
+    .box { border: 1px solid #cbd5e1; padding: 1rem; border-radius: 4px; }
+    h3 { margin: 0 0 0.8rem 0; font-size: 1.05rem; color: #334155; border-bottom: 1px dashed #cbd5e1; padding-bottom: 0.3rem; }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: center; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.4rem; }
+    th { background: #f8fafc; }
+
+    .chart-box { height: 200px; position: relative; }
+    .radar-box { height: 250px; position: relative; }
+    
+    .keyword { background: #e0f2fe; color: #0369a1; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.85rem; display: inline-block; margin-right: 0.4rem; }
+    
+    p { margin: 0; line-height: 1.6; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+  <div class="a4-paper">
+    <h1>입학사정관 종합 평가 시뮬레이션 리포트</h1>
+    <div class="subtitle">지원자: 유동훈 | 발곡고등학교 | 융합계열</div>
+
+    <!-- 1단계 -->
+    <div class="section-title">[1단계] 정량 및 기본 서류 평가</div>
+    <div class="flex-row">
+      <div class="flex-col">
+        <div class="box">
+          <h3>학교 정보 및 출결</h3>
+          <table>
+            <tr><th>고교 유형</th><td>일반고</td></tr>
+            <tr><th>출결 상황</th><td style="color: #16a34a; font-weight: bold;">미인정 결석 0일</td></tr>
+          </table>
+        </div>
+        <div class="box" style="background: #eff6ff;">
+          <h3>산출 내신 (GPA)</h3>
+          <div style="font-size: 2rem; font-weight: bold; color: #1d4ed8; text-align: center;">2.35 등급</div>
+        </div>
+      </div>
+      <div class="flex-col">
+        <div class="box">
+          <h3>학기별 등급 추이</h3>
+          <div class="chart-box"><canvas id="trendChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2단계 -->
+    <div class="section-title" style="page-break-before: auto;">[2단계] 정성 및 심층 역량 평가</div>
+    <div style="margin-bottom: 1rem;">
+      <span class="keyword">#융합사고력</span> <span class="keyword">#자기주도학습</span> <span class="keyword">#리더십</span> <span class="keyword">#학업성실성</span>
+    </div>
+    
+    <div class="flex-row">
+      <div class="flex-col">
+        <div class="box">
+          <h3>세부능력 및 특기사항</h3>
+          <p>수업 참여도와 과제 수행 능력이 매우 긍정적입니다. 특히 융합적 사고를 요구하는 수행평가에서의 활약이 돋보입니다.</p>
+        </div>
+        <div class="box">
+          <h3>독서 활동</h3>
+          <p>전공 및 융합 분야와 관련된 다수의 도서를 탐독하며 지적 호기심을 스스로 충족해 나가는 능력이 관찰됨.</p>
+        </div>
+      </div>
+      <div class="flex-col">
+        <div class="box">
+          <h3>창의적 체험활동</h3>
+          <p><strong>자율:</strong> 리더십 발휘 및 공동체 의식 관찰<br>
+          <strong>동아리:</strong> 전공 관련 탐구 실행력 매우 우수<br>
+          <strong>진로:</strong> 진로 탐색의 뚜렷한 일관성 확인</p>
+        </div>
+        <div class="box">
+          <h3>행동특성 및 종합의견</h3>
+          <p>탁월한 배려심을 갖추었으며, 매사에 성실한 태도로 임하여 교사 및 교우들의 신뢰가 매우 두터움.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3단계 -->
+    <div class="section-title">[3단계] 종합 판정 및 최종 결과</div>
+    <div class="flex-row">
+      <div class="flex-col">
+        <div class="box">
+          <h3>핵심 역량 시각화</h3>
+          <div class="radar-box"><canvas id="radarChart"></canvas></div>
+        </div>
+      </div>
+      <div class="flex-col">
+        <div class="box">
+          <h3>전공 적합성</h3>
+          <div style="font-size: 1.8rem; font-weight: bold; color: #1d4ed8; text-align: center;">A등급 (우수)</div>
+        </div>
+        <div class="box" style="background: #fff1f2; border-color: #fecdd3;">
+          <h3 style="color: #be123c; border-bottom-color: #fecdd3;">AI 최종 종합 컨설팅</h3>
+          <p style="color: #9f1239; font-weight: bold;">"인서울 중위권 이상 대학 안정적 지원 가능. 동아리 활동 내역과 세특의 융합적 사고를 적극 어필할 것을 권장합니다."</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: { labels: ['1-1', '1-2', '2-1', '2-2', '3-1'], datasets: [{ label: '전체 평균', data: [2.6, 2.5, 2.4, 2.3, 2.35], borderColor: '#3b82f6', tension: 0.1 }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { reverse: true, min: 1, max: 9 } } }
+    });
+
+    new Chart(document.getElementById('radarChart'), {
+      type: 'radar',
+      data: { labels: ['학업역량', '진로역량', '탐구력', '공동체역량', '발전가능성', '자기주도성'], datasets: [{ label: '지원자 역량', data: [85, 92, 90, 88, 95, 89], backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: '#3b82f6' }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } }
+    });
+  </script>
+</body>
+</html>

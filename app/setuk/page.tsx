@@ -12,7 +12,7 @@ import Step2 from "./step2/Step2";
 import Step3 from "./step3/Step3";
 import Step4 from "./step4/Step4";
 
-const steps = ["학생 정보 입력", "탐구 활동 입력", "AI 세특 추천"];
+const steps = ["학생정보입력", "탐구활동 입력", "탐구·세특 결과"];
 
 export default function SetukPage() {
   const [step, setStep] = useState(1);
@@ -24,10 +24,8 @@ export default function SetukPage() {
   const [isMajorRelated, setIsMajorRelated] = useState(true);
   
   const [result, setResult] = useState<string>("");
-  const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
-    setLoading(true);
     setStep(3);
     try {
       const res = await fetch("/api/solution", {
@@ -56,13 +54,12 @@ export default function SetukPage() {
         }
         setStep(4);
         window.scrollTo({ top: 0, behavior: "smooth" });
-        setLoading(false);
       }, 1500);
       
-    } catch (err: any) {
-      alert(`분석 중 오류가 발생했습니다: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      alert(`분석 중 오류가 발생했습니다: ${message}`);
       setStep(2);
-      setLoading(false);
     }
   };
 
@@ -95,7 +92,10 @@ export default function SetukPage() {
               style={{ objectFit: "contain" }}
             />
           </Link>
-          <span style={{ fontSize: "10px", fontWeight: "bold", color: "#9CA3AF", letterSpacing: "0.15em" }}>PREMIUM SETUK MAKER</span>
+          <div style={{ textAlign: "left", lineHeight: 1.15 }}>
+            <div style={{ fontSize: "14px", fontWeight: 900, color: "#1a0f08" }}>나의 입시멘토</div>
+            <div style={{ fontSize: "20px", fontWeight: 900, color: "#1a0f08" }}>탐구·세특·입시위치진단</div>
+          </div>
         </div>
 
         {/* Multi-step progress bar integrated directly in the Frame */}
@@ -112,10 +112,10 @@ export default function SetukPage() {
         {step < 3 && (
           <div style={{ textAlign: "center", marginBottom: "16px" }}>
             <h1 className="heading-premium" style={{ fontSize: "2rem", fontWeight: 950, marginBottom: "8px", color: "#1a0f08", letterSpacing: "-0.05em" }}>
-              탐구·세특 메이커
+              탐구·세특 제안
             </h1>
             <p style={{ color: "#5D4D3D", fontWeight: 700, fontSize: "0.95rem", maxWidth: "800px", margin: "0 auto", lineHeight: "1.5" }}>
-              학생의 탐구 활동을 분석하여 입시 전문가 수준의 세부능력 및 특기사항 문장을 생성합니다.
+              학생의 탐구 활동을 분석하여 탐구 주제, 독서, 세특 문장을 제안합니다.
             </p>
           </div>
         )}

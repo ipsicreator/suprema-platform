@@ -1,6 +1,7 @@
 import type { PrismAnswers } from "./questions";
 
 export type SubmitResponse = { id: number; engine_type: string; score: Record<string, number> };
+export type PrismResultResponse = Record<string, unknown>;
 
 const API_BASE = process.env.NEXT_PUBLIC_PRISM_API_BASE || "";
 
@@ -27,12 +28,12 @@ export async function submitPrismAnswers(args: { clientId: string; answers: Pris
   }
 }
 
-export async function fetchPrismResult(args: { resultId: number }): Promise<any | null> {
+export async function fetchPrismResult(args: { resultId: number }): Promise<PrismResultResponse | null> {
   if (!API_BASE) return null;
   try {
     const res = await fetch(`${cleanBase(API_BASE)}/ipsidna-prism/result/${args.resultId}`, { cache: "no-store" });
     if (!res.ok) return null;
-    return (await res.json()) as any;
+    return (await res.json()) as PrismResultResponse;
   } catch {
     return null;
   }

@@ -92,7 +92,7 @@ export default function ReportPage() {
             </Link>
           </div>
           <span style={{ fontSize: "11px", fontWeight: "900", color: "#9CA3AF", letterSpacing: "0.2em", textTransform: "uppercase" }}>
-            Standalone Report View
+            PREMIUM DIAGNOSIS
           </span>
         </div>
 

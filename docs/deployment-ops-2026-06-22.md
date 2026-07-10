@@ -128,7 +128,6 @@
 ### 4.3 AI/추천
 
 - `GEMINI_API_KEY`
-- `NEXT_PUBLIC_PRISM_API_BASE`
 
 ### 4.4 메일
 
@@ -163,7 +162,16 @@
 - Google/Naver/Kakao 로그인 키
 - Toss 결제 키
 - 관리자 이메일 목록
-- Prism API Base
+
+## 4.7 범위 제외 메모
+
+- `app/ipsidna-prism/**`
+- `app/api/ipsidna-prism/**`
+- `lib/ipsidna/**`
+
+위 경로는 분리된 별도 프로젝트 소스가 현재 레포에 남아 있는 상태다.
+현재 `나의 입시멘토` 운영 문서와 배포 점검 범위에서는 제외한다.
+분리 기준 프로젝트 위치는 `C:\Users\chris\Desktop\새 폴더\myungni_next` 이다.
 
 ## 6. 배포 후 점검 순서
 
