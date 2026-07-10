@@ -99,9 +99,10 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         submit();
       }}
       style={{
+        width: "100%",
         maxWidth: 1100,
         margin: "0 auto",
-        padding: 28,
+        padding: 24,
         borderRadius: 28,
         border: "1px solid #eadfce",
         background: "#fff",
@@ -141,7 +142,13 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         </div>
       ) : null}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 16,
+        }}
+      >
         <Field label="컨설턴트명" value={info.consultantName} onChange={(v) => update("consultantName", v)} />
         <Field label="학생 이름 *" value={info.studentName} onChange={(v) => update("studentName", v)} required />
         <Field label="학교명 *" value={info.schoolName} onChange={(v) => update("schoolName", v)} required />
@@ -192,6 +199,7 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
             fontSize: 16,
             fontWeight: 900,
             boxShadow: "0 15px 30px rgba(139,26,26,0.18)",
+            maxWidth: "100%",
           }}
         >
           다음 단계로 이동
