@@ -6,23 +6,23 @@ import AppFooter from "@/app/components/AppFooter";
 const steps = [
   {
     no: "01",
-    title: "사용자정보 입력",
-    description: "학생이름, 학년, 학교, 연락처 정보를 먼저 입력합니다.",
+    title: "학생정보 입력",
+    description: "학생명, 학교, 학년, 연락처, 이메일을 넣고 학생부 PDF를 올립니다.",
   },
   {
     no: "02",
     title: "학생부 분석",
-    description: "학생부 PDF 또는 이미지 파일을 모두 처리해 분석 결과를 확인합니다.",
+    description: "과목별 원점수, 평균, 성취도, 비교 분석, 메모, 인쇄, 메일 보내기를 확인합니다.",
   },
   {
     no: "03",
-    title: "탐구/독서/세특",
-    description: "과목, 독서, 세특 문장을 연결하는 제안 결과를 확인합니다.",
+    title: "전공주제 / 세특 / 탐구",
+    description: "기본 3개 주제와 추가 3개 주제, 책, 자료, 세특 문장을 함께 봅니다.",
   },
   {
     no: "04",
-    title: "입시위치 진단",
-    description: "상향·안정·적정·도전 판단과 최종 결과를 확인합니다.",
+    title: "입시 위치 진단",
+    description: "희망대학별 판단 결과, 근거, 1~3단계 묶음, 메일 보내기를 확인합니다.",
   },
 ];
 
@@ -59,8 +59,8 @@ export default function ProcessPage() {
         >
           <div />
           <div style={{ paddingTop: 8, textAlign: "left", lineHeight: 1.15 }}>
-            <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: "-0.03em" }}>나의 입시멘토</div>
-            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.02em" }}>탐구·세특·입시위치진단</div>
+            <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: "-0.03em" }}>수프리마 랩</div>
+            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.02em" }}>탐구 · 세특 · 입시위치진단</div>
           </div>
           <div
             style={{
@@ -78,10 +78,11 @@ export default function ProcessPage() {
 
         <section style={{ padding: "32px 32px 12px", textAlign: "center" }}>
           <h1 style={{ margin: 0, fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 900, letterSpacing: "-0.06em" }}>
-            프로세스 안내
+            전체 흐름
           </h1>
           <p style={{ margin: "16px auto 0", maxWidth: 900, fontSize: 16, fontWeight: 600, lineHeight: 1.8, color: "#5f5549" }}>
-            학생 정보 입력부터 학생부·성적분석, 탐구/독서 제안, 입시위치 진단까지 같은 화면 톤으로 연결합니다.
+            학생정보 입력부터 학생부 분석, 탐구 제안, 입시 위치 진단까지 한 흐름으로 이어집니다.
+            각 단계는 결과 화면, 인쇄, 메일 보내기까지 바로 연결됩니다.
           </p>
         </section>
 
@@ -117,13 +118,33 @@ export default function ProcessPage() {
             ))}
           </div>
 
+          <div
+            style={{
+              marginTop: 24,
+              borderRadius: 24,
+              border: "1px solid #eadfce",
+              background: "#fffaf4",
+              padding: 20,
+            }}
+          >
+            <div style={{ marginBottom: 10, fontSize: 12, fontWeight: 900, letterSpacing: "0.14em", color: "#8b1a1a" }}>
+              RESULT CHECK
+            </div>
+            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+              <MiniResult title="1단계" text="학생부 PDF 업로드와 기본 정보 확인" />
+              <MiniResult title="2단계" text="학생부 원문, 요약 분석, 메일 / 인쇄" />
+              <MiniResult title="3단계" text="탐구 주제, 책, 자료, 세특 문장" />
+              <MiniResult title="4단계" text="희망대학 판단, 근거, 최종 결과 발송" />
+            </div>
+          </div>
+
           <div style={{ marginTop: 24, display: "flex", flexWrap: "wrap", gap: 12 }}>
             <ActionLink href="/diagnosis/step1" primary>
-              사용자정보 입력
+              학생정보 입력
             </ActionLink>
             <ActionLink href="/diagnosis/step1/evaluation">학생부 분석 결과</ActionLink>
-            <ActionLink href="/exploration">탐구/독서/세특 제안</ActionLink>
-            <ActionLink href="/diagnosis">입시위치진단</ActionLink>
+            <ActionLink href="/exploration">탐구 / 독서 / 세특 제안</ActionLink>
+            <ActionLink href="/diagnosis">입시 위치 진단</ActionLink>
             <ActionLink href="/report">최종 결과 페이지</ActionLink>
           </div>
         </section>
@@ -164,5 +185,21 @@ function ActionLink({
     >
       {children}
     </Link>
+  );
+}
+
+function MiniResult({ title, text }: { title: string; text: string }) {
+  return (
+    <div
+      style={{
+        borderRadius: 18,
+        border: "1px solid #e7dac6",
+        background: "#fff",
+        padding: 16,
+      }}
+    >
+      <div style={{ marginBottom: 6, fontSize: 12, fontWeight: 900, color: "#8b1a1a" }}>{title}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.6, color: "#4b5563" }}>{text}</div>
+    </div>
   );
 }

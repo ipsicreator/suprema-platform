@@ -58,11 +58,11 @@ export default function FlowShell({
           }}
         >
           <Link href="/" style={{ display: "inline-flex", alignItems: "center" }}>
-            <Image src="/suprema-logo.png" alt="나의 입시멘토" width={160} height={48} priority style={{ height: 44, width: "auto" }} />
+            <Image src="/suprema-logo.png" alt="수프리마 랩" width={160} height={48} priority style={{ height: 44, width: "auto" }} />
           </Link>
           <div style={{ paddingTop: 8, textAlign: "left", lineHeight: 1.15 }}>
-            <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: "-0.03em" }}>나의 입시멘토</div>
-            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.02em" }}>탐구·세특·입시위치진단</div>
+            <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: "-0.03em" }}>수프리마 랩</div>
+            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.02em" }}>학생정보 · 학생부분석 · 입시위치진단</div>
           </div>
           <div
             style={{

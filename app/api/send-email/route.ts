@@ -34,6 +34,12 @@ function buildHtml(payload: EmailPayload) {
   const grade = String(reportData.grade || "");
   const averageGrade = String(reportData.averageGrade || "-");
   const subject = String(reportData.subject || "");
+  const keywords = Array.isArray((reportData as { studentAnalysis?: { keyKeywords?: unknown[] } }).studentAnalysis?.keyKeywords)
+    ? ((reportData as { studentAnalysis?: { keyKeywords?: string[] } }).studentAnalysis?.keyKeywords || []).slice(0, 3).join(", ")
+    : "";
+  const comprehensiveOpinion = String(
+    (reportData as { studentAnalysis?: { comprehensiveOpinion?: string } }).studentAnalysis?.comprehensiveOpinion || "",
+  );
   const signalCount = Array.isArray(reportData.studentSignals) ? reportData.studentSignals.length : 0;
   const resultCount = Array.isArray((reportData as { results?: unknown[] }).results)
     ? ((reportData as { results?: unknown[] }).results || []).length
@@ -43,14 +49,14 @@ function buildHtml(payload: EmailPayload) {
     : 0;
 
   let title = "나의 입시멘토 · 학생부 분석 보고서";
-  let summary = "상세 보고서는 앱의 학생부 분석 / 보고서 화면에서 함께 확인합니다.";
+  let summary = "상세 보고서는 앱의 학생부 분석 화면에서 함께 확인할 수 있습니다.";
 
   if (payload.subject?.includes("탐구")) {
     title = "나의 입시멘토 · 탐구/독서 제안 보고서";
     summary = `학생부 신호 ${signalCount}개, 생성 결과 ${resultCount}건을 포함한 탐구 제안 보고서입니다.`;
   } else if (payload.subject?.includes("입시위치")) {
     title = "나의 입시멘토 · 입시위치진단 보고서";
-    summary = `지원 대학 ${choiceCount}건과 학종 평가축을 포함한 진단 보고서입니다.`;
+    summary = `지원 대상 ${choiceCount}건과 최종 판단 결과를 포함한 진단 보고서입니다.`;
   }
 
   return `
@@ -59,9 +65,11 @@ function buildHtml(payload: EmailPayload) {
       <p style="margin: 0 0 10px;"><strong>학생명</strong>: ${studentName}</p>
       <p style="margin: 0 0 10px;"><strong>학교</strong>: ${schoolName}</p>
       <p style="margin: 0 0 10px;"><strong>학년</strong>: ${grade}</p>
-      <p style="margin: 0 0 20px;"><strong>평균등급</strong>: ${averageGrade}</p>
+      <p style="margin: 0 0 10px;"><strong>평균등급</strong>: ${averageGrade}</p>
+      ${keywords ? `<p style="margin: 0 0 10px;"><strong>핵심 키워드</strong>: ${keywords}</p>` : ""}
       ${subject ? `<p style="margin: 0 0 10px;"><strong>과목</strong>: ${subject}</p>` : ""}
       <p style="margin: 0;">${summary}</p>
+      ${comprehensiveOpinion ? `<p style="margin: 16px 0 0; line-height: 1.6;">${comprehensiveOpinion}</p>` : ""}
     </div>
   `;
 }
@@ -71,7 +79,7 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as EmailPayload;
     const email = String(payload.email || "").trim();
     if (!email) {
-      return jsonUtf8({ error: "메일주소가 필요합니다." }, { status: 400 });
+      return jsonUtf8({ error: "메일 주소가 필요합니다." }, { status: 400 });
     }
 
     const resendApiKey = process.env.RESEND_API_KEY || "";
@@ -96,7 +104,7 @@ export async function POST(request: Request) {
 
       if (!response.ok) {
         const errorText = await response.text();
-        return jsonUtf8({ error: `메일 발송 제공자 오류: ${errorText}` }, { status: 502 });
+        return jsonUtf8({ error: `메일 발송 서비스 오류: ${errorText}` }, { status: 502 });
       }
 
       return jsonUtf8({ success: true, message: "메일 발송이 완료되었습니다." });
@@ -105,7 +113,7 @@ export async function POST(request: Request) {
     await saveOutbox({ ...payload, email, subject, reportData: { ...(payload.reportData || {}), html } });
     return jsonUtf8({
       success: true,
-      message: "메일 발송 설정이 없어 발송 요청만 보관했습니다. `.cache/suprema-platform/outbox`를 확인하세요.",
+      message: "메일 설정이 없어 발송 요청만 저장했습니다. `.cache/suprema-platform/outbox` 를 확인하세요.",
     });
   } catch (error) {
     console.error("Error sending email:", error);

@@ -2,7 +2,12 @@ export type ExtractedSubject = {
   subject: string;
   unit?: number;
   grade?: number | string;
+  year?: number | string;
   semester?: string;
+  rawScore?: number;
+  scoreAverage?: number;
+  achievementLevel?: string;
+  studentCount?: number;
 };
 
 export type UserInfo = {
@@ -16,6 +21,7 @@ export type UserInfo = {
   studentIndex?: number;
   gradingSystem?: "9-level" | "5-level";
   careerHint: string;
+  hopeDepartment?: string;
   supportTrack?: string;
   parsedSubjects?: ExtractedSubject[];
   studentRecord?: unknown;

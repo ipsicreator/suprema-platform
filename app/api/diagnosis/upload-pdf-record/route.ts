@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import pdf from "pdf-parse";
 import { pbAdmin, hasPocketBaseAdmin } from "@/lib/pocketbaseAdmin";
 import { extractTextFromPDFBuffer, calculateGPAFromText, type ExtractedSubject } from "@/lib/pdf-parser";
 
@@ -70,7 +71,7 @@ export async function POST(req: Request) {
 
     const geminiApiKey = process.env.GEMINI_API_KEY || "";
     if (geminiApiKey) {
-      console.log("[PDF Parser] Gemini API key detected. Running Gemini 1.5 Flash parser...");
+      console.log("[PDF Parser] Gemini API key detected. Running Gemini 2.5 Flash parser...");
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
         const geminiRes = await fetch(geminiUrl, {
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
                 gpa: parsed.gpa,
                 subjects: parsed.subjects,
                 studentAnalysis: parsed.studentAnalysis,
-                message: parsed.message || "성공적으로 학생부 분석이 완료되었습니다.",
+                message: parsed.message || "학생부 분석이 완료되었습니다.",
               };
             }
           }
@@ -115,7 +116,11 @@ export async function POST(req: Request) {
 
     if (!result) {
       const clientExtractedText = String(body?.extractedText ?? "").trim();
-      const text = clientExtractedText || extractTextFromPDFBuffer(buffer);
+      let text = clientExtractedText || extractTextFromPDFBuffer(buffer);
+      if (!text.trim()) {
+        const parsed = await pdf(buffer).catch(() => null);
+        text = parsed?.text || "";
+      }
       finalRawText = text;
       result = calculateGPAFromText(text, gradingSystem);
     }
@@ -139,9 +144,6 @@ export async function POST(req: Request) {
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "PDF 분석 중 서버 오류가 발생했습니다.";
-    return NextResponse.json(
-      { success: false, error: message },
-      { status: 500 },
-    );
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

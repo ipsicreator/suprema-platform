@@ -15,6 +15,7 @@ import PrintableReportShell from "../PrintableReportShell";
 import GradeTrendChart from "./charts/GradeTrendChart";
 import SubjectRadarChart from "./charts/SubjectRadarChart";
 import GradeDistributionChart from "./charts/GradeDistributionChart";
+import { buildStudentAnalysisReportSummary } from "@/lib/student-analysis-report";
 
 export interface StudentRecordReportData {
   studentName: string;
@@ -48,6 +49,23 @@ export interface StudentRecordReportData {
 
 const sectionStyle = "rounded-[28px] border border-[#eadfce] bg-[#fffaf4] p-6";
 const serviceName = "나의 입시멘토 · 탐구·세특·입시위치진단";
+const stageFacts = {
+  1: [
+    "학생명, 학교, 학년, 평균 등급을 먼저 확인합니다.",
+    "과목별 원점수, 평균, 성취도, 수강자 수를 표로 보여줍니다.",
+    "원문 항목이 화면의 어느 블록으로 연결되는지 같이 표시합니다.",
+  ],
+  2: [
+    "학기별 평균 등급과 강점 과목을 보여줍니다.",
+    "학기 추이, 교과군 레이더, 원점수-평균 편차를 함께 확인합니다.",
+    "핵심 키워드, 교과 분석, 세특 분석, 종합 의견을 묶어 보여줍니다.",
+  ],
+  3: [
+    "학생부 전체 흐름을 바탕으로 학업역량, 전공적합성, 종합 의견을 정리합니다.",
+    "강점 정리, 보완 포인트, 면접 포인트를 한 번에 확인합니다.",
+    "추가 주제를 메일이나 인쇄로 바로 보낼 수 있습니다.",
+  ],
+} as const;
 
 export default function StudentRecordReport({
   data,
@@ -110,6 +128,21 @@ export default function StudentRecordReport({
   const trendData = useMemo(() => buildTrendData(data.parsedSubjects), [data.parsedSubjects]);
   const radarData = useMemo(() => buildSubjectGroupRadarData(data.parsedSubjects), [data.parsedSubjects]);
   const distributionData = useMemo(() => buildDistributionData(data.parsedSubjects), [data.parsedSubjects]);
+  const reportSummary = useMemo(
+    () =>
+      buildStudentAnalysisReportSummary({
+        studentName: data.studentName,
+        supportTrack: data.supportTrack,
+        careerHint: data.careerHint,
+        hopeDepartment: data.supportTrack,
+        parsedSubjects: data.parsedSubjects.map((subject) => ({
+          subject: subject.subject,
+          grade: subject.grade,
+        })),
+        studentAnalysis: data.studentAnalysis,
+      }),
+    [data.careerHint, data.parsedSubjects, data.studentAnalysis, data.studentName, data.supportTrack],
+  );
 
   const handleSendEmail = async () => {
     const trimmed = email.trim();
@@ -190,12 +223,22 @@ export default function StudentRecordReport({
       </div>
 
       {activeStep === 1 ? (
-        <section className={`${sectionStyle} mb-5`}>
-          <SectionHeader
-            badge="1단계 · 학생부 원본"
-            title="원문 → 화면 매핑"
-            description="원문 항목이 어느 화면 블록으로 연결되는지 먼저 보여줍니다."
-          />
+      <section className={`${sectionStyle} mb-5`}>
+        <div className="mb-5 rounded-[22px] border border-[#efe6dc] bg-white p-5">
+          <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">1단계 핵심 결과</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {stageFacts[1].map((item) => (
+              <div key={item} className="rounded-[18px] bg-[#faf6f0] px-4 py-3 text-sm font-semibold leading-6 text-slate-700">
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+        <SectionHeader
+          badge="1단계 · 학생부 원본"
+          title="원문 → 화면 매핑"
+          description="원문 항목이 어느 화면 블록으로 연결되는지 먼저 보여줍니다."
+        />
 
           <div className="mb-6 overflow-x-auto rounded-[20px] border border-[#efe6dc] bg-white">
             <table className="w-full border-collapse text-sm">
@@ -272,6 +315,16 @@ export default function StudentRecordReport({
 
       {activeStep === 2 ? (
         <section className={`${sectionStyle} mb-5`}>
+          <div className="mb-5 rounded-[22px] border border-[#efe6dc] bg-white p-5">
+            <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">2단계 핵심 결과</div>
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              {stageFacts[2].map((item) => (
+                <div key={item} className="rounded-[18px] bg-[#faf6f0] px-4 py-3 text-sm font-semibold leading-6 text-slate-700">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
           <SectionHeader
             badge="2단계 · 요약·비교 분석"
             title="핵심 지표 요약"
@@ -354,6 +407,16 @@ export default function StudentRecordReport({
 
       {activeStep === 3 ? (
         <section className={sectionStyle}>
+          <div className="mb-5 rounded-[22px] border border-[#efe6dc] bg-white p-5">
+            <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">3단계 핵심 결과</div>
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              {stageFacts[3].map((item) => (
+                <div key={item} className="rounded-[18px] bg-[#faf6f0] px-4 py-3 text-sm font-semibold leading-6 text-slate-700">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
           <SectionHeader
             badge="3단계 · 입학사정관 평가"
             title="판단과 다음 행동"
@@ -368,13 +431,37 @@ export default function StudentRecordReport({
               <p>{data.studentAnalysis?.majorSuitability || "전공 적합성 판단 문구가 아직 연결되지 않았습니다."}</p>
             </AnalysisBox>
             <AnalysisBox title="종합 의견">
-              <p>{data.studentAnalysis?.comprehensiveOpinion || "입학사정관 종합 의견이 아직 연결되지 않았습니다."}</p>
+              <p>{reportSummary.overallSummary}</p>
             </AnalysisBox>
           </div>
 
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <SummaryCard label="추천 판단" value={keywords[0] ? `${keywords[0]} 중심 강점 유지` : "학생부 강점 유지"} />
             <SummaryCard label="보완 포인트" value={data.parsedSubjects.length > 0 ? "과목 간 연속성과 탐구 연결 강화" : "교과 데이터 추출 확인 필요"} />
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            <AnalysisBox title="강점 정리">
+              <ul className="list-disc space-y-2 pl-5">
+                {reportSummary.strengths.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </AnalysisBox>
+            <AnalysisBox title="보완 포인트">
+              <ul className="list-disc space-y-2 pl-5">
+                {reportSummary.cautions.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </AnalysisBox>
+            <AnalysisBox title="면접 포인트">
+              <ul className="list-disc space-y-2 pl-5">
+                {reportSummary.interviewPoints.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </AnalysisBox>
           </div>
         </section>
       ) : null}
@@ -476,7 +563,10 @@ export default function StudentRecordReport({
           <PrintParagraph title="학업역량" value={data.studentAnalysis?.academicCapacity || "학생부 기반 학업역량 분석이 아직 연결되지 않았습니다."} />
           <PrintParagraph title="세특 분석" value={data.studentAnalysis?.seTeukAnalysis || "세특 분석이 아직 연결되지 않았습니다."} />
           <PrintParagraph title="전공적합성" value={data.studentAnalysis?.majorSuitability || "전공 적합성 판단 문구가 아직 연결되지 않았습니다."} />
-          <PrintParagraph title="종합 의견" value={data.studentAnalysis?.comprehensiveOpinion || "입학사정관 종합 의견이 아직 연결되지 않았습니다."} />
+          <PrintParagraph title="종합 의견" value={reportSummary.overallSummary} />
+          <PrintParagraph title="강점 정리" value={reportSummary.strengths.join(" / ") || "강점 문구가 아직 연결되지 않았습니다."} />
+          <PrintParagraph title="보완 포인트" value={reportSummary.cautions.join(" / ") || "보완 포인트가 아직 연결되지 않았습니다."} />
+          <PrintParagraph title="면접 포인트" value={reportSummary.interviewPoints.join(" / ")} />
         </div>
 
         <div className="rounded-[24px] border border-[#eadfce] bg-white p-5">

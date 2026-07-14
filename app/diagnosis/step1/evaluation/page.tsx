@@ -6,9 +6,16 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ArrowRight, ChartColumnBig, FileText, MessageCircleMore, Target } from "lucide-react";
 import AdmissionOfficerEvaluation from "../../../components/admission/AdmissionOfficerEvaluation";
-import type { UserInfo, ExtractedSubject } from "../../../components/UserInfoForm";
+import type { UserInfo } from "@/lib/user-info";
 
-type NormalizedSubject = ExtractedSubject & { index: number };
+type NormalizedSubject = {
+  subject: string;
+  unit?: number;
+  grade?: number | string;
+  year?: number;
+  semester?: string | number;
+  index: number;
+};
 
 function getGradeBucket(grade: number, gradingSystem?: string) {
   if (gradingSystem === "5-level") {
@@ -107,16 +114,16 @@ export default function StudentAnalysisPage() {
             <p className="mb-2 inline-flex rounded-full bg-[#8b1a1a]/5 px-3 py-1 text-xs font-extrabold tracking-[0.2em] text-[#8b1a1a]">
               STUDENT RECORD ANALYSIS
             </p>
-            <h1 className="text-3xl font-black tracking-tight text-[#1a0f08] md:text-4xl">학생부 3단 분석 화면</h1>
+            <h1 className="text-3xl font-black tracking-tight text-[#1a0f08] md:text-4xl">학생부 3면 분석 화면</h1>
             <p className="mt-2 text-sm font-medium text-slate-500">
-              1. 학생부 원본 · 2. 요약/비교 분석 · 3. 입학사정관 평가를 한 화면에 분리해 보여줍니다.
+              1. 학생부 원본 · 2. 요약/비교 분석 · 3. 입학사정관 평가를 한 화면에서 분리해 보여줍니다.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="/diagnosis/step1" className="rounded-xl border border-[#d7c8b8] bg-[#faf6f0] px-4 py-3 text-sm font-bold text-slate-700">
               학생부 다시 입력
             </Link>
-            <Link href="/exploration" className="rounded-xl bg-[#8b1a1a] px-4 py-3 text-sm font-bold text-white">
+            <Link href="/diagnosis/step3" className="rounded-xl bg-[#8b1a1a] px-4 py-3 text-sm font-bold text-white">
               탐구주제 제안으로 이동
             </Link>
           </div>
@@ -179,7 +186,7 @@ export default function StudentAnalysisPage() {
               <SectionHeader
                 step="02"
                 title="요약·비교 분석"
-                description="학기/과목/키워드/핵심과목/역량 평가를 한 화면에서 연결합니다."
+                description="학기/과목/키워드 기반으로 성적 흐름과 핵심 항목을 함께 보여줍니다."
               />
 
               <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -275,8 +282,8 @@ export default function StudentAnalysisPage() {
               topKeywords={topKeywords}
             />
             <div className="mt-6 flex justify-end">
-              <Link href="/exploration" className="inline-flex items-center gap-2 rounded-xl bg-[#8b1a1a] px-4 py-3 text-sm font-bold text-white">
-                탐구주제 추천으로 이어가기 <ArrowRight className="h-4 w-4" />
+              <Link href="/diagnosis/step3" className="inline-flex items-center gap-2 rounded-xl bg-[#8b1a1a] px-4 py-3 text-sm font-bold text-white">
+                탐구주제 추천으로 이어가기<ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>

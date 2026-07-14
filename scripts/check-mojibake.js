@@ -1,24 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 
-const roots = ["app", "lib", "scripts"];
+const roots = ["app", "lib", "scripts", "docs"];
 const exts = new Set([".ts", ".tsx", ".js", ".jsx", ".css", ".md"]);
-const suspicious = [
-  "吏꾨",
-  "遺꾩",
-  "諛쒖",
-  "硫붿",
-  "怨쇰",
-  "媛?μ",
-  "?숈",
-  "?먭",
-  "?낆",
-  "?섏",
-  "?댁",
-  "?꾩",
-  "?됯",
-  "?붿",
-];
+const suspicious = [String.fromCharCode(0xfffd)];
 
 const results = [];
 

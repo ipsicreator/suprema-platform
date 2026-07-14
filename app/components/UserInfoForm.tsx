@@ -1,42 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  buildPdfUploadPreview,
+  buildPdfUploadSummary,
+  mergePdfAnalysisIntoUserInfo,
+  resetPdfAnalysisFromUserInfo,
+} from "@/lib/pdf-analysis-user-info";
+import type { UserInfo } from "@/lib/user-info";
 
-export interface ExtractedSubject {
+export type { UserInfo } from "@/lib/user-info";
+
+type UploadAnalysisSubject = {
   subject: string;
   unit: number;
   grade: number;
   year?: number;
   semester?: number;
-}
-
-export interface UserInfo {
-  consultantName: string;
-  studentName: string;
-  schoolName: string;
-  grade: string;
-  studentPhone: string;
-  parentPhone: string;
-  email: string;
-  studentIndex?: number;
-  gradingSystem?: "9-level" | "5-level";
-  careerHint: string;
-  hopeDepartment?: string;
-  parsedSubjects?: ExtractedSubject[];
-  studentAnalysis?: {
-    majorField?: string;
-    majorSuitability?: string;
-    keyKeywords?: string[];
-    academicCapacity?: string;
-    seTeukAnalysis?: string;
-    comprehensiveOpinion?: string;
-  };
-}
+};
 
 interface Props {
   onNext: (info: UserInfo) => void;
   serviceType: "setuk" | "diagnosis";
 }
+
+type HealthResponse = {
+  pocketbase?: {
+    status?: string;
+    message?: string;
+  };
+  mail?: {
+    status?: string;
+    message?: string;
+  };
+};
 
 const gradeOptions = ["1학년", "2학년", "3학년"];
 
@@ -52,43 +49,137 @@ const fieldStyle: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
+const defaultUserInfo: UserInfo = {
+  consultantName: "",
+  studentName: "",
+  schoolName: "",
+  grade: "3학년",
+  studentPhone: "",
+  parentPhone: "",
+  email: "",
+  studentIndex: 2.5,
+  gradingSystem: "9-level",
+  careerHint: "",
+  parsedSubjects: [],
+};
+
+function readInitialUserInfo() {
+  if (typeof window === "undefined") return defaultUserInfo;
+
+  try {
+    const raw = sessionStorage.getItem("suprema_user_info");
+    if (!raw) return defaultUserInfo;
+    const saved = JSON.parse(raw) as UserInfo;
+    return { ...defaultUserInfo, ...saved };
+  } catch {
+    return defaultUserInfo;
+  }
+}
+
+function saveUserInfo(value: UserInfo) {
+  sessionStorage.setItem("suprema_user_info", JSON.stringify(value));
+}
+
 export default function UserInfoForm({ onNext, serviceType }: Props) {
-  const [mounted, setMounted] = useState(false);
-  const [hasSavedInfo, setHasSavedInfo] = useState(false);
-  const [info, setInfo] = useState<UserInfo>({
-    consultantName: "",
-    studentName: "",
-    schoolName: "",
-    grade: "3학년",
-    studentPhone: "",
-    parentPhone: "",
-    email: "",
-    studentIndex: 2.5,
-    gradingSystem: "9-level",
-    careerHint: "",
-    parsedSubjects: [],
-  });
+  const [selectedPdf, setSelectedPdf] = useState<File | null>(null);
+  const [uploadMessage, setUploadMessage] = useState("");
+  const [uploadError, setUploadError] = useState("");
+  const [analyzingPdf, setAnalyzingPdf] = useState(false);
+  const [info, setInfo] = useState<UserInfo>(() => readInitialUserInfo());
+  const [healthInfo, setHealthInfo] = useState<HealthResponse | null>(null);
+  const hasSavedInfo = Boolean(info.studentName && info.schoolName);
 
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem("suprema_user_info");
-      if (raw) {
-        const saved = JSON.parse(raw) as UserInfo;
-        setInfo((prev) => ({ ...prev, ...saved }));
-        setHasSavedInfo(Boolean(saved.studentName && saved.schoolName));
-      }
-    } catch {}
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+  const pdfSummary = buildPdfUploadSummary(info);
+  const pdfPreview = buildPdfUploadPreview(info);
 
   const update = (key: keyof UserInfo, value: string | number) => {
     setInfo((prev) => ({ ...prev, [key]: value } as UserInfo));
   };
 
+  const readHealth = async () => {
+    try {
+      const response = await fetch("/api/health", { cache: "no-store" });
+      if (!response.ok) return;
+      const result = (await response.json()) as HealthResponse;
+      setHealthInfo(result);
+    } catch {}
+  };
+
+  useEffect(() => {
+    const loadHealth = async () => {
+      await readHealth();
+    };
+    void loadHealth();
+  }, []);
+
+  const analyzePdf = async () => {
+    if (!selectedPdf) {
+      setUploadError("PDF 파일을 먼저 선택해 주세요.");
+      setUploadMessage("");
+      return;
+    }
+
+    setAnalyzingPdf(true);
+    setUploadError("");
+    setUploadMessage("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedPdf);
+      formData.append("gradingSystem", info.gradingSystem || "9-level");
+
+      const response = await fetch("/api/diagnosis/upload-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json()) as {
+        success?: boolean;
+        error?: string;
+        message?: string;
+        gpa?: number;
+        subjects?: UploadAnalysisSubject[];
+        studentAnalysis?: UserInfo["studentAnalysis"];
+      };
+
+      if (!response.ok || !result.success) {
+        setUploadError(result.error || result.message || "PDF 분석 중 오류가 발생했습니다.");
+        return;
+      }
+
+      setInfo((prev) => {
+        const next = mergePdfAnalysisIntoUserInfo(prev, {
+          success: true,
+          gpa: Number(result.gpa || 0),
+          subjects: result.subjects || [],
+          studentAnalysis: result.studentAnalysis,
+          message: result.message || "PDF 분석 완료",
+        }) as UserInfo;
+        saveUserInfo(next);
+        return next;
+      });
+
+      setUploadMessage(result.message || "PDF 분석이 완료되었습니다.");
+      await readHealth();
+    } catch {
+      setUploadError("PDF 분석 요청 중 오류가 발생했습니다.");
+    } finally {
+      setAnalyzingPdf(false);
+    }
+  };
+
+  const resetPdfAnalysis = () => {
+    setInfo((prev) => {
+      const next = resetPdfAnalysisFromUserInfo(prev) as UserInfo;
+      saveUserInfo(next);
+      return next;
+    });
+    setSelectedPdf(null);
+    setUploadMessage("분석 결과를 초기화했습니다.");
+    setUploadError("");
+  };
+
   const submit = () => {
-    sessionStorage.setItem("suprema_user_info", JSON.stringify(info));
+    saveUserInfo(info);
     onNext(info);
   };
 
@@ -137,7 +228,7 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
               fontWeight: 800,
             }}
           >
-            저장 정보로 계속
+            저장된 정보로 계속
           </button>
         </div>
       ) : null}
@@ -156,13 +247,13 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         <Field label="학생 연락처 *" value={info.studentPhone} onChange={(v) => update("studentPhone", v)} required />
         <Field label="학부모 연락처 *" value={info.parentPhone} onChange={(v) => update("parentPhone", v)} required />
         <Field label="이메일 *" value={info.email} onChange={(v) => update("email", v)} required />
-        <Field label="희망 진로/계열 *" value={info.careerHint} onChange={(v) => update("careerHint", v)} required />
+        <Field label="희망 진로/학과 *" value={info.careerHint} onChange={(v) => update("careerHint", v)} required />
 
         {serviceType === "diagnosis" ? (
           <>
             <Field
               as="select"
-              label="성적 체계 *"
+              label="등급 체계 *"
               value={info.gradingSystem || "9-level"}
               onChange={(v) => update("gradingSystem", v as "9-level" | "5-level")}
               options={[
@@ -172,7 +263,7 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
             />
             <Field
               type="number"
-              label={`현재 등급 (${info.gradingSystem === "5-level" ? "1~5" : "1~9"}) *`}
+              label={`현재 내신 등급 (${info.gradingSystem === "5-level" ? "1~5" : "1~9"}) *`}
               value={String(info.studentIndex ?? "")}
               onChange={(v) => update("studentIndex", Number(v))}
             />
@@ -183,7 +274,141 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
       <div style={{ marginTop: 24, padding: 18, borderRadius: 20, border: "1px solid #eadfce", background: "#fffaf4" }}>
         <div style={{ fontSize: 14, fontWeight: 900, color: "#8b1a1a", marginBottom: 8 }}>학생부 PDF 자동 분석</div>
         <div style={{ fontSize: 13, color: "#6c6256", lineHeight: 1.7 }}>
-          현재 배포 고정 우선 처리로 업로드 영역은 단순화했습니다. 입력 후 다음 단계로 이동하면 진단 흐름이 이어집니다.
+          학생부 PDF를 올리면 과목 수, 평균 등급, 핵심 키워드를 먼저 반영합니다.
+        </div>
+
+        {healthInfo ? (
+          <div
+            style={{
+              marginTop: 14,
+              display: "grid",
+              gap: 8,
+              borderRadius: 16,
+              border: "1px solid #e8dccb",
+              background: "#fff",
+              padding: 14,
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 900, color: "#8b1a1a" }}>운영 상태 안내</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#4b5563" }}>
+              PDF 저장 경로: {healthInfo.pocketbase?.message || "상태 확인 전"}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#4b5563" }}>
+              메일 발송 경로: {healthInfo.mail?.message || "상태 확인 전"}
+            </div>
+          </div>
+        ) : null}
+
+        <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            onChange={(event) => {
+              setSelectedPdf(event.target.files?.[0] || null);
+              setUploadError("");
+              setUploadMessage("");
+            }}
+            style={{ ...fieldStyle, padding: "11px 16px", background: "#fff" }}
+          />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={analyzePdf}
+              disabled={analyzingPdf}
+              style={{
+                border: "none",
+                borderRadius: 12,
+                background: "#1f6d5c",
+                color: "#fff",
+                padding: "12px 18px",
+                fontSize: 14,
+                fontWeight: 800,
+                opacity: analyzingPdf ? 0.7 : 1,
+              }}
+            >
+              {analyzingPdf ? "PDF 분석 중" : "PDF 분석하기"}
+            </button>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#6c6256" }}>
+              {selectedPdf ? selectedPdf.name : "선택된 PDF 없음"}
+            </div>
+            {pdfSummary ? (
+              <button
+                type="button"
+                onClick={resetPdfAnalysis}
+                style={{
+                  border: "1px solid #d9c8b3",
+                  borderRadius: 12,
+                  background: "#fff",
+                  color: "#6c6256",
+                  padding: "11px 14px",
+                  fontSize: 13,
+                  fontWeight: 800,
+                }}
+              >
+                분석 결과 초기화
+              </button>
+            ) : null}
+          </div>
+          {pdfSummary ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <SummaryBadge text={pdfSummary.gradeText} />
+              <SummaryBadge text={pdfSummary.subjectText} />
+              <SummaryBadge text={pdfSummary.keywordText} />
+            </div>
+          ) : null}
+          {pdfPreview ? (
+            <div
+              style={{
+                display: "grid",
+                gap: 12,
+                borderRadius: 18,
+                border: "1px solid #e8dccb",
+                background: "#fff",
+                padding: 16,
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 900, color: "#8b1a1a" }}>분석 미리보기</div>
+              {pdfPreview.subjects.length ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {pdfPreview.subjects.map((subject) => (
+                    <div
+                      key={`${subject.subject}-${subject.semester}`}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        borderRadius: 14,
+                        background: "#fffaf4",
+                        padding: "12px 14px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "#1a0f08" }}>{subject.subject}</div>
+                        <div style={{ marginTop: 4, fontSize: 12, fontWeight: 700, color: "#6c6256" }}>{subject.semester}</div>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: "#8b1a1a" }}>{subject.grade}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              <div
+                style={{
+                  borderRadius: 14,
+                  background: "#f8f5ef",
+                  padding: "12px 14px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  lineHeight: 1.7,
+                  color: "#4b5563",
+                }}
+              >
+                {pdfPreview.opinion}
+              </div>
+            </div>
+          ) : null}
+          {uploadMessage ? <StatusMessage tone="success" text={uploadMessage} /> : null}
+          {uploadError ? <StatusMessage tone="error" text={uploadError} /> : null}
         </div>
       </div>
 
@@ -206,6 +431,43 @@ export default function UserInfoForm({ onNext, serviceType }: Props) {
         </button>
       </div>
     </form>
+  );
+}
+
+function SummaryBadge({ text }: { text: string }) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        borderRadius: 999,
+        border: "1px solid #e2d5c3",
+        background: "#fff",
+        padding: "9px 14px",
+        fontSize: 13,
+        fontWeight: 800,
+        color: "#8b1a1a",
+      }}
+    >
+      {text}
+    </span>
+  );
+}
+
+function StatusMessage({ tone, text }: { tone: "success" | "error"; text: string }) {
+  return (
+    <div
+      style={{
+        borderRadius: 14,
+        padding: "12px 14px",
+        fontSize: 13,
+        fontWeight: 800,
+        background: tone === "success" ? "#edf8f4" : "#fff1f1",
+        color: tone === "success" ? "#166534" : "#b42318",
+      }}
+    >
+      {text}
+    </div>
   );
 }
 
@@ -241,13 +503,7 @@ function Field({
           })}
         </select>
       ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          style={fieldStyle}
-          required={required}
-        />
+        <input type={type} value={value} onChange={(e) => onChange(e.target.value)} style={fieldStyle} required={required} />
       )}
     </label>
   );

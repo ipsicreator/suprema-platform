@@ -21,7 +21,7 @@ export default function DiagnosisStep1Page() {
     <FlowShell
       badge="PREMIUM DIAGNOSIS"
       title="학생정보입력"
-      subtitle="학생정보와 학생부를 정확하게 입력해 주세요."
+      subtitle="사용자 정보를 입력하고 학생부 PDF를 등록합니다."
       currentStep={1}
       steps={diagnosisSteps}
       footer={<AppFooter />}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { readDiagnosisSessionSnapshot } from "@/lib/diagnosis-session";
 import pb from "../../../../lib/pocketbase";
 import { MOCK_CANDIDATE, SUCCESSFUL_CANDIDATES, UNIVERSITIES } from "../../../../lib/utils/evaluationLogic";
 import { parseGpaTextToNumber } from "../../../../lib/utils/admission/admissionLines";
@@ -65,14 +66,27 @@ export default function EvaluationSimulation({ onBack, studentData }: Evaluation
     const loadRealData = async () => {
       setIsLoading(true);
       try {
+        const sessionSnapshot = readDiagnosisSessionSnapshot();
+        const sessionInfo = sessionSnapshot.userInfo;
+
         if (!studentData?.id) {
-          setCandidate(MOCK_CANDIDATE as CandidateRecord);
+          setCandidate({
+            ...(MOCK_CANDIDATE as CandidateRecord),
+            schoolLine: sessionInfo?.schoolName ? `${sessionInfo.schoolName} · ${sessionInfo.studentName || "학생"}` : (MOCK_CANDIDATE as CandidateRecord).schoolLine,
+            track: sessionInfo?.careerHint || "학생부 종합 · 교과 기준",
+            realGpa: sessionInfo?.studentIndex || "데이터 없음",
+          });
+          if (sessionInfo?.studentIndex) {
+            setParsedGpa(Number(sessionInfo.studentIndex));
+          }
           return;
         }
 
         const savedInfo = JSON.parse(localStorage.getItem(`student_info_${studentData.id}`) || "{}");
         if (savedInfo.gpa) {
           setParsedGpa(parseGpaTextToNumber(savedInfo.gpa));
+        } else if (sessionInfo?.studentIndex) {
+          setParsedGpa(Number(sessionInfo.studentIndex));
         }
 
         const records = await pb.collection("suprima_pdf_analyses").getFullList({
@@ -101,11 +115,22 @@ export default function EvaluationSimulation({ onBack, studentData }: Evaluation
             },
           });
         } else {
-          setCandidate({ ...(MOCK_CANDIDATE as CandidateRecord), schoolLine: `분석 데이터 부족 · ${studentData.name}` });
+          setCandidate({
+            ...(MOCK_CANDIDATE as CandidateRecord),
+            schoolLine: `분석 데이터 부족 · ${studentData.name}`,
+            track: sessionInfo?.careerHint || "학생부 종합 · 교과 기준",
+            realGpa: sessionInfo?.studentIndex || "데이터 없음",
+          });
         }
       } catch (error) {
         console.error("DB 로드 실패", error);
-        setCandidate(MOCK_CANDIDATE as CandidateRecord);
+        const sessionInfo = readDiagnosisSessionSnapshot().userInfo;
+        setCandidate({
+          ...(MOCK_CANDIDATE as CandidateRecord),
+          schoolLine: sessionInfo?.schoolName ? `${sessionInfo.schoolName} · ${sessionInfo.studentName || "학생"}` : (MOCK_CANDIDATE as CandidateRecord).schoolLine,
+          track: sessionInfo?.careerHint || "학생부 종합 · 교과 기준",
+          realGpa: sessionInfo?.studentIndex || "데이터 없음",
+        });
       } finally {
         setIsLoading(false);
       }

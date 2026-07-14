@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import FlowShell from "@/app/components/FlowShell";
 import AppFooter from "@/app/components/AppFooter";
+import { buildStep4SessionPayload, createNextUniversityTarget, summarizeJudgments } from "@/lib/step4-storage";
 import { diagnosisSteps } from "../steps";
 
 type Judgment = "하향" | "안정" | "도전" | "불가";
@@ -37,20 +38,22 @@ type Step3Bundle = {
 
 function readStep4Context() {
   if (typeof window === "undefined") {
-    return { profile: null as Record<string, unknown> | null, email: "", step3Bundle: null as Step3Bundle | null };
+    return { profile: null as Record<string, unknown> | null, email: "", step3Bundle: null as Step3Bundle | null, savedStep4: null as { email?: string; openId?: string; targets?: UniversityTarget[] } | null };
   }
 
   try {
     const raw = sessionStorage.getItem("suprema_user_info");
     const step3Raw = sessionStorage.getItem("diagnosis_step3_topics");
+    const step4Raw = sessionStorage.getItem("diagnosis_step4_state");
     const info = raw ? JSON.parse(raw) : null;
     return {
       profile: info || null,
       email: String(info?.email || ""),
       step3Bundle: step3Raw ? (JSON.parse(step3Raw) as Step3Bundle) : null,
+      savedStep4: step4Raw ? (JSON.parse(step4Raw) as { email?: string; openId?: string; targets?: UniversityTarget[] }) : null,
     };
   } catch {
-    return { profile: null, email: "", step3Bundle: null };
+    return { profile: null, email: "", step3Bundle: null, savedStep4: null };
   }
 }
 
@@ -62,14 +65,14 @@ const defaultTargets: UniversityTarget[] = [
     trackType: "학생부종합",
     admissionName: "지역균형선발",
     judgment: "도전",
-    reason: "학생부 탐구 주제와 전공 적합성이 연결되지만, 최신 합격 기준을 보면 추가 보완이 필요합니다.",
+    reason: "학생부 주제와 전공 적합성은 좋지만 최근 합격 기준과 비교하면 추가 보완이 필요합니다.",
   },
   {
     id: "target-2",
     university: "연세대학교",
     department: "경영학과",
     trackType: "학생부교과",
-    admissionName: "추천전형",
+    admissionName: "추천형",
     judgment: "안정",
     reason: "중간권 성적과 전공 관심이 잘 맞아 비교적 안정적으로 판단됩니다.",
   },
@@ -80,7 +83,7 @@ const defaultTargets: UniversityTarget[] = [
     trackType: "학생부종합",
     admissionName: "학업우수형",
     judgment: "불가",
-    reason: "현재 성적과 학생부 구성만으로는 당장 추천하기 어려운 단계로 보입니다.",
+    reason: "현재 성적과 학생부 구성만으로는 합격 추천이 어려운 단계로 보입니다.",
   },
 ];
 
@@ -92,46 +95,50 @@ const judgmentStyle: Record<Judgment, string> = {
 };
 
 export default function DiagnosisStep4Page() {
-  const [targets, setTargets] = useState(defaultTargets);
-  const [openId, setOpenId] = useState(defaultTargets[0].id);
   const [initialContext] = useState(() => readStep4Context());
-  const [email, setEmail] = useState(initialContext.email);
+  const [targets, setTargets] = useState(initialContext.savedStep4?.targets?.length ? initialContext.savedStep4.targets : defaultTargets);
+  const [openId, setOpenId] = useState(initialContext.savedStep4?.openId || (initialContext.savedStep4?.targets?.[0]?.id ?? defaultTargets[0].id));
+  const [email, setEmail] = useState(initialContext.savedStep4?.email || initialContext.email);
   const [profile] = useState<Record<string, unknown> | null>(initialContext.profile);
   const [step3Bundle] = useState<Step3Bundle | null>(initialContext.step3Bundle);
   const [mailOpen, setMailOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
 
-  const summary = useMemo(() => {
-    const count = targets.reduce<Record<Judgment, number>>(
-      (acc, target) => {
-        acc[target.judgment] += 1;
-        return acc;
-      },
-      { 하향: 0, 안정: 0, 도전: 0, 불가: 0 },
-    );
-    return `하향 ${count.하향} · 안정 ${count.안정} · 도전 ${count.도전} · 불가 ${count.불가}`;
-  }, [targets]);
+  const summary = useMemo(() => summarizeJudgments(targets), [targets]);
+
+  function saveStep4State(nextTargets: UniversityTarget[], nextOpenId: string, nextEmail: string) {
+    try {
+      sessionStorage.setItem("diagnosis_step4_state", JSON.stringify(buildStep4SessionPayload({ targets: nextTargets, openId: nextOpenId, email: nextEmail })));
+    } catch {}
+  }
 
   function addTarget() {
     const nextIndex = targets.length + 1;
-    const next: UniversityTarget = {
-      id: `target-${nextIndex}`,
-      university: "희망대학 입력",
-      department: "모집단위 입력",
-      trackType: "전형유형 선택",
-      admissionName: "전형명 입력",
-      judgment: "도전",
-      reason: "학생이 직접 선택한 희망대학을 학생부 기준으로 진단합니다.",
-    };
-    setTargets((prev) => [...prev, next]);
+    const next: UniversityTarget = createNextUniversityTarget(nextIndex);
+    const nextTargets = [...targets, next];
+    setTargets(nextTargets);
     setOpenId(next.id);
+    saveStep4State(nextTargets, next.id, email);
   }
 
   function updateTarget(id: string, field: keyof UniversityTarget, value: string) {
-    setTargets((prev) =>
-      prev.map((target) => (target.id === id ? { ...target, [field]: value } : target)),
-    );
+    const nextTargets = targets.map((target) => (target.id === id ? { ...target, [field]: value } : target));
+    setTargets(nextTargets);
+    saveStep4State(nextTargets, openId, email);
+  }
+
+  function handleToggleOpen(id: string) {
+    const nextOpenId = openId === id ? "" : id;
+    setOpenId(nextOpenId);
+    saveStep4State(targets, nextOpenId, email);
+  }
+
+  function handleResetTargets() {
+    setTargets(defaultTargets);
+    setOpenId(defaultTargets[0].id);
+    saveStep4State(defaultTargets, defaultTargets[0].id, email);
+    setStatus("4단계 희망대학 목록을 초기값으로 되돌렸습니다.");
   }
 
   async function handleSendMail() {
@@ -160,7 +167,8 @@ export default function DiagnosisStep4Page() {
         }),
       });
       const result = await response.json().catch(() => ({}));
-      setStatus(result?.message || (response.ok ? "메일 발송 완료" : "메일 발송 실패"));
+      setStatus(result?.message || (response.ok ? "메일 발송이 완료되었습니다." : "메일 발송에 실패했습니다."));
+      saveStep4State(targets, openId, trimmed);
     } catch {
       setStatus("메일 발송 중 오류가 발생했습니다.");
     } finally {
@@ -171,8 +179,8 @@ export default function DiagnosisStep4Page() {
   return (
     <FlowShell
       badge="PREMIUM DIAGNOSIS"
-      title="입시위치진단"
-      subtitle="학생이 직접 선택한 희망대학을 기준으로 하향·안정·도전·불가 결과를 제시합니다."
+      title="입시 위치 진단"
+      subtitle="학생부 기반으로 대학별 진단 결과를 보여줍니다."
       currentStep={4}
       steps={diagnosisSteps}
       footer={<AppFooter />}
@@ -185,30 +193,14 @@ export default function DiagnosisStep4Page() {
             <p className="mt-1 text-sm font-semibold text-[#6c6256]">{summary}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => window.print()} className="rounded-full bg-[#8b1a1a] px-5 py-3 text-sm font-black text-white">
-              인쇄
-            </button>
-            <button
-              onClick={() => setMailOpen((prev) => !prev)}
-              className="rounded-full border border-[#8b1a1a] bg-white px-5 py-3 text-sm font-black text-[#8b1a1a]"
-            >
-              메일 보내기
-            </button>
+            <button onClick={() => window.print()} className="rounded-full bg-[#8b1a1a] px-5 py-3 text-sm font-black text-white">인쇄</button>
+            <button onClick={() => setMailOpen((prev) => !prev)} className="rounded-full border border-[#8b1a1a] bg-white px-5 py-3 text-sm font-black text-[#8b1a1a]">메일 보내기</button>
+            <button onClick={handleResetTargets} className="rounded-full border border-[#d9c8b3] bg-[#fff8f0] px-5 py-3 text-sm font-black text-[#3f3f46]">4단계 초기화</button>
           </div>
           {mailOpen ? (
             <div className="mt-4 flex w-full flex-wrap gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="메일 주소 입력"
-                className="min-w-[260px] flex-1 rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-              />
-              <button
-                onClick={handleSendMail}
-                disabled={sending}
-                className="rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-60"
-              >
+              <input type="email" value={email} onChange={(event) => { const nextEmail = event.target.value; setEmail(nextEmail); saveStep4State(targets, openId, nextEmail); }} placeholder="메일 주소 입력" className="min-w-[260px] flex-1 rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold text-slate-700" />
+              <button onClick={handleSendMail} disabled={sending} className="rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-60">
                 {sending ? "발송 중" : "4단계 결과 발송"}
               </button>
             </div>
@@ -221,27 +213,18 @@ export default function DiagnosisStep4Page() {
           <div className="mb-4">
             <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">진단계요약</div>
             <h3 className="mt-1 text-lg font-black text-[#1f1720]">1 · 2 · 3단계 결과 묶음</h3>
-            <p className="mt-1 text-sm font-semibold text-[#6c6256]">
-              3단계 결과를 포함한 전체 내용을 4단계 입시위치진단 화면에서 함께 보여줍니다.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-[#eadfce] bg-white px-4 py-3">
-            <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">진단계요약</div>
-            <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">
-              1 · 2 · 3단계 결과를 묶어서 보여주고, 4단계 입시위치진단 판단과 함께 전달합니다.
-            </p>
+            <p className="mt-1 text-sm font-semibold text-[#6c6256]">이전 단계 정보와 탐구 결과를 함께 보면서 대학별 판단 근거를 확인합니다.</p>
           </div>
 
           <div className="mt-3 grid gap-3 md:grid-cols-3">
-            <SummaryCard title="1단계" heading="학생정보입력">
+            <SummaryCard title="입시 위치 진단" heading="학생정보입력">
               {String(profile?.studentName || "학생명 없음")} · {String(profile?.schoolName || "학교명 없음")}
             </SummaryCard>
-            <SummaryCard title="2단계" heading="학생부 분석">
+            <SummaryCard title="입시 위치 진단" heading="학생부 분석">
               희망 진로 {String(profile?.careerHint || "정보 없음")} · 내신 {String(profile?.studentIndex || "-")} 기준
             </SummaryCard>
-            <SummaryCard title="3단계" heading="탐구활동/독서/세특">
-              총 {step3Bundle?.topics?.length || 0}개 주제를 입시위치진단과 함께 묶어 전달합니다.
+            <SummaryCard title="입시 위치 진단" heading="탐구활동/독서/세특">
+              총 {step3Bundle?.topics?.length || 0}개 주제를 입시위치 진단과 함께 연결합니다.
             </SummaryCard>
           </div>
 
@@ -261,20 +244,12 @@ export default function DiagnosisStep4Page() {
         <div className="space-y-4">
           {targets.map((target, index) => (
             <section key={target.id} className="overflow-hidden rounded-[24px] border border-[#eadfce] bg-[#fffdf8]">
-              <button
-                type="button"
-                onClick={() => setOpenId((prev) => (prev === target.id ? "" : target.id))}
-                className="flex w-full flex-wrap items-center justify-between gap-3 px-5 py-4 text-left"
-              >
+              <button type="button" onClick={() => handleToggleOpen(target.id)} className="flex w-full flex-wrap items-center justify-between gap-3 px-5 py-4 text-left">
                 <div>
                   <div className="text-xs font-black tracking-[0.16em] text-[#8b1a1a]">UNIVERSITY {index + 1}</div>
-                  <h3 className="mt-1 text-lg font-black text-[#1f1720]">
-                    {target.university} · {target.department}
-                  </h3>
+                  <h3 className="mt-1 text-lg font-black text-[#1f1720]">{target.university} · {target.department}</h3>
                 </div>
-                <span className={`rounded-full border px-4 py-2 text-sm font-black ${judgmentStyle[target.judgment]}`}>
-                  {target.judgment}
-                </span>
+                <span className={`rounded-full border px-4 py-2 text-sm font-black ${judgmentStyle[target.judgment]}`}>{target.judgment}</span>
               </button>
 
               {openId === target.id ? (
@@ -286,18 +261,12 @@ export default function DiagnosisStep4Page() {
                     <EditableField label="전형명" value={target.admissionName} onChange={(value) => updateTarget(target.id, "admissionName", value)} />
                     <label className="text-sm font-black text-[#1f1720]">
                       판정
-                      <select
-                        value={target.judgment}
-                        onChange={(event) => updateTarget(target.id, "judgment", event.target.value)}
-                        className="mt-2 w-full rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-bold print:hidden"
-                      >
+                      <select value={target.judgment} onChange={(event) => updateTarget(target.id, "judgment", event.target.value)} className="mt-2 w-full rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-bold print:hidden">
                         {(["하향", "안정", "도전", "불가"] as Judgment[]).map((item) => (
                           <option key={item}>{item}</option>
                         ))}
                       </select>
-                      <span className="mt-2 hidden rounded-xl border border-[#eadfce] bg-white px-4 py-3 text-sm font-bold print:block">
-                        {target.judgment}
-                      </span>
+                      <span className="mt-2 hidden rounded-xl border border-[#eadfce] bg-white px-4 py-3 text-sm font-bold print:block">{target.judgment}</span>
                     </label>
                     <EditableField label="진단 근거" value={target.reason} onChange={(value) => updateTarget(target.id, "reason", value)} wide />
                   </div>
@@ -308,16 +277,10 @@ export default function DiagnosisStep4Page() {
         </div>
 
         <div className="mt-5 flex flex-wrap justify-between gap-3 print:hidden">
-          <button onClick={addTarget} className="rounded-full border border-[#8b1a1a] bg-white px-6 py-4 text-sm font-black text-[#8b1a1a]">
-            희망대학 추가
-          </button>
+          <button onClick={addTarget} className="rounded-full border border-[#8b1a1a] bg-white px-6 py-4 text-sm font-black text-[#8b1a1a]">희망대학 추가</button>
           <div className="flex gap-3">
-            <Link href="/diagnosis/step3" className="rounded-full border border-[#d9c8b3] bg-[#fff8f0] px-6 py-4 text-sm font-black text-[#3f3f46]">
-              이전 단계
-            </Link>
-            <Link href="/diagnosis" className="rounded-full bg-[#9f2420] px-6 py-4 text-sm font-black text-white">
-              최종 결과 페이지
-            </Link>
+            <Link href="/diagnosis/step3" className="rounded-full border border-[#d9c8b3] bg-[#fff8f0] px-6 py-4 text-sm font-black text-[#3f3f46]">이전 단계</Link>
+            <Link href="/diagnosis" className="rounded-full bg-[#9f2420] px-6 py-4 text-sm font-black text-white">최종 결과 페이지</Link>
           </div>
         </div>
       </div>
@@ -349,14 +312,8 @@ function EditableField({
   return (
     <label className={`text-sm font-black text-[#1f1720] ${wide ? "md:col-span-2 print:col-span-2" : ""}`}>
       {label}
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold text-slate-700 print:hidden"
-      />
-      <span className="mt-2 hidden rounded-xl border border-[#eadfce] bg-white px-4 py-3 text-sm font-semibold text-slate-700 print:block">
-        {value}
-      </span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 w-full rounded-xl border border-[#d9c8b3] bg-white px-4 py-3 text-sm font-semibold text-slate-700 print:hidden" />
+      <span className="mt-2 hidden rounded-xl border border-[#eadfce] bg-white px-4 py-3 text-sm font-semibold text-slate-700 print:block">{value}</span>
     </label>
   );
 }

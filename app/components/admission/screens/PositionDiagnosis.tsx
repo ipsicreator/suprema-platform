@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Compass, Printer, Save, CheckCircle2, Search, Filter } from 'lucide-react';
+import { readDiagnosisSessionSnapshot } from '@/lib/diagnosis-session';
 import { parseGpaTextToNumber } from '../../../../lib/utils/admission/admissionLines';
 import AdmissionOfficerEvaluation from '../AdmissionOfficerEvaluation';
 import { ADMISSION_DATA } from '../data';
@@ -35,9 +36,13 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
   const [isSaved, setIsSaved] = useState(false);
 
   const parsedGpa = useMemo(() => {
-    if (!studentData?.id) return null;
-    const savedInfo = JSON.parse(localStorage.getItem(`student_info_${studentData.id}`) || '{}');
-    return savedInfo.gpa ? parseGpaTextToNumber(savedInfo.gpa) : null;
+    const sessionInfo = readDiagnosisSessionSnapshot().userInfo;
+    if (studentData?.id) {
+      const savedInfo = JSON.parse(localStorage.getItem(`student_info_${studentData.id}`) || '{}');
+      if (savedInfo.gpa) return parseGpaTextToNumber(savedInfo.gpa);
+    }
+    if (sessionInfo?.studentIndex) return Number(sessionInfo.studentIndex);
+    return null;
   }, [studentData]);
 
   // Cascading filters

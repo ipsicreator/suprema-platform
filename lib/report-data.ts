@@ -27,7 +27,12 @@ export function toStudentRecordReportData(info: Partial<UserInfo> | null | undef
           ...subject,
           unit: toOptionalNumber(subject.unit),
           grade: toOptionalNumber(subject.grade),
+          year: toOptionalNumber(subject.year),
           semester: toOptionalNumber(subject.semester),
+          rawScore: toOptionalNumber(subject.rawScore),
+          scoreAverage: toOptionalNumber(subject.scoreAverage),
+          achievement: subject.achievementLevel,
+          studentCount: toOptionalNumber(subject.studentCount),
         }))
       : [],
     studentRecord: info?.studentRecord as StudentRecordStructured | undefined,

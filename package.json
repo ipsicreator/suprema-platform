@@ -6,8 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "check:mojibake": "node scripts/check-mojibake.js",
+    "generate:student-docs": "node scripts/generate_student_docs.mjs",
     "start": "next start",
     "lint": "eslint",
+    "verify:diagnosis": "node scripts/verify_diagnosis_render.mjs",
+    "verify:step2-report": "node scripts/verify_step2_report_data.mjs",
     "update:admissions": "node scripts/update_admission.js && node scripts/sync_consultant_app.js",
     "sync:consultant": "node scripts/sync_consultant_app.js"
   },

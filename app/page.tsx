@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -38,13 +39,16 @@ export default function Home() {
         overflow: "hidden" // 모서리 밖으로 이미지 튀어나옴 방지
       }}>
         
-        <img 
-          src="/5_16_IMAGE.png" 
-          alt="대치 수프리마 랜딩" 
-          style={{ 
+        <Image
+          src="/5_16_IMAGE.png"
+          alt="대치 수프리마 랜딩"
+          width={1600}
+          height={900}
+          priority
+          style={{
             display: "block",
-            maxWidth: "100%", 
-            maxHeight: "90vh", 
+            maxWidth: "100%",
+            maxHeight: "90vh",
             width: "auto",
             height: "auto",
             objectFit: "contain"

@@ -44,6 +44,8 @@ next-env.d.ts
 .npm-cache/
 .codex/
 .codex-work/
+.cache/
+.tmp/
 outputs/
 StudyEngine/
 public/uploads/
@@ -58,6 +60,11 @@ data/2028_pdf_extracted/
 *.zip
 *.pdf
 *.hwp
+
+# generated student docs
+docs/student-analysis-*.md
+docs/student-placement-*.md
+docs/student-interview-*.md
 
 .env
 .env.*
