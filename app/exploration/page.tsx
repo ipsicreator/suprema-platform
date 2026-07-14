@@ -167,9 +167,9 @@ export default function ExplorationPage() {
 
   return (
     <FlowShell
-      badge="PREMIUM DIAGNOSIS"
-      title="탐구·세특 제안"
-      subtitle="학생부 신호와 직접 입력 키워드를 결합해 탐구, 독서, 세특 연결 결과를 제안합니다."
+      badge="AI 학생부/성적분석 · 탐구/독서 제안"
+      title="탐구/독서 제안"
+      subtitle="학생부 3개 신호와 직접 입력 3개를 결합해 탐구/독서 제안을 생성하고, 자료 파일과 API 결과를 함께 보여줍니다."
       steps={[
         { no: "01", title: "학생부/성적분석", description: "학생부에서 추출한 핵심 신호를 확인합니다.", icon: <Brain className="h-5 w-5" /> },
         { no: "02", title: "직접 입력", description: "개인이 직접 넣는 키워드와 진로 힌트를 받습니다.", icon: <FileSearch className="h-5 w-5" /> },
@@ -178,20 +178,20 @@ export default function ExplorationPage() {
       ]}
       footer={
         <div className="rounded-[28px] border border-[#0f172a] bg-[#0f1e3b] px-6 py-5 text-center text-white shadow-[0_18px_44px_rgba(15,23,42,0.18)]">
-          <p className="text-lg font-extrabold">나의 입시멘토 탐구·세특·입시위치진단 흐름에 맞춰 결과를 연결합니다.</p>
+          <p className="text-lg font-extrabold">탐구 주제 발굴부터 보고서 생성까지 하나의 흐름으로 연결합니다.</p>
         </div>
       }
     >
       <div className="max-w-5xl mx-auto">
         <header className="mb-10 text-center">
           <div className="flex flex-col items-center gap-4 mb-6">
-            <div className="v-badge">나의 입시멘토 · 탐구·세특·입시위치진단</div>
+            <div className="v-badge">학생부/성적분석 → 탐구/독서 제안</div>
             <h1 className="text-5xl font-black tracking-tight">
-              <span className="v-highlight">탐구·세특 제안</span>
+              AI <span className="v-highlight">탐구/독서 제안</span>
             </h1>
           </div>
           <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-            학생부 3개 신호와 직접 입력 3개를 결합해 탐구 주제, 독서, 세특 연결 결과를 함께 보여줍니다.
+            학생부 3개 신호와 직접 입력 3개를 결합해 탐구/독서 제안을 만들고, 자료 파일과 API 결과를 함께 보여줍니다.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
             <Link href="/diagnosis/step1/evaluation" className="text-sm font-bold text-[var(--accent-color)] hover:underline">
@@ -334,7 +334,7 @@ export default function ExplorationPage() {
                   disabled={loading}
                   className="w-full py-4 bg-[var(--accent-color)] hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50"
                 >
-                  {loading ? "탐구·세특 제안을 생성하는 중입니다..." : "탐구·세특 제안 생성하기"}
+                  {loading ? "AI가 탐구/독서 제안을 생성하는 중입니다..." : "탐구/독서 제안 생성하기"}
                 </button>
               </motion.div>
             ) : (
@@ -365,7 +365,7 @@ export default function ExplorationPage() {
             >
               <h2 className="text-2xl font-bold flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-sm">AI</span>
-                AI가 제안한 탐구·세특 결과
+                AI가 제안한 탐구/독서 제안
               </h2>
               <div className="space-y-6">
                 {results.map((topic, idx) => (

@@ -5,32 +5,10 @@ export const runtime = "nodejs";
 
 const COLLECTION = "suprema_pdf_uploads";
 
-type PocketBaseCollectionRecord = {
-  id?: string;
-  name?: string;
-  listRule?: string;
-  viewRule?: string;
-  createRule?: string;
-  updateRule?: string;
-  deleteRule?: string;
-  [key: string]: unknown;
-};
-
-type PocketBaseCollectionsApi = {
-  getFullList: () => Promise<PocketBaseCollectionRecord[]>;
-  getOne: (id: string) => Promise<PocketBaseCollectionRecord>;
-  create: (payload: Record<string, unknown>) => Promise<PocketBaseCollectionRecord>;
-  update: (id: string, payload: Record<string, unknown>) => Promise<unknown>;
-};
-
-type PocketBaseAdminClient = {
-  collections: PocketBaseCollectionsApi;
-};
-
-async function findCollectionIdByName(pb: PocketBaseAdminClient, name: string): Promise<string | null> {
+async function findCollectionIdByName(pb: any, name: string): Promise<string | null> {
   try {
     const list = await pb.collections.getFullList();
-    const found = (list || []).find((collection) => collection?.name === name);
+    const found = (list || []).find((c: any) => c?.name === name);
     return found?.id || null;
   } catch {
     return null;
@@ -46,9 +24,9 @@ export async function POST() {
       );
     }
 
-    const pb = (await pbAdmin()) as unknown as PocketBaseAdminClient;
+    const pb = await pbAdmin();
 
-    let col: PocketBaseCollectionRecord;
+    let col: any;
     const collectionId = (await findCollectionIdByName(pb, COLLECTION)) || COLLECTION;
     try {
       col = await pb.collections.getOne(collectionId);
@@ -91,7 +69,7 @@ export async function POST() {
     };
 
     const updateId = desired?.id || (await findCollectionIdByName(pb, COLLECTION)) || COLLECTION;
-    await pb.collections.update(updateId, desired);
+    await pb.collections.update(updateId, desired as any);
 
     return NextResponse.json({
       ok: true,
@@ -104,10 +82,9 @@ export async function POST() {
         deleteRule: desired.deleteRule,
       },
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+  } catch (e: any) {
     return NextResponse.json(
-      { ok: false, error: "pocketbase_admin_configure_failed", message },
+      { ok: false, error: "pocketbase_admin_configure_failed", message: e?.message || String(e) },
       { status: 500 },
     );
   }

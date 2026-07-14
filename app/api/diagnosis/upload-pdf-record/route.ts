@@ -1,44 +1,20 @@
 import { NextResponse } from "next/server";
 import { pbAdmin, hasPocketBaseAdmin } from "@/lib/pocketbaseAdmin";
-import { extractTextFromPDFBuffer, calculateGPAFromText, type ExtractedSubject } from "@/lib/pdf-parser";
+import { extractTextFromPDFBuffer, calculateGPAFromText } from "@/lib/pdf-parser";
 
 export const runtime = "nodejs";
 
-type UploadPdfRecordRequest = {
-  recordId?: string;
-  gradingSystem?: "5-level" | "9-level";
-  extractedText?: string;
-};
-
-type GeminiPdfParsedResult = {
-  success?: boolean;
-  gpa?: number;
-  subjects?: ExtractedSubject[];
-  studentAnalysis?: Record<string, unknown>;
-  message?: string;
-};
-
-type GeminiGenerateResponse = {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{
-        text?: string;
-      }>;
-    };
-  }>;
-};
-
 export async function POST(req: Request) {
   if (!hasPocketBaseAdmin()) {
-    return NextResponse.json({ success: false, error: "PDF 분석 저장소 설정이 완료되지 않았습니다." }, { status: 500 });
+    return NextResponse.json({ success: false, error: "pocketbase_not_configured" }, { status: 500 });
   }
 
-  const body = (await req.json().catch(() => null)) as UploadPdfRecordRequest | null;
+  const body = (await req.json().catch(() => null)) as any;
   const recordId = String(body?.recordId ?? "").trim();
   const gradingSystem = (String(body?.gradingSystem ?? "9-level") as "5-level" | "9-level") || "9-level";
 
   if (!recordId) {
-    return NextResponse.json({ success: false, error: "분석할 PDF 기록 ID가 없습니다." }, { status: 400 });
+    return NextResponse.json({ success: false, error: "recordId_required" }, { status: 400 });
   }
 
   try {
@@ -46,7 +22,7 @@ export async function POST(req: Request) {
     const record = await pb.collection("suprema_pdf_uploads").getOne(recordId);
     const fileName = String(record?.file ?? "").trim();
     if (!fileName) {
-      return NextResponse.json({ success: false, error: "업로드된 PDF 파일 정보를 찾지 못했습니다." }, { status: 400 });
+      return NextResponse.json({ success: false, error: "file_missing" }, { status: 400 });
     }
 
     const fileUrl = pb.files.getUrl(record, fileName);
@@ -57,7 +33,7 @@ export async function POST(req: Request) {
 
     if (!res.ok) {
       return NextResponse.json(
-        { success: false, error: `PDF 파일 다운로드에 실패했습니다. (${res.status})` },
+        { success: false, error: `file_download_failed_${res.status}` },
         { status: 502 },
       );
     }
@@ -65,7 +41,7 @@ export async function POST(req: Request) {
     const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    let result: ReturnType<typeof calculateGPAFromText> | null = null;
+    let result: any = null;
     let finalRawText = "";
 
     const geminiApiKey = process.env.GEMINI_API_KEY || "";
@@ -93,17 +69,17 @@ export async function POST(req: Request) {
         });
 
         if (geminiRes.ok) {
-          const geminiJson = (await geminiRes.json()) as GeminiGenerateResponse;
+          const geminiJson = await geminiRes.json();
           const responseText = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (responseText) {
-            const parsed = JSON.parse(responseText) as GeminiPdfParsedResult;
-            if (parsed.success && typeof parsed.gpa === "number" && parsed.subjects && parsed.subjects.length > 0) {
+            const parsed = JSON.parse(responseText);
+            if (parsed.success && parsed.subjects && parsed.subjects.length > 0) {
               result = {
                 success: true,
                 gpa: parsed.gpa,
                 subjects: parsed.subjects,
                 studentAnalysis: parsed.studentAnalysis,
-                message: parsed.message || "성공적으로 학생부 분석이 완료되었습니다.",
+                message: parsed.message || "?깃났?곸쑝濡??숈깮遺 遺꾩꽍???꾨즺?덉뒿?덈떎.",
               };
             }
           }
@@ -137,10 +113,9 @@ export async function POST(req: Request) {
       message: result.message,
       rawTextLength: finalRawText.length,
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "PDF 분석 중 서버 오류가 발생했습니다.";
+  } catch (e: any) {
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: e?.message || "server_error" },
       { status: 500 },
     );
   }

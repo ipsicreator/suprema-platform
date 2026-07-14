@@ -42,7 +42,6 @@ next-env.d.ts
 
 # local caches and generated artifacts
 .npm-cache/
-.codex/
 .codex-work/
 outputs/
 StudyEngine/
@@ -61,14 +60,4 @@ data/2028_pdf_extracted/
 
 .env
 .env.*
-
-
-# Ignore build/artifact folders and large archives
-.next/
-node_modules/
-scratch/
-*.zip
-*.sst
-*.log
-*.out
 

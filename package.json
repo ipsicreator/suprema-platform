@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "check:mojibake": "node scripts/check-mojibake.js",
     "start": "next start",
     "lint": "eslint",
     "update:admissions": "node scripts/update_admission.js && node scripts/sync_consultant_app.js",
@@ -16,7 +15,6 @@
     "@tailwindcss/postcss": "^4.3.0",
     "autoprefixer": "^10.5.0",
     "axios": "^1.17.0",
-    "chart.js": "^4.5.1",
     "cheerio": "^1.2.0",
     "framer-motion": "^12.38.0",
     "iconv-lite": "^0.7.2",
@@ -30,7 +28,6 @@
     "postcss": "^8.5.14",
     "puppeteer": "^25.1.0",
     "react": "19.2.4",
-    "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
     "tesseract.js": "^7.0.0",

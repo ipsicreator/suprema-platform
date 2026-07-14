@@ -1,131 +1,69 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 export type FlowStep = {
   no: string;
   title: string;
-  description?: string;
-  icon?: ReactNode;
+  description: string;
+  icon: ReactNode;
 };
 
 type FlowShellProps = {
-  badge?: string;
+  badge: string;
   title: string;
   subtitle: string;
   steps?: FlowStep[];
-  currentStep?: number;
   footer?: ReactNode;
   children: ReactNode;
 };
 
-export default function FlowShell({
-  badge = "PREMIUM DIAGNOSIS",
-  title,
-  subtitle,
-  steps = [],
-  currentStep = 1,
-  footer,
-  children,
-}: FlowShellProps) {
+export default function FlowShell({ badge, title, subtitle, steps, footer, children }: FlowShellProps) {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#f7f4ee",
-        padding: "16px",
-        color: "#1a0f08",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1120,
-          margin: "0 auto",
-          overflow: "hidden",
-          borderRadius: 32,
-          border: "1px solid #eadfce",
-          background: "#fff",
-          boxShadow: "0 28px 90px rgba(44,26,10,0.08)",
-        }}
-      >
-        <header
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto 1fr",
-            alignItems: "start",
-            gap: 16,
-            padding: "24px 32px 0",
-          }}
-        >
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center" }}>
-            <Image src="/suprema-logo.png" alt="나의 입시멘토" width={160} height={48} priority style={{ height: 44, width: "auto" }} />
+    <main className="min-h-screen bg-[#f8f5f1] px-4 py-8 md:px-6">
+      <div className="mx-auto max-w-6xl rounded-[32px] border border-[#eadfce] bg-white p-5 shadow-[0_24px_70px_rgba(44,26,10,0.08)] md:p-8">
+        <div className="mb-8 flex flex-col gap-4 border-b border-[#ece0d1] pb-6 md:flex-row md:items-start md:justify-between">
+          <div>
+            <div className="inline-flex rounded-full bg-[#8b1a1a]/5 px-3 py-1 text-xs font-extrabold tracking-[0.2em] text-[#8b1a1a]">
+              {badge}
+            </div>
+            <h1 className="mt-4 text-3xl font-black tracking-tight text-[#1a0f08] md:text-5xl">{title}</h1>
+            <p className="mt-3 max-w-3xl text-sm font-medium text-slate-500 md:text-base">{subtitle}</p>
+          </div>
+          <Link href="/diagnosis/step1" className="rounded-full border border-[#d7c8b8] bg-[#faf6f0] px-4 py-3 text-sm font-bold text-slate-700">
+            학생부 다시 입력
           </Link>
-          <div style={{ paddingTop: 8, textAlign: "left", lineHeight: 1.15 }}>
-            <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: "-0.03em" }}>나의 입시멘토</div>
-            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.02em" }}>탐구·세특·입시위치진단</div>
-          </div>
-          <div
-            style={{
-              justifySelf: "end",
-              paddingTop: 8,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.34em",
-              color: "#a7adb8",
-            }}
-          >
-            {badge}
-          </div>
-        </header>
+        </div>
 
-        {steps.length ? (
-          <section style={{ padding: "24px 32px 0" }}>
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}>
-              {steps.map((step, index) => {
-                const active = index + 1 === currentStep;
-                return (
-                  <div key={step.no} style={{ textAlign: "center" }}>
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        margin: "0 auto",
-                        borderRadius: 999,
-                        border: `2px solid ${active ? "#8b1a1a" : "#eadfce"}`,
-                        background: active ? "#8b1a1a" : "#fff",
-                        color: active ? "#fff" : "#9ca3af",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 14,
-                        fontWeight: 700,
-                      }}
-                    >
+        {steps?.length ? (
+          <section className="rounded-[28px] border border-[#ece0d1] bg-[#fffdf9] p-5 shadow-[0_18px_44px_rgba(44,26,10,0.05)] md:p-7">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <h2 className="text-xl font-extrabold text-[#1a0f08]">진행 단계</h2>
+              <span className="rounded-full border border-[#e4d7c9] bg-white px-3 py-1 text-xs font-bold text-[#8b1a1a]">
+                {steps.length} STEP
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-4">
+              {steps.map((step) => (
+                <div key={step.no} className="rounded-[24px] border border-[#ece0d1] bg-white p-5 shadow-[0_10px_26px_rgba(44,26,10,0.04)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#efe5d8] bg-[#f8f5f1] text-[#1a0f08]">
+                      {step.icon}
+                    </div>
+                    <div className="rounded-full border border-[#eadfce] bg-[#fff8f0] px-3 py-1 text-sm font-black text-[#8b1a1a]">
                       {step.no}
                     </div>
-                    <div style={{ marginTop: 12, fontSize: 14, fontWeight: 700, color: active ? "#8b1a1a" : "#6f7480" }}>
-                      {step.title}
-                    </div>
-                    {step.description ? (
-                      <div style={{ marginTop: 4, fontSize: 11, lineHeight: 1.6, color: "#9ca3af" }}>{step.description}</div>
-                    ) : null}
                   </div>
-                );
-              })}
+                  <h3 className="mt-4 text-lg font-black text-[#1a0f08]">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{step.description}</p>
+                </div>
+              ))}
             </div>
           </section>
         ) : null}
 
-        <section style={{ padding: "32px 32px 0", textAlign: "center" }}>
-          <h1 style={{ margin: 0, fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 900, letterSpacing: "-0.06em" }}>{title}</h1>
-          <p style={{ margin: "16px auto 0", maxWidth: 900, fontSize: 16, fontWeight: 600, lineHeight: 1.8, color: "#5f5549" }}>
-            {subtitle}
-          </p>
-        </section>
+        <div className="mt-6">{children}</div>
 
-        <section style={{ padding: "32px 32px 24px" }}>{children}</section>
-
-        {footer ? <div style={{ borderTop: "1px solid #ece0d1", padding: "24px 32px" }}>{footer}</div> : null}
+        {footer ? <div className="mt-6">{footer}</div> : null}
       </div>
     </main>
   );
