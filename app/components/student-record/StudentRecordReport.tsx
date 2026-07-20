@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import type { StudentRecordStructured } from "@/lib/student-record";
+import type { StudentRecordReportData as SharedStudentRecordReportData } from "@/lib/report-data";
 import {
   buildCompetencyScores,
   buildCoreSubjectChecks,
@@ -37,7 +38,7 @@ export interface StudentRecordReportData {
     achievement?: string;
     studentCount?: number;
   }>;
-  studentRecord?: StudentRecordStructured;
+  studentRecord?: SharedStudentRecordReportData["studentRecord"] | StudentRecordStructured;
   studentAnalysis?: {
     keyKeywords?: string[];
     academicCapacity?: string;
@@ -137,7 +138,8 @@ export default function StudentRecordReport({
         hopeDepartment: data.supportTrack,
         parsedSubjects: data.parsedSubjects.map((subject) => ({
           subject: subject.subject,
-          grade: subject.grade,
+          unit: subject.unit ?? 0,
+          grade: subject.grade ?? 0,
         })),
         studentAnalysis: data.studentAnalysis,
       }),
@@ -264,8 +266,18 @@ export default function StudentRecordReport({
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <RecordBlock title="학생 정보" items={structured?.schoolInfo.items} rawText={structured?.schoolInfo.rawText} compact />
-            <RecordBlock title="교육과정 이수" items={structured?.curriculum.items} rawText={structured?.curriculum.rawText} compact />
+            <RecordBlock
+              title="학생 정보"
+              items={structured?.schoolInfo?.items ?? []}
+              rawText={structured?.schoolInfo?.items?.join("\n") ?? ""}
+              compact
+            />
+            <RecordBlock
+              title="교육과정 이수"
+              items={structured?.curriculum?.items ?? []}
+              rawText={structured?.curriculum?.items?.join("\n") ?? ""}
+              compact
+            />
           </div>
 
           <div className="mt-4 rounded-[20px] border border-[#efe6dc] bg-white p-5">

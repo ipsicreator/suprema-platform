@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
+import AppFooter from "@/app/components/AppFooter";
 import FlowShell from "@/app/components/FlowShell";
 import { diagnosisScreenText, diagnosisSteps } from "../content";
 
@@ -55,6 +56,21 @@ function readStep4Context() {
   }
 }
 
+function saveStep4State(targets: UniversityTarget[], openId: string, email: string) {
+  if (typeof window === "undefined") return;
+
+  try {
+    sessionStorage.setItem(
+      "diagnosis_step4_state",
+      JSON.stringify({
+        targets,
+        openId,
+        email,
+      }),
+    );
+  } catch {}
+}
+
 const defaultTargets: UniversityTarget[] = [
   {
     id: "target-1",
@@ -103,8 +119,6 @@ export default function DiagnosisStep4Page() {
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
 
-  const summary = useMemo(() => summarizeJudgments(targets), [targets]);
-
   const summary = useMemo(() => {
     const count = targets.reduce<Record<Judgment, number>>(
       (acc, target) => {
@@ -127,7 +141,8 @@ export default function DiagnosisStep4Page() {
       judgment: "보통",
       reason: "학생이 직접 선택한 희망대학을 성적과 학생부 기준으로 진단합니다.",
     };
-    setTargets((prev) => [...prev, next]);
+    const nextTargets = [...targets, next];
+    setTargets(nextTargets);
     setOpenId(next.id);
     saveStep4State(nextTargets, next.id, email);
   }

@@ -17,6 +17,7 @@ export interface UserInfo {
   studentIndex?: number;
   gradingSystem?: "9-level" | "5-level";
   careerHint: string;
+  supportTrack?: string;
   hopeDepartment?: string;
   parsedSubjects?: ExtractedSubject[];
   studentAnalysis?: {
@@ -27,4 +28,27 @@ export interface UserInfo {
     seTeukAnalysis?: string;
     comprehensiveOpinion?: string;
   };
+}
+
+export function formatGradePair(userInfo?: Partial<UserInfo> | null): string {
+  if (!userInfo) {
+    return "-";
+  }
+
+  const grade = String(userInfo.grade || "").trim();
+  const studentIndex = userInfo.studentIndex;
+
+  if (grade && Number.isFinite(studentIndex)) {
+    return `${grade}학년 ${studentIndex}등급`;
+  }
+
+  if (grade) {
+    return `${grade}학년`;
+  }
+
+  if (Number.isFinite(studentIndex)) {
+    return `${studentIndex}등급`;
+  }
+
+  return "-";
 }

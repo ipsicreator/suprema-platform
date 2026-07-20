@@ -1,7 +1,7 @@
 import type { StudentRecordReportData } from "@/lib/report-data";
 
 type MappingInput = {
-  structured: StudentRecordReportData["studentRecord"];
+  structured?: StudentRecordReportData["studentRecord"];
   studentName: string;
   schoolName: string;
   grade: string;
@@ -12,6 +12,7 @@ export type StudentRecordMappingRow = {
   source: string;
   target: string;
   value: string;
+  reportTarget?: string;
 };
 
 export function buildStudentRecordMappingRows(input: MappingInput): StudentRecordMappingRow[] {
@@ -28,14 +29,16 @@ export function buildStudentRecordMappingRows(input: MappingInput): StudentRecor
     },
   ];
 
-  const sections = [
-    input.structured.schoolInfo,
-    input.structured.curriculum,
-    input.structured.grades,
-    input.structured.sepec,
-    input.structured.creativeActivities,
-    input.structured.behaviorSummary,
-  ].filter((section): section is NonNullable<typeof section> => Boolean(section));
+  const sections = input.structured
+    ? [
+        input.structured.schoolInfo,
+        input.structured.curriculum,
+        input.structured.grades,
+        input.structured.sepec,
+        input.structured.creativeActivities,
+        input.structured.behaviorSummary,
+      ].filter((section): section is NonNullable<typeof section> => Boolean(section))
+    : [];
 
   for (const section of sections) {
     rows.push({
