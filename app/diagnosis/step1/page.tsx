@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import FlowShell from "@/app/components/FlowShell";
 import AppFooter from "@/app/components/AppFooter";
 import Step1 from "./Step1";
-import { diagnosisSteps } from "../steps";
+import { diagnosisScreenText, diagnosisSteps } from "../content";
 import { UserInfo } from "../../components/UserInfoForm";
 
 export default function DiagnosisStep1Page() {
@@ -20,8 +20,8 @@ export default function DiagnosisStep1Page() {
   return (
     <FlowShell
       badge="PREMIUM DIAGNOSIS"
-      title="학생정보입력"
-      subtitle="사용자 정보를 입력하고 학생부 PDF를 등록합니다."
+      title={diagnosisScreenText.step1.title}
+      subtitle={diagnosisScreenText.step1.subtitle}
       currentStep={1}
       steps={diagnosisSteps}
       footer={<AppFooter />}
@@ -30,3 +30,4 @@ export default function DiagnosisStep1Page() {
     </FlowShell>
   );
 }
+

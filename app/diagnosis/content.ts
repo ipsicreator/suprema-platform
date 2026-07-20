@@ -22,3 +22,18 @@ export const diagnosisSteps: FlowStep[] = [
     description: "내신성적과 학생부 기반으로 희망대학 매칭 진단 및 결과를 제시합니다.",
   },
 ];
+
+export const diagnosisScreenText = {
+  step1: {
+    title: "학생정보입력",
+    subtitle: "정밀한 진단과 리포트 발송을 위해 모든 정보를 정확하게 입력해 주세요.",
+  },
+  step2: {
+    title: "학생부 분석",
+    subtitle: "학생부 상세 분석결과를 리포트로 제공합니다.",
+  },
+  step4: {
+    title: "입시위치 진단",
+    subtitle: "내신성적과 학생부 기반으로 희망대학 매칭 진단 및 결과를 제시합니다.",
+  },
+} as const;

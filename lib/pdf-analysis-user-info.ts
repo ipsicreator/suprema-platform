@@ -42,7 +42,7 @@ export function mergePdfAnalysisIntoUserInfo(
       unit: subject.unit,
       grade: subject.grade,
       year: subject.year,
-      semester: toParsedSubjectSemester(subject),
+      semester: subject.semester,
       rawScore: subject.rawScore,
       scoreAverage: subject.scoreAverage,
       achievementLevel: subject.achievementLevel,
