@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import FlowShell from "@/app/components/FlowShell";
+import AppFooter from "@/app/components/AppFooter";
 import Step1 from "./Step1";
 import { diagnosisScreenText, diagnosisSteps } from "../content";
 import { UserInfo } from "../../components/UserInfoForm";
@@ -23,6 +24,7 @@ export default function DiagnosisStep1Page() {
       subtitle={diagnosisScreenText.step1.subtitle}
       currentStep={1}
       steps={diagnosisSteps}
+      footer={<AppFooter />}
     >
       <Step1 onNext={handleNext} />
     </FlowShell>

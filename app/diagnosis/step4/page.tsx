@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import FlowShell from "@/app/components/FlowShell";
 import { diagnosisScreenText, diagnosisSteps } from "../content";
 
@@ -33,6 +33,27 @@ type Step3Bundle = {
   careerHint?: string;
   topics?: Step3Topic[];
 };
+
+function readStep4Context() {
+  if (typeof window === "undefined") {
+    return { profile: null as Record<string, unknown> | null, email: "", step3Bundle: null as Step3Bundle | null, savedStep4: null as { email?: string; openId?: string; targets?: UniversityTarget[] } | null };
+  }
+
+  try {
+    const raw = sessionStorage.getItem("suprema_user_info");
+    const step3Raw = sessionStorage.getItem("diagnosis_step3_topics");
+    const step4Raw = sessionStorage.getItem("diagnosis_step4_state");
+    const info = raw ? JSON.parse(raw) : null;
+    return {
+      profile: info || null,
+      email: String(info?.email || ""),
+      step3Bundle: step3Raw ? (JSON.parse(step3Raw) as Step3Bundle) : null,
+      savedStep4: step4Raw ? (JSON.parse(step4Raw) as { email?: string; openId?: string; targets?: UniversityTarget[] }) : null,
+    };
+  } catch {
+    return { profile: null, email: "", step3Bundle: null, savedStep4: null };
+  }
+}
 
 const defaultTargets: UniversityTarget[] = [
   {
@@ -72,29 +93,17 @@ const judgmentStyle: Record<Judgment, string> = {
 };
 
 export default function DiagnosisStep4Page() {
-  const [targets, setTargets] = useState(defaultTargets);
-  const [openId, setOpenId] = useState(defaultTargets[0].id);
-  const [email, setEmail] = useState("");
-  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
-  const [step3Bundle, setStep3Bundle] = useState<Step3Bundle | null>(null);
+  const [initialContext] = useState(() => readStep4Context());
+  const [targets, setTargets] = useState(initialContext.savedStep4?.targets?.length ? initialContext.savedStep4.targets : defaultTargets);
+  const [openId, setOpenId] = useState(initialContext.savedStep4?.openId || (initialContext.savedStep4?.targets?.[0]?.id ?? defaultTargets[0].id));
+  const [email, setEmail] = useState(initialContext.savedStep4?.email || initialContext.email);
+  const [profile] = useState<Record<string, unknown> | null>(initialContext.profile);
+  const [step3Bundle] = useState<Step3Bundle | null>(initialContext.step3Bundle);
   const [mailOpen, setMailOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem("suprema_user_info");
-      const step3Raw = sessionStorage.getItem("diagnosis_step3_topics");
-      const info = raw ? JSON.parse(raw) : null;
-      setProfile(info || null);
-      setEmail(info?.email || "");
-      setStep3Bundle(step3Raw ? JSON.parse(step3Raw) : null);
-    } catch {
-      setProfile(null);
-      setEmail("");
-      setStep3Bundle(null);
-    }
-  }, []);
+  const summary = useMemo(() => summarizeJudgments(targets), [targets]);
 
   const summary = useMemo(() => {
     const count = targets.reduce<Record<Judgment, number>>(
@@ -120,19 +129,26 @@ export default function DiagnosisStep4Page() {
     };
     setTargets((prev) => [...prev, next]);
     setOpenId(next.id);
+    saveStep4State(nextTargets, next.id, email);
   }
 
   function updateTarget(id: string, field: keyof UniversityTarget, value: string) {
-    setTargets((prev) =>
-      prev.map((target) =>
-        target.id === id
-          ? {
-              ...target,
-              [field]: value,
-            }
-          : target,
-      ),
-    );
+    const nextTargets = targets.map((target) => (target.id === id ? { ...target, [field]: value } : target));
+    setTargets(nextTargets);
+    saveStep4State(nextTargets, openId, email);
+  }
+
+  function handleToggleOpen(id: string) {
+    const nextOpenId = openId === id ? "" : id;
+    setOpenId(nextOpenId);
+    saveStep4State(targets, nextOpenId, email);
+  }
+
+  function handleResetTargets() {
+    setTargets(defaultTargets);
+    setOpenId(defaultTargets[0].id);
+    saveStep4State(defaultTargets, defaultTargets[0].id, email);
+    setStatus("4단계 희망대학 목록을 초기값으로 되돌렸습니다.");
   }
 
   async function handleSendMail() {
@@ -150,10 +166,12 @@ export default function DiagnosisStep4Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: trimmed,
-          subject: "[나의 입시멘토] 전체 진단 결과",
+          subject: "[나의 입시멘토] 입시위치진단 결과",
           reportData: {
             service: "나의 입시멘토",
             type: "admission-position-diagnosis",
+            profile,
+            step3Bundle,
             targets,
           },
         }),
@@ -174,6 +192,7 @@ export default function DiagnosisStep4Page() {
       subtitle={diagnosisScreenText.step4.subtitle}
       currentStep={4}
       steps={diagnosisSteps}
+      footer={<AppFooter />}
     >
       <div className="mx-auto max-w-[980px] rounded-[28px] border border-[#eadfce] bg-white p-6 text-left shadow-[0_18px_50px_rgba(44,26,10,0.04)]">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-[#eadfce] bg-[#fffaf4] p-5 print:hidden">

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>학생부 종합 분석 결과보고서 - 유동훈</title>
+<style>
+  body {
+    font-family: 'Malgun Gothic', sans-serif;
+    background-color: #e2e8f0;
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    padding: 20mm;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+    position: relative;
+    color: #0f172a;
+  }
+  h1 { font-size: 2.2rem; margin: 0; color: #0f172a; border-bottom: 3px solid #1e293b; padding-bottom: 1rem; }
+  .subtitle { color: #475569; font-size: 1.1rem; margin-top: 0.5rem; }
+  
+  .header-info { display: flex; justify-content: space-between; margin-bottom: 2rem; margin-top: 1rem; }
+  .header-info div { font-size: 1.1rem; }
+  
+  .section-title {
+    background-color: #1e293b; color: white; padding: 0.5rem 1rem; border-radius: 4px; font-size: 1.2rem; margin-top: 2rem;
+  }
+  
+  .flex-row { display: flex; gap: 2rem; margin-top: 1rem; }
+  .box { flex: 1; padding: 1.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+  .box-green { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .box-red { background: #fff1f2; border: 1px solid #fecdd3; }
+  
+  table { width: 100%; border-collapse: collapse; text-align: center; margin-top: 0.5rem; }
+  th, td { padding: 0.5rem; border: 1px solid #cbd5e1; }
+  th { background: #e2e8f0; }
+  .highlight-grade { color: #2563eb; font-weight: bold; }
+  
+  .big-score { font-size: 3rem; font-weight: bold; color: #0f172a; margin-top: 0.5rem; }
+  
+  .keyword { padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; border-radius: 20px; font-weight: bold; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem;}
+  
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; }
+  h4 { color: #475569; margin: 0 0 0.5rem 0; font-size: 1.1rem; border-left: 3px solid #3b82f6; padding-left: 0.5rem;}
+  p { margin: 0; line-height: 1.6; font-size: 0.95rem; }
+  
+  .univ-row { display: flex; justify-content: space-between; padding: 0.6rem; border-bottom: 1px solid #e2e8f0; }
+  .status-safe { color: #16a34a; font-weight: bold; }
+  .status-fit { color: #2563eb; font-weight: bold; }
+  .status-stretch { color: #d97706; font-weight: bold; }
+  .status-danger { color: #dc2626; font-weight: bold; }
+  
+  @media print {
+    body { background: white; padding: 0; }
+    .a4-page { box-shadow: none; padding: 0; width: 100%; min-height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="a4-page">
+  <div style="border-bottom: 3px solid #1e293b; padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+      <h1 style="border: none; padding: 0;">학생부 종합 분석 결과보고서</h1>
+      <div class="subtitle">수프리마 AI 입시 진단 플랫폼</div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 1.3rem; font-weight: bold;">지원자: 유동훈</div>
+      <div style="color: #475569;">발곡고등학교 | 융합/자유전공 계열</div>
+    </div>
+  </div>
+
+  <div class="section-title">[1차 평가] 교과 성적 및 학업 역량 진단</div>
+  <div class="flex-row">
+    <div class="box">
+      <h3 style="margin-top:0;">교과 석차 등급 분석</h3>
+      <table>
+        <tr><th>과목</th><th>단위수</th><th>등급</th></tr>
+        <tr><td>국어</td><td>4</td><td>3</td></tr>
+        <tr><td>수학</td><td>4</td><td class="highlight-grade">2</td></tr>
+        <tr><td>영어</td><td>4</td><td>3</td></tr>
+        <tr><td>한국사</td><td>3</td><td>2</td></tr>
+        <tr><td>사회</td><td>4</td><td>2</td></tr>
+        <tr><td>과학</td><td>4</td><td class="highlight-grade">2</td></tr>
+      </table>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="box" style="flex: 1;">
+        <h3 style="margin-top:0;">산출 내신 (GPA)</h3>
+        <div class="big-score">2.35</div>
+      </div>
+      <div class="box box-green" style="flex: 2;">
+        <h3 style="margin-top:0; color: #166534;">학업 역량 총평</h3>
+        <p style="color: #14532d;">전반적으로 2~3등급대의 안정적인 성적을 유지하고 있으며, 특히 수학과 과학 교과에서의 성취도가 돋보입니다. 이는 융합 계열 및 자연과학 기반 전공으로의 진학에 매우 긍정적인 지표로 작용합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top: 2.5rem;">[2차 평가] 비교과 심층 분석 (창체/세특)</div>
+  <div class="box" style="background: white; margin-top: 1rem;">
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="margin-top:0;">생기부 핵심 역량 키워드</h3>
+      <span class="keyword">#학업성실성</span>
+      <span class="keyword">#발곡고</span>
+      <span class="keyword">#융합사고력</span>
+      <span class="keyword">#자기주도학습</span>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h4>자율 활동</h4>
+        <p>학급 및 학교 행사에 적극적으로 참여하며, 공동체 의식과 리더십을 발휘한 경험이 다수 관찰됩니다.</p>
+      </div>
+      <div>
+        <h4>동아리 활동</h4>
+        <p>관심 분야에 대한 깊이 있는 탐구를 진행하였으며, 실제 결과물을 도출해내는 실행력이 매우 우수합니다.</p>
+      </div>
+      <div>
+        <h4>진로 활동</h4>
+        <p>다양한 진로 탐색 활동을 통해 본인의 적성과 흥미를 구체화해 나가는 과정이 생기부에 뚜렷하게 잘 드러나 있습니다.</p>
+      </div>
+      <div>
+        <h4 style="border-left-color: #be123c; color: #be123c;">세특 요약 및 융합 평가</h4>
+        <p style="font-weight: bold;">융합적 사고를 요구하는 수행평가에서의 활약이 학생부종합전형 경쟁력을 충분히 뒷받침합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top: 2.5rem;">[3차 평가] 목표 대학 진단 및 최종 컨설팅 판정</div>
+  <div class="flex-row">
+    <div class="box">
+      <h3 style="margin-top:0;">입시 위치 진단 (6개 대학)</h3>
+      <div class="univ-row"><span>A대학교 (자유전공학부)</span><span class="status-safe">안정</span></div>
+      <div class="univ-row"><span>B대학교 (융합인재학부)</span><span class="status-fit">적정</span></div>
+      <div class="univ-row"><span>C대학교 (인공지능학과)</span><span class="status-fit">적정</span></div>
+      <div class="univ-row"><span>D대학교 (자유전공)</span><span class="status-stretch">소신</span></div>
+      <div class="univ-row"><span>E대학교 (응용과학부)</span><span class="status-stretch">소신</span></div>
+      <div class="univ-row" style="border:none;"><span>F대학교 (데이터과학부)</span><span class="status-danger">위험</span></div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="box">
+        <h3 style="margin-top:0;">전공 적합성</h3>
+        <div class="big-score" style="color: #0284c7; font-size: 2.5rem;">A등급 (우수)</div>
+      </div>
+      <div class="box box-red" style="flex: 1;">
+        <h3 style="margin-top:0; color: #be123c;">최종 컨설팅 종합 의견</h3>
+        <p style="color: #881337; font-weight: bold; font-size: 1.05rem;">"성실함과 발전 가능성을 두루 갖춘 인재로, 학종 진단 시 인서울 중위권 이상 대학에 안정적인 지원이 가능합니다. 2차 평가의 동아리 활동 실행력을 강조하십시오."</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

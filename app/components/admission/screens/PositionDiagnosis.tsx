@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Compass, Printer, Save, CheckCircle2, Search, Filter } from 'lucide-react';
+import { readDiagnosisSessionSnapshot } from '@/lib/diagnosis-session';
 import { parseGpaTextToNumber } from '../../../../lib/utils/admission/admissionLines';
 import AdmissionOfficerEvaluation from '../AdmissionOfficerEvaluation';
 import { ADMISSION_DATA } from '../data';
@@ -8,6 +9,19 @@ import { ADMISSION_DATA } from '../data';
 interface PositionDiagnosisProps {
   onBack?: () => void;
   studentData?: { id: string; name: string } | null;
+}
+
+function formatLineBreakText(value?: string | null) {
+  if (!value) return '-';
+  return value
+    .split(/\r?\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(' / ');
+}
+
+function formatCompetition(value?: number | null) {
+  return typeof value === 'number' && Number.isFinite(value) ? `${value.toFixed(2)}:1` : '-';
 }
 
 export default function PositionDiagnosis({ onBack, studentData }: PositionDiagnosisProps) {
@@ -22,9 +36,13 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
   const [isSaved, setIsSaved] = useState(false);
 
   const parsedGpa = useMemo(() => {
-    if (!studentData?.id) return null;
-    const savedInfo = JSON.parse(localStorage.getItem(`student_info_${studentData.id}`) || '{}');
-    return savedInfo.gpa ? parseGpaTextToNumber(savedInfo.gpa) : null;
+    const sessionInfo = readDiagnosisSessionSnapshot().userInfo;
+    if (studentData?.id) {
+      const savedInfo = JSON.parse(localStorage.getItem(`student_info_${studentData.id}`) || '{}');
+      if (savedInfo.gpa) return parseGpaTextToNumber(savedInfo.gpa);
+    }
+    if (sessionInfo?.studentIndex) return Number(sessionInfo.studentIndex);
+    return null;
   }, [studentData]);
 
   // Cascading filters
@@ -87,7 +105,7 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
           )}
           <div>
             <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Compass size={24} color="#3b82f6" /> 입시위치 진단
+              <Compass size={24} color="#3b82f6" /> 입시위치진단
             </h1>
             <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.95rem' }}>
               {studentData ? `${studentData.name} 학생의 내신(${parsedGpa || '없음'})을 기준으로 합격 가능성을 진단합니다.` : '2027학년도 수시전형 입결 데이터를 조건별로 검색합니다.'}
@@ -189,10 +207,20 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>모집단위명</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>전형유형</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>전형명</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>최저학력기준</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>전형방법</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>필요서류</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>복수지원</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1', color: '#4f46e5' }}>26컷</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>25컷</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>24컷</th>
-                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>수능최저/비고</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>지원자격</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>학년별 반영비율</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>반영과목</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>진로선택과목</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>26경쟁률</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>입시결과등급/경쟁률</th>
+                <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>주의사항</th>
                 <th style={{ padding: '0.75rem', borderBottom: '2px solid #cbd5e1' }}>내신격차(진단)</th>
               </tr>
             </thead>
@@ -229,10 +257,42 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
                       </span>
                     </td>
                     <td style={{ padding: '0.75rem', color: '#475569' }}>{row.name}</td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#334155', minWidth: '180px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.minRequirement)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#334155', minWidth: '220px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.method)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '180px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.documents)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '140px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.duplicateSupport)}
+                    </td>
                     <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#4f46e5' }}>{row.cutoff26 ? row.cutoff26.toFixed(2) : '-'}</td>
                     <td style={{ padding: '0.75rem', color: '#64748b' }}>{row.cutoff25 ? row.cutoff25.toFixed(2) : '-'}</td>
                     <td style={{ padding: '0.75rem', color: '#64748b' }}>{row.cutoff24 ? row.cutoff24.toFixed(2) : '-'}</td>
-                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={row.req}>{row.req || '-'}</td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '220px', lineHeight: 1.45 }} title={row.req}>
+                      {formatLineBreakText(row.req)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '160px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.gradeRatio)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '180px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.subjects)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '180px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.careerSelectionSubjects)}
+                    </td>
+                    <td style={{ padding: '0.75rem', color: '#475569', fontWeight: 700 }}>
+                      {formatCompetition(row.competition26)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '180px', lineHeight: 1.45 }}>
+                      {formatLineBreakText(row.resultGradeCompetition)}
+                    </td>
+                    <td style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', minWidth: '240px', lineHeight: 1.45 }} title={row.supportNotes || row.remarks || row.reference26}>
+                      {formatLineBreakText(row.supportNotes || row.remarks || row.reference26)}
+                    </td>
                     <td style={{ padding: '0.75rem', fontWeight: 600, color: gapColor }}>{gapMsg}</td>
                   </tr>
                 );

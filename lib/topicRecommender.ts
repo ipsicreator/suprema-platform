@@ -14,6 +14,19 @@ interface TopicBank {
   [subject: string]: Topic[];
 }
 
+interface UniversityMajorGuide {
+  recommended_subjects: string[];
+}
+
+interface UniversityGuide {
+  focus: string[];
+  majors: Record<string, UniversityMajorGuide>;
+}
+
+interface UniversityGuides {
+  universities: Record<string, UniversityGuide>;
+}
+
 let topicBank: TopicBank | null = null;
 
 function loadTopicBank(): TopicBank {
@@ -36,14 +49,14 @@ function normalizeTokens(text: string): string[] {
     .filter((t) => t.length > 1);
 }
 
-let universityGuides: any = null;
+let universityGuides: UniversityGuides | null = null;
 
-function loadUniversityGuides(): any {
+function loadUniversityGuides(): UniversityGuides {
   if (universityGuides) return universityGuides;
   try {
     const dataPath = path.join(process.cwd(), 'data', 'university_guides.json');
     const data = fs.readFileSync(dataPath, 'utf-8');
-    universityGuides = JSON.parse(data);
+    universityGuides = JSON.parse(data) as UniversityGuides;
     return universityGuides;
   } catch (error) {
     console.error('Failed to load university guides:', error);
@@ -83,7 +96,6 @@ function calculateRelevanceScore(
   // 2. University/Major Goal Linkage
   if (targetGoal) {
     let bestUnivMatch = "";
-    let bestMajorMatch = "";
 
     // Find university and major from targetGoal string (e.g., "서울대 컴공")
     for (const univName of Object.keys(guides.universities)) {
@@ -96,16 +108,15 @@ function calculateRelevanceScore(
     if (bestUnivMatch) {
       const univData = guides.universities[bestUnivMatch];
       // Evaluation Focus Match
-      univData.focus.forEach((f: string) => {
+      univData.focus.forEach((f) => {
         if (corpus.includes(f.toLowerCase())) score += 30;
       });
 
       // Major-specific Recommended Subjects Match
       for (const major of Object.keys(univData.majors)) {
         if (targetGoal.includes(major.substring(0, 2))) {
-          bestMajorMatch = major;
           const recSubjects = univData.majors[major].recommended_subjects;
-          const matchedSubjects = recSubjects.filter((s: string) => corpus.includes(s.toLowerCase()));
+          const matchedSubjects = recSubjects.filter((s) => corpus.includes(s.toLowerCase()));
           score += matchedSubjects.length * 20;
           if (matchedSubjects.length > 0) {
             tip = `[${bestUnivMatch} ${major}] 권장 과목(${matchedSubjects.join(', ')}) 역량을 강조하기 좋습니다.`;

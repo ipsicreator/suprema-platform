@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>수프리마 AI 솔루션 플랫폼</title>
+  <style>
+    :root {
+      --bg-color: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --accent: #1d4ed8;
+      --accent-hover: #1e40af;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg-color);
+      font-family: "Pretendard", "Noto Sans KR", sans-serif;
+      color: var(--text-primary);
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 50px 0;
+    }
+
+    .tablet-frame {
+      width: 1200px;
+      min-height: 1000px;
+      position: relative;
+      background: white;
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      box-shadow: 0 40px 100px rgba(15, 23, 42, 0.1);
+      overflow: hidden;
+      padding-bottom: 250px;
+    }
+
+    .top-header {
+      padding: 40px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-img { height: 50px; }
+
+    .top-btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: #f8fafc;
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .top-btn:hover { background: #e2e8f0; color: var(--accent); }
+
+    .hero {
+      padding: 60px 60px;
+      text-align: center;
+    }
+
+    .brand-title {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 24px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 50px;
+    }
+
+    /* Vibeon Style 4-Step Process */
+    .process-container {
+      max-width: 1000px;
+      margin: 60px auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .process-card {
+      background: #f8fafc;
+      padding: 40px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      position: relative;
+      transition: all 0.3s;
+    }
+    .process-card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(29, 78, 216, 0.05); }
+
+    .process-num {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      margin: 0 auto 20px;
+    }
+
+    .process-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+    .process-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+    .main-cta-area {
+      margin: 80px 0;
+    }
+
+    .main-cta-btn {
+      padding: 24px 100px;
+      background: var(--accent);
+      color: white;
+      font-size: 32px;
+      font-weight: 900;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 20px 50px rgba(29, 78, 216, 0.2);
+      transition: all 0.3s;
+      letter-spacing: -0.02em;
+    }
+    .main-cta-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(29, 78, 216, 0.3);
+      background: var(--accent-hover);
+    }
+
+    .prep-guide {
+      max-width: 800px;
+      margin: 40px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      background: #f1f5f9;
+      padding: 30px;
+      border-radius: 20px;
+    }
+
+    .prep-item { display: flex; align-items: center; gap: 20px; text-align: left; }
+    .prep-icon { font-size: 32px; width: 60px; height: 60px; background: white; display: grid; place-items: center; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .prep-text strong { display: block; font-size: 18px; color: var(--accent); margin-bottom: 4px; }
+    .prep-text p { margin: 0; font-size: 14px; color: var(--text-secondary); }
+
+    footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 250px;
+      background: #0f172a;
+      color: white;
+      padding: 50px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .footer-left h4 { font-size: 20px; font-weight: 900; color: #3b82f6; margin-bottom: 20px; }
+    .footer-left p { font-size: 14px; color: #94a3b8; line-height: 1.8; }
+    .footer-right { text-align: right; }
+    .footer-right img { height: 60px; opacity: 0.8; margin-bottom: 20px; }
+    .footer-right .copy { font-size: 12px; color: #475569; }
+
+  </style>
+</head>
+
+<body>
+  <main class="tablet-frame">
+    <header class="top-header">
+      <img class="logo-img" src="/suprema-logo.png" alt="Su·Prima Logo" />
+      <button class="top-btn" onclick="window.parent.location.href='/introduction'">센터 소개</button>
+    </header>
+
+    <section class="hero">
+      <h1 class="brand-title">Su·Prima AI 진단 플랫폼</h1>
+      <p>대치 수프리마 입시&코칭센터의 압도적인 데이터 솔루션</p>
+
+      <!-- Step Flow (Vibeon Style) -->
+      <div class="process-container">
+        <div class="process-card">
+          <div class="process-num">1</div>
+          <h3>기본 정보 입력</h3>
+          <p>학년, 계열, 목표 대학 등<br>기초 입시 데이터를 입력합니다.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">2</div>
+          <h3>학생부 정밀 분석</h3>
+          <p>AI가 학생부의 핵심 역량과<br>학업 성취도를 수치화합니다.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">3</div>
+          <h3>탐구주제 제안</h3>
+          <p>분석 결과를 바탕으로 한<br>개인 맞춤형 심화 탐구를 추천합니다.</p>
+        </div>
+        <div class="process-card">
+          <div class="process-num">4</div>
+          <h3>종합 리포트</h3>
+          <p>대학별 합격 가능성과<br>최종 전략 보고서를 발행합니다.</p>
+        </div>
+      </div>
+
+      <div class="prep-guide">
+        <div class="prep-item">
+          <div class="prep-icon">📄</div>
+          <div class="prep-text">
+            <strong>준비물</strong>
+            <p>학교생활기록부 (PDF/이미지)</p>
+          </div>
+        </div>
+        <div class="prep-item">
+          <div class="prep-icon">🎯</div>
+          <div class="prep-text">
+            <strong>목표 대학</strong>
+            <p>희망 학과 및 전형 리스트</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-cta-area">
+        <button class="main-cta-btn" onclick="window.parent.location.href='/diagnosis'">진단 시작하기 ➜</button>
+        <p style="margin-top: 30px; font-size: 16px; color: var(--text-secondary);">
+          * 소셜 로그인 없이 바로 이용 가능하며, 데이터는 안전하게 보호됩니다.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-left">
+        <h4>대치수프리마 입시&코칭센터</h4>
+        <p>
+          대표 : 이기욱 대표컨설턴트 | 연락처 : 010-2370-1077(문자전송)<br>
+          소재지 : 서울시 강남구 테헤란로 326 B1F<br>
+          공식 홈페이지 : band.us/@suprima | blog.naver.com/gouniv_hifive
+        </p>
+      </div>
+      <div class="footer-right">
+        <img src="/suprema-logo.png" alt="Logo" style="filter: brightness(0) invert(1);" />
+        <div class="copy">© 2025 Suprima Admission & Coaching Center. All rights reserved.</div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    (function() {
+      const unlock = (el) => {
+        if (!el || !el.style) return;
+        el.style.userSelect = 'text';
+        el.style.webkitUserSelect = 'text';
+        if (el.oncopy) el.oncopy = null;
+        if (el.onpaste) el.onpaste = null;
+        if (el.oncontextmenu) el.oncontextmenu = null;
+        if (el.onselectstart) el.onselectstart = null;
+      };
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach(node => { if (node.nodeType === 1) { unlock(node); node.querySelectorAll('*').forEach(unlock); } });
+          if (mutation.type === 'attributes') unlock(mutation.target);
+        });
+      });
+      observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
+      document.querySelectorAll('*').forEach(unlock);
+      const allow = (e) => { e.stopImmediatePropagation(); return true; };
+      window.addEventListener('copy', allow, true);
+      window.addEventListener('paste', allow, true);
+      window.addEventListener('contextmenu', allow, true);
+      window.addEventListener('selectstart', allow, true);
+    })();
+  </script>
+</body>
+</html>

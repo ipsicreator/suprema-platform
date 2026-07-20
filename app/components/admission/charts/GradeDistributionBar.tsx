@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import type { ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface GradeDistributionBarProps {
   distribution: { A: number; B: number; C: number; n: number };
@@ -21,7 +22,7 @@ export default function GradeDistributionBar({ distribution, subjectName }: Grad
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-          <Tooltip formatter={(value: any) => [`${value}%`, '鍮꾩쑉']} cursor={{fill: '#f1f5f9'}} />
+          <Tooltip formatter={(value: ValueType | undefined) => [`${String(value ?? 0)}%`, '비율']} cursor={{ fill: '#f1f5f9' }} />
           <Bar dataKey="value" fill="#3b82f6" name={`${subjectName} (n=${distribution.n})`} />
         </BarChart>
       </ResponsiveContainer>

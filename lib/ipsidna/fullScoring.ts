@@ -1,4 +1,4 @@
-import type { FullChoice, FullDimension, FullQuestion } from "./fullQuestions";
+import type { FullChoice, FullDimension } from "./fullQuestions";
 import { FULL_QUESTIONS_24 } from "./fullQuestions";
 
 export type FullAnswers = Record<string, FullChoice>;
