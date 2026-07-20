@@ -33,7 +33,7 @@ export default function IntroPage() {
           탐구·세특·입시위치진단을 하나의 흐름으로 제공합니다. 첫 화면에서 전체 흐름을 보여주고, 아래 단계로 바로 이동할 수 있습니다.
         </p>
         <div className="intro-actions">
-          <Link href="/process" className="primary-btn">
+          <Link href="/diagnosis" className="primary-btn">
             전체 흐름 보기
           </Link>
           <Link href="/diagnosis" className="ghost-btn">
