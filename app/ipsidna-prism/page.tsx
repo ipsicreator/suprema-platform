@@ -8,7 +8,7 @@ export default function IpsiDnaPrismLanding() {
     <main className={styles.page}>
       <header className={styles.header}>
         <div className={styles.brandRow}>
-          <img className={styles.logo} src="/suprema-logo.png" alt="대치수프리마" />
+          <img className={styles.logo} src="/suprema-logo.svg" alt="대치수프리마" />
           <div className={styles.brandText}>대치수프리마</div>
         </div>
       </header>

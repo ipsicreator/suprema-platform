@@ -82,7 +82,7 @@ export default function ReportPage() {
             </Link>
             <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
               <Image 
-                src="/suprema-logo.png" 
+                src="/suprema-logo.svg" 
                 alt="대치 수프리마 Su-Prima" 
                 width={140} 
                 height={38} 

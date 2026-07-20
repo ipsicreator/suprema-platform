@@ -87,7 +87,7 @@ export default function SetukPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #ECE0D1", paddingBottom: "12px", marginBottom: "16px" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <Image 
-              src="/suprema-logo.png" 
+              src="/suprema-logo.svg" 
               alt="대치 수프리마 Su-Prima 입시&코칭 센터" 
               width={160} 
               height={44} 

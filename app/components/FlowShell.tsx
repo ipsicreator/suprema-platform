@@ -34,7 +34,7 @@ export default function FlowShell({
         <header className="grid grid-cols-[1fr_auto_1fr] items-start gap-4 px-6 pt-6 md:px-8 md:pt-7">
           <Link href="/" className="shrink-0">
             <Image
-              src="/suprema-logo.png"
+              src="/suprema-logo.svg"
               alt="대치 수프리마"
               width={160}
               height={48}
