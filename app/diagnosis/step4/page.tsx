@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import FlowShell from "@/app/components/FlowShell";
+import { diagnosisScreenText } from "@/app/diagnosis/content";
 import { diagnosisSteps } from "../steps";
 
 type Judgment = "하향" | "안정" | "도전" | "불가";
@@ -170,8 +171,8 @@ export default function DiagnosisStep4Page() {
   return (
     <FlowShell
       badge="PREMIUM DIAGNOSIS"
-      title="입시위치 진단"
-      subtitle="학생이 직접 선택한 희망대학 기준으로 성적과 학생부를 연결해 진단 결과를 제시합니다."
+      title={diagnosisScreenText.step4.title}
+      subtitle={diagnosisScreenText.step4.subtitle}
       currentStep={4}
       steps={diagnosisSteps}
     >

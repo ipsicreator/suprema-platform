@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { buildTextSvg, diagnosisContent } from "@/app/diagnosis/content";
 
 export type FlowStep = {
   no: string;
@@ -20,10 +21,10 @@ type FlowShellProps = {
 };
 
 export default function FlowShell({
-  badge = "PREMIUM DIAGNOSIS",
+  badge = diagnosisContent.badge,
   title,
   subtitle,
-  steps = [],
+  steps = diagnosisContent.steps,
   currentStep = 1,
   footer,
   children,
@@ -35,19 +36,40 @@ export default function FlowShell({
           <Link href="/" className="shrink-0">
             <Image
               src="/suprema-logo.svg"
-              alt="대치 수프리마"
+              alt="수프리마"
               width={160}
               height={48}
               priority
               className="h-11 w-auto object-contain"
             />
           </Link>
-          <div className="pt-2 text-left leading-tight text-[#1a0f08]" spellCheck={false}>
-            <div className="text-[15px] font-black tracking-[-0.03em]">나의 입시멘토</div>
-            <div className="text-[22px] font-black tracking-[-0.02em]">탐구·세특 입시위치진단</div>
+          <div className="pt-2 text-left leading-tight" spellCheck={false}>
+            <Image
+              src={buildTextSvg("나의 입시멘토")}
+              alt="나의 입시멘토"
+              width={280}
+              height={40}
+              unoptimized
+              className="h-7 w-auto"
+            />
+            <Image
+              src={buildTextSvg("탐구·세특 입시위치진단")}
+              alt="탐구 세특 입시위치진단"
+              width={360}
+              height={40}
+              unoptimized
+              className="mt-1 h-7 w-auto"
+            />
           </div>
-          <div className="justify-self-end pt-2 text-[11px] font-bold uppercase tracking-[0.34em] text-[#a7adb8]">
-            {badge}
+          <div className="justify-self-end pt-2">
+            <Image
+              src={buildTextSvg(badge)}
+              alt={badge}
+              width={240}
+              height={36}
+              unoptimized
+              className="h-7 w-auto"
+            />
           </div>
         </header>
 
@@ -70,13 +92,27 @@ export default function FlowShell({
                       >
                         {step.no}
                       </div>
-                      <span className={`mt-3 text-sm font-semibold ${active ? "text-[#8b1a1a]" : "text-[#6f7480]"}`}>
-                        {step.title}
-                      </span>
+                      <div className="mt-3">
+                        <Image
+                          src={buildTextSvg(step.title)}
+                          alt={step.title}
+                          width={220}
+                          height={32}
+                          unoptimized
+                          className="h-6 w-auto"
+                        />
+                      </div>
                       {step.description ? (
-                        <span className="mt-1 max-w-[13rem] text-[11px] leading-5 text-[#9ca3af]">
-                          {step.description}
-                        </span>
+                        <div className="mt-1 max-w-[13rem]">
+                          <Image
+                            src={buildTextSvg(step.description)}
+                            alt={step.description}
+                            width={240}
+                            height={40}
+                            unoptimized
+                            className="h-8 w-auto"
+                          />
+                        </div>
                       ) : null}
                     </li>
                   );
@@ -87,12 +123,24 @@ export default function FlowShell({
         ) : null}
 
         <section className="px-6 pt-8 text-center md:px-8 md:pt-10">
-          <h1 className="text-[clamp(2rem,4vw,3.2rem)] font-black tracking-[-0.06em] text-[#1a0f08]">
-            {title}
-          </h1>
-          <p className="mx-auto mt-4 max-w-3xl text-[15px] font-semibold leading-7 text-[#5f5549] md:text-[16px]">
-            {subtitle}
-          </p>
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-3">
+            <Image
+              src={buildTextSvg(title)}
+              alt={title}
+              width={980}
+              height={120}
+              unoptimized
+              className="h-auto w-full"
+            />
+            <Image
+              src={buildTextSvg(subtitle)}
+              alt={subtitle}
+              width={980}
+              height={80}
+              unoptimized
+              className="h-auto w-full"
+            />
+          </div>
         </section>
 
         <section className="px-6 pt-8 pb-6 md:px-8 md:pt-10 md:pb-8">{children}</section>

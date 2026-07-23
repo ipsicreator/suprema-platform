@@ -20,6 +20,7 @@ import {
   YAxis,
 } from "recharts";
 import FlowShell from "@/app/components/FlowShell";
+import { diagnosisScreenText } from "@/app/diagnosis/content";
 import { toStudentRecordReportData } from "@/lib/report-data";
 import { buildStudentRecordMappingRows } from "@/lib/student-record-mapping";
 import type { UserInfo } from "@/lib/user-info";
@@ -163,8 +164,8 @@ export default function DiagnosisStep2Page() {
   return (
     <FlowShell
       badge="PREMIUM DIAGNOSIS"
-      title="학생부 분석"
-      subtitle="학생부 상세 분석결과를 리포트로 제공합니다."
+      title={diagnosisScreenText.step2.title}
+      subtitle={diagnosisScreenText.step2.subtitle}
       currentStep={2}
       steps={diagnosisSteps}
     >

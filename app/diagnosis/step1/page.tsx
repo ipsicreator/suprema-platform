@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import FlowShell from "@/app/components/FlowShell";
+import { diagnosisScreenText } from "@/app/diagnosis/content";
 import Step1 from "./Step1";
 import { diagnosisSteps } from "../steps";
 import { UserInfo } from "../../components/UserInfoForm";
@@ -19,8 +20,8 @@ export default function DiagnosisStep1Page() {
   return (
     <FlowShell
       badge="PREMIUM DIAGNOSIS"
-      title="진단정보입력"
-      subtitle="정밀한 진단과 리포트 발송을 위해 모든 정보를 정확히 입력해주세요."
+      title={diagnosisScreenText.step1.title}
+      subtitle={diagnosisScreenText.step1.subtitle}
       currentStep={1}
       steps={diagnosisSteps}
     >
