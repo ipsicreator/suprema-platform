@@ -36,7 +36,7 @@ type DiagnosisRequestBody = {
   gradingSystem?: string;
 };
 
-const cachedAdmissionData = admissionData as AdmissionDataRow[];
+const cachedAdmissionData = admissionData as unknown as AdmissionDataRow[];
 
 function generateHash(data: unknown) {
   return crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');

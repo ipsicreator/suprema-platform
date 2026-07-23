@@ -224,8 +224,8 @@ export default function PositionDiagnosis({ onBack, studentData }: PositionDiagn
                     <td style={{ padding: '0.75rem', color: '#475569' }}>{row.track}</td>
                     <td style={{ padding: '0.75rem', color: '#334155' }}>{row.dept}</td>
                     <td style={{ padding: '0.75rem' }}>
-                      <span style={{ padding: '0.25rem 0.5rem', backgroundColor: row.type.includes('종합') ? '#dbeafe' : '#f1f5f9', color: row.type.includes('종합') ? '#1d4ed8' : '#475569', borderRadius: '0.25rem', fontSize: '0.8rem' }}>
-                        {row.type}
+                      <span style={{ padding: '0.25rem 0.5rem', backgroundColor: String(row.type || '').includes('종합') ? '#dbeafe' : '#f1f5f9', color: String(row.type || '').includes('종합') ? '#1d4ed8' : '#475569', borderRadius: '0.25rem', fontSize: '0.8rem' }}>
+                        {row.type || '-'}
                       </span>
                     </td>
                     <td style={{ padding: '0.75rem', color: '#475569' }}>{row.name}</td>

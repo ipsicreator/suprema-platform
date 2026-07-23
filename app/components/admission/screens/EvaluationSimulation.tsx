@@ -119,7 +119,7 @@ export default function EvaluationSimulation({ onBack, studentData }: Evaluation
   const matchingTargets = useMemo(() => {
     return ADMISSION_DATA.filter((admission) => {
       const cutoff = admission.cutoff26 ?? admission.cutoff25 ?? admission.cutoff24;
-      return admission.univ.includes(selectedUniv.name) && cutoff !== null;
+      return String(admission.univ || '').includes(selectedUniv.name) && cutoff !== null;
     });
   }, [selectedUniv.name]);
 

@@ -14,4 +14,4 @@ export type AdmissionRow = {
   req: string;
 };
 
-export const ADMISSION_DATA = admissionData as AdmissionRow[];
+export const ADMISSION_DATA = admissionData as unknown as AdmissionRow[];
